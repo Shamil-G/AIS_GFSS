@@ -90,6 +90,7 @@ def view_get_report(rep_number):
     global list_reports
     global list_params
     if not list_reports:
+        log.info(f"GET_REPORT. LIST_REPORTS is NULL")
         return redirect(url_for('view_root'))
     rep_num = str(rep_number).zfill(2)
     session['rep_code'] = rep_num
@@ -103,9 +104,10 @@ def view_get_report(rep_number):
 
 
 @app.route('/edit_params', methods=['GET', 'POST'])
-def f_edit_params():
+def view_edit_params():
     global list_params
     if not list_params:
+        log.info(f"EDIT_PARAMS. LIST+PARAMS is NULL")
         return redirect(url_for('view_root'))
 
     new_params = {}
