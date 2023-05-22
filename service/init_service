@@ -1,0 +1,9 @@
+systemctl get-default
+systemctl daemon-reload
+systemctl enable /home/ais_gfss/AIS_GFSS/service/ais.service
+systemctl stop ais
+systemctl start ais
+systemctl status -l ais
+
+firewall-cmd --add-port=8080/tcp --permanent
+firewall-cmd --reload

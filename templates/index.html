@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ res_value('SELECT_DEP') }}
+{% endblock %}
+
+{% block main_title %}
+{{ res_value('SELECT_DEP') }}
+{% endblock %}
+
+
+{% block navigate %}
+   {% for el in owner_cursor %}
+        <!--<form class="form_model_list">-->
+            <a class="title2" href="/dep/{{el.dep_name}}">{{ el.dep_name }}</a>
+        <!--</form>-->
+   {% endfor %}
+{% endblock %}
+
+{% block body %}
+<div class="forms_model_list">
+    {% for el in cursor %}
+    <form class="form_model_list">
+        <p class="title2" href="/dep/{{el.dep_name}}">{{ el.dep_name }}</p>
+    </form>
+    {% endfor %}
+
+</div>
+{% endblock %}

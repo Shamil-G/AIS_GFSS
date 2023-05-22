@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ res_value('SELECT_GROUP') }}
+{% endblock %}
+
+{% block main_title %}
+<a href="/" styles="color: green">. .</a>-><a href="/dep/{{ session['dep_name'] }}">{{ session['dep_name'] }}</a>
+{% endblock %}
+
+
+{% block navigate %}
+    <a href="/">{{ res_value('RETURN') }}</a>
+{% endblock %}
+
+{% block body %}
+    {% for el in cursor %}
+<groups>
+    <a class="title2" href="/list_reports/{{el.grp}}">{{ el.grp }}</a>
+</groups>
+    {% endfor %}
+{% endblock %}

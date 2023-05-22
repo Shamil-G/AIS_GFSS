@@ -1,0 +1,33 @@
+.form_parms {
+    grid-gap: 4px;
+    padding: 30px;
+    margin: auto;
+    border-radius: 5px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+
+.form_parms > input:hover {
+    background: #f5f5b8;
+    color: brown;
+}
+
+.form_parms > label {
+    display: flex;
+}
+
+input[name="edit_parms"]{
+ margin-top: 25px;
+ padding: 5px;
+ color: green;
+ font-weight: bold;
+}
+
+input[type="date"]{
+ padding: 4px;
+}
+
+.form_parms > input {
+    border-radius: 4px;
+    background: #f5f5d8;
+}
+

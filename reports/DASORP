@@ -1,0 +1,54 @@
+select b.ID, b.CITY_NAME, b.BIN, b.NAME_POS, b.FORM, b.ADDRESS, 
+       sum(jAN_SUM), SUM(JAN_COUNT), 
+       sum(FEB_SUM), SUM(FEB_COUNT),
+       sum(MAR_SUM), SUM(MAR_COUNT),
+       sum(APR_SUM), SUM(APR_COUNT),
+       sum(MAY_SUM), SUM(MAY_COUNT),
+       sum(JUN_SUM), SUM(JUN_COUNT),
+       sum(JUL_SUM), SUM(JUL_COUNT),
+       sum(AUG_SUM), SUM(AUG_COUNT),
+       sum(SEP_SUM), SUM(SEP_COUNT),
+       sum(OCT_SUM), SUM(OCT_COUNT),
+       sum(NOV_SUM), SUM(NOV_COUNT),
+       sum(DEC_SUM), SUM(DEC_COUNT)
+from (       
+select a.ID, a.CITY_NAME, a.BIN, a.NAME_POS, a.FORM, a.ADDRESS,
+        case when a.pay_date between to_date('01.01.2022','dd.mm.yyyy') and to_date('31.01.2022','dd.mm.yyyy') then a.sum_all else 0 end jan_sum,
+        case when a.pay_date between to_date('01.01.2022','dd.mm.yyyy') and to_date('31.01.2022','dd.mm.yyyy') then a.count_sicid else 0 end jan_count,
+        case when a.pay_date between to_date('01.02.2022','dd.mm.yyyy') and to_date('28.02.2022','dd.mm.yyyy') then a.sum_all else 0 end feb_sum,
+        case when a.pay_date between to_date('01.02.2022','dd.mm.yyyy') and to_date('28.02.2022','dd.mm.yyyy') then a.count_sicid else null end feb_count,
+        case when a.pay_date between to_date('01.03.2022','dd.mm.yyyy') and to_date('31.03.2022','dd.mm.yyyy') then a.sum_all else 0 end mar_sum,
+        case when a.pay_date between to_date('01.03.2022','dd.mm.yyyy') and to_date('31.03.2022','dd.mm.yyyy') then a.count_sicid else null end mar_count,
+        case when a.pay_date between to_date('01.04.2022','dd.mm.yyyy') and to_date('30.04.2022','dd.mm.yyyy') then a.sum_all else 0 end apr_sum,
+        case when a.pay_date between to_date('01.04.2022','dd.mm.yyyy') and to_date('30.04.2022','dd.mm.yyyy') then a.count_sicid else null end apr_count,
+        case when a.pay_date between to_date('01.05.2022','dd.mm.yyyy') and to_date('31.05.2022','dd.mm.yyyy') then a.sum_all else 0 end may_sum,
+        case when a.pay_date between to_date('01.05.2022','dd.mm.yyyy') and to_date('31.05.2022','dd.mm.yyyy') then a.count_sicid else null end may_count,
+        case when a.pay_date between to_date('01.06.2022','dd.mm.yyyy') and to_date('30.06.2022','dd.mm.yyyy') then a.sum_all else 0 end jun_sum,
+        case when a.pay_date between to_date('01.06.2022','dd.mm.yyyy') and to_date('30.06.2022','dd.mm.yyyy') then a.count_sicid else null end jun_count,
+        case when a.pay_date between to_date('01.07.2022','dd.mm.yyyy') and to_date('31.07.2022','dd.mm.yyyy') then a.sum_all else 0 end jul_sum,
+        case when a.pay_date between to_date('01.07.2022','dd.mm.yyyy') and to_date('31.07.2022','dd.mm.yyyy') then a.count_sicid else null end jul_count,
+        case when a.pay_date between to_date('01.08.2022','dd.mm.yyyy') and to_date('31.08.2022','dd.mm.yyyy') then a.sum_all else 0 end aug_sum,
+        case when a.pay_date between to_date('01.08.2022','dd.mm.yyyy') and to_date('31.08.2022','dd.mm.yyyy') then a.count_sicid else null end aug_count,
+        case when a.pay_date between to_date('01.09.2022','dd.mm.yyyy') and to_date('30.09.2022','dd.mm.yyyy') then a.sum_all else 0 end sep_sum,
+        case when a.pay_date between to_date('01.09.2022','dd.mm.yyyy') and to_date('30.09.2022','dd.mm.yyyy') then a.count_sicid else null end sep_count,
+        case when a.pay_date between to_date('01.10.2022','dd.mm.yyyy') and to_date('31.10.2022','dd.mm.yyyy') then a.sum_all else 0 end oct_sum,
+        case when a.pay_date between to_date('01.10.2022','dd.mm.yyyy') and to_date('31.10.2022','dd.mm.yyyy') then a.count_sicid else null end oct_count,
+        case when a.pay_date between to_date('01.11.2022','dd.mm.yyyy') and to_date('30.11.2022','dd.mm.yyyy') then a.sum_all else 0 end nov_sum,
+        case when a.pay_date between to_date('01.11.2022','dd.mm.yyyy') and to_date('30.11.2022','dd.mm.yyyy') then a.count_sicid else null end nov_count,
+        case when a.pay_date between to_date('01.12.2022','dd.mm.yyyy') and to_date('31.12.2022','dd.mm.yyyy') then a.sum_all else 0 end dec_sum,
+        case when a.pay_date between to_date('01.12.2022','dd.mm.yyyy') and to_date('31.12.2022','dd.mm.yyyy') then a.count_sicid else null end dec_count
+from (
+        select  b.ID, b.CITY_NAME, b.BIN, b.NAME_POS, b.FORM, b.ADDRESS, b.pay_date, sum(b.sum_pay) sum_all, count(b.sicid) count_sicid 
+        from    (
+                    select da.ID, da.CITY_NAME, da.BIN, da.NAME_POS, da.FORM, da.ADDRESS, si.sicid, trunc(si.pay_date,'MM') pay_date, sum(si.sum_pay) sum_pay
+                    from dasorp2012 da, si_member_2 si 
+                    where da.bin = si.p_rnn(+)
+--                    and da.bin = '220750005848'
+--                    and da.bin = '190750029311'
+                    and si.pay_date between '01.01.2022' and '31.12.2022'
+                    group by da.ID, da.CITY_NAME, da.BIN, da.NAME_POS, da.FORM, da.ADDRESS, si.sicid, trunc(si.pay_date,'MM')
+                ) b
+        group by b.ID, b.CITY_NAME, b.BIN, b.NAME_POS, b.FORM, b.ADDRESS, b.pay_date
+     ) a
+) b
+group by ID, CITY_NAME, BIN, NAME_POS, FORM, ADDRESS

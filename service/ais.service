@@ -1,0 +1,14 @@
+[Unit]
+Description=GUNICORN-AIS
+After=network.target
+
+[Service]
+Type=simple
+User=ais_gfss
+Group=ais_gfss
+WorkingDirectory=/home/ais_gfss/AIS_GFSS
+Environment="LD_LIBRARY_PATH=/home/ais_gfss/instantclient_21_8"
+ExecStart=/home/ais_gfss/AIS_GFSS/venv/bin/gunicorn
+
+[Install] 
+WantedBy=multi-user.target

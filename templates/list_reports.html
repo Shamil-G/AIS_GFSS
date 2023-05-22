@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ res_value('SELECT_REPORT') }}
+{% endblock %}
+
+{% block main_title %}
+<a href="/">. .</a>-><a href="/dep/{{ session['dep_name'] }}">{{ session['dep_name'] }}</a>-><a href="/list_reports/{{ session['grp_name'] }}">{{ session['grp_name'] }}</a>
+{% endblock %}
+
+
+{% block navigate %}
+    <a href="/">{{ res_value('RETURN') }}</a>
+{% endblock %}
+
+{% block body %}
+    {% for el in cursor %}
+    <reports>
+        <a href="/get/{{el.num}}">{{el.num}}.&nbsp;{{ el.name }}</a>
+    </reports>
+    {% endfor %}
+{% endblock %}

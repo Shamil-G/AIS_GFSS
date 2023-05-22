@@ -1,0 +1,171 @@
+from  db.connect import select_one, plsql_proc_s, get_connection, plsql_execute, plsql_proc_s
+from  ast import Num
+from  main_app import log
+import importlib
+from   app_config import REPORT_PATH, debug_level
+from   model.list_reports import dict_reports
+import os
+import os as platform
+
+
+
+stmt_table = """
+CREATE TABLE LOAD_REPORT_STATUS(
+date_execute date,
+live_time   number(6,2),
+status      varchar2(8),
+file_path        varchar2(512)
+)
+"""
+
+stmt_index = """
+create unique index XU_LOAD_REPORT_STATUS_F_NAME on LOAD_REPORT_STATUS (file_path);
+"""
+
+
+def check_report(file_path: str):
+    stmt = f"""
+      select status, 
+             case when status = 2 then
+                        date_execute + 
+                        (case when live_time>0 then live_time/24 else 1 end) -
+                        (case when live_time>0 then sysdate else date_execute end) 
+                  else live_time end
+      from LOAD_REPORT_STATUS lr 
+      where lr.file_path = '{file_path}'
+    """
+    mistake, result, err_msg = select_one(stmt, [])
+    log.info(f"CHECK_REPORT. MISTAKE: {mistake},  err_msg: {err_msg}, FILE_PATH: {file_path}")
+    if mistake == 0:
+        if result:
+            status = result[0]
+            remain_time = result[1]
+            log.info(f"CHECK_REPORT. RESULT: {result}, status: {status}")
+            if remain_time<0:
+                log.info(f"CHECK_REPORT. REMAIN TIME: {remain_time}, FILE_PATH: {file_path}")
+                # Delete active record
+                stmt_del = f"""
+                begin 
+                    delete from LOAD_REPORT_STATUS lr where lr.file_path = '{file_path}'; 
+                    commit; 
+                end;
+                """
+                with get_connection().cursor() as cursor:
+                    plsql_execute(cursor, 'CHECK_REPORT', stmt_del, [])
+                # Remove report
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                status = 0
+            return status
+        return 10
+    return -100
+
+
+def init_report(file_path: str, live_time: str):
+    stmt_new = f"""
+      begin
+        insert into LOAD_REPORT_STATUS(date_execute, status, live_time, file_path)  values(sysdate, 1, {live_time}, '{file_path}');
+        commit;
+      end;
+    """
+    with get_connection().cursor() as cursor:
+        plsql_execute(cursor, 'INIT_REPORT', stmt_new, [])
+        log.info(f"INSERT into LOAD_REPORT_STATUS")
+    # 0 - файл отсутствует
+    # 1 - Файл готовится
+    # 2 - Файл готов
+    # 10 - Журнал не содержит информаци об отчете
+
+
+def set_status_report(file_path: str, status: int):
+    stmt_upd = f"""
+      begin
+          update LOAD_REPORT_STATUS st
+          set st.status = :status,
+              st.date_execute = sysdate
+          where st.file_path = '{file_path}';
+          commit;
+      end;
+    """
+    with get_connection().cursor() as cursor:
+        plsql_execute(cursor, 'SET STATUS REPORT', stmt_upd, [status])
+
+
+
+def call_report(dep: str, group: str, code: str, params: dict):
+    if debug_level > 3:
+        log.info(f'--- CALL REPORT. DEP: {dep}, group: {group}, code: {code}, params: {params}')
+    #Определим владельца отчета-департамент
+    if dep in dict_reports:
+        dp = dict_reports[dep]
+        if debug_level > 3:
+            log.info(f'--- CALL REPORT. DP: {dp}')
+        #Определим группу отчетов
+        if group in dp:
+            grp = dp[group]
+            if debug_level > 3:
+                log.info(f'--- CALL REPORT. GRP: {grp}')
+            #Определяем код отчета в группе
+            if code in grp:
+                cd = grp[code]
+                if debug_level > 2:
+                    log.info(f'--- CALL REPORT. DEP: {dep}, group: {group}, code: {code}, params: {params}')
+                #Определим по коду отчета имя Python модуля для последующей загрузке
+                if 'proc' in cd:
+                    proc = cd['proc']
+                    #Определим время жизни отчета
+                    live_time = 0
+                    if 'live_time' in grp:
+                        live_time = grp['live_time']
+                    init_report_path = f'{REPORT_PATH}/{dep}.{group}'
+                    # Дополним параметром начального пути для отчета
+                    params['file_name']=init_report_path
+                    log.info(f'CALL_REPORT. PARAMS: {params}')
+
+                    #Определим путь для импорта необходимого Python модуля-отчета
+                    module_dir = grp['module_dir']
+                    module_path = f"{module_dir}.{proc}"
+                    #loaded_module = __import__(module_path, globals(), locals(), ['make_report'], 0)
+                    loaded_module = importlib.import_module(module_path)
+                    # Получаем полный путь к файлу - результату
+                    file_name = loaded_module.get_file_path(**params)
+
+                    #log.info(f'CALL REPORT. GET FILE NAME. file_name: {file_name}')
+                    status = int(check_report(file_name))
+
+                    ##log.info(f'CALL REPORT. CHECK REPORT. status: {status}')
+                    if status < 0:
+                        log.info(f'CALL REPORT. Ошибка статуса. {status}. {file_name}')
+                        return {"status": status}
+                    # Если запись об отчете в БД присутствует
+                    if status in (1, 2): # Файл готовится или готов
+                        if status == 1:
+                            log.info(f'CALL REPORT. Отчет готовится. status: {status}. {file_name}')
+                        if status == 2:
+                            log.info(f'CALL REPORT. Отчет готов. status: {status}. {file_name}')
+                        return {"status": status, "file_path": file_name}
+
+                    # Если запись об отчете в БД отсутствует, то ее надо сделать
+                    if status in (0,10):
+                        init_report(file_name, live_time)
+
+                        log.info(f'MAKE_REPORT. Start DO REPORT: {file_name}')
+
+                        params['file_name']=file_name
+
+                        # Получаем полный путь к файлу - результату
+
+                        if platform == 'unix':
+                            from os import fork
+                            pid = fork()
+                            if pid:
+                                return {"status": 1, "file_path": file_name}
+                            else:
+                                log.info(f'CALL REPORT. CHILD FORK PROCESS. {file_name}')
+                                loaded_module.do_report(**params)
+                        else:
+                            log.info(f'CALL REPORT. THREAD PROCESS. \nBEG PARAMS ---------------------\n{params}\nEND PARAMS ---------------------')
+                            result = loaded_module.thread_report(**params)
+                            return result
+    return {"status": 0, "file_path": "Mistake in parameters"}
+
