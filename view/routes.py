@@ -99,7 +99,7 @@ def view_get_report(rep_number):
             params = rep.get('params')
             if len(params)>0:
                 list_params = params
-                return redirect(url_for('f_edit_params'))
+                return redirect(url_for('view_edit_params'))
     return redirect(url_for('view_list_reports', grp=session['grp_name']))
 
 
