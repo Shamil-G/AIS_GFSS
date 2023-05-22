@@ -12,7 +12,7 @@ if using.startswith('DEV_WIN'):
     port = 8080
 else:
     os = 'unix'
-    debug_level = 2
+    debug_level = 3
     host = 'localhost'
     port = 80
 

@@ -1,0 +1,4 @@
+. /home/ais_gfss/AIS_GFSS/venv/bin/activate
+
+#python main_app.py
+gunicorn

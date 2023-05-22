@@ -8,6 +8,7 @@ pip3.9 install requests
 pip3.9 install gunicorn
 pip3.9 install gevent
 pip3.9 install xlsxwriter
+pip3.9 install redis
 
 #python main_app.py
 gunicorn

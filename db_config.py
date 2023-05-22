@@ -1,6 +1,6 @@
 from ais_gfss_parameter import using
 from util.logger import log
-#import redis
+import redis
 
 if using.startswith('PROD'):
     LIB_DIR = r'/home/ais_gfss/instantclient_21_8'
@@ -41,10 +41,10 @@ class SessionConfig:
     if using.startswith('DEV'):
         SESSION_TYPE = "filesystem"
     else:
-        # SESSION_TYPE = 'redis'
-        SESSION_TYPE = "filesystem"
+        SESSION_TYPE = 'redis'
+        #SESSION_TYPE = "filesystem"
         # SESSION_REDIS = db_redis
-        # SESSION_REDIS = redis.from_url('redis://@10.15.15.11:6379')
+        SESSION_REDIS = redis.from_url('redis://@192.168.20.33:6379')
     SESSION_USE_SIGNER = True
     # SESSION_REDIS = Redis(host='10.15.15.11', port='6379')
     # SESSION_PERMANENT = False

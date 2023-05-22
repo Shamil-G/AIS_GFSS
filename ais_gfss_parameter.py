@@ -1,2 +1,2 @@
-using = "DEV_WIN"
+using = "PROD"
 app_name = "AIS_GFSS"

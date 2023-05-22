@@ -106,6 +106,7 @@ def view_get_report(rep_number):
 def f_edit_params():
     global list_params
     if not list_params:
+        log.info('F_EDIT_PARAMS. list params is NULL')
         return redirect(url_for('view_root'))
 
     new_params = {}
