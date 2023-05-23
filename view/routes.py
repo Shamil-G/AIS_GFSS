@@ -10,7 +10,6 @@ import os
 
 #from model.call_report import call_report, call_report
 
-list_reports = []
 list_params = []
 
 empty_response_save = """
@@ -40,7 +39,7 @@ def utility_processor():
 def view_root():
     # log.info("Static folder: " + app.static_folder)
     owners = get_owner_reports()
-    if 'username' in session:
+    if debug_level > 1 and 'username' in session:
         log.info(f"VIEW_ROOT. USERNAME: {session['username']}")
     #if not g or 'user' not in g or g.user.is_anonymous():
     #    log.info(f"VIEW MODELS. NOT LOGIN")
@@ -76,24 +75,19 @@ def view_set_dep(dep_name):
     #return empty_call_response, 200, {'Content-Type': 'text/html;charset=utf-8'}
 
 
-@app.route('/list_reports/<int:grp>', methods=['POST', 'GET'])
+@app.route('/list-reports/<int:grp>', methods=['POST', 'GET'])
 @login_required
-def view_list_reports(grp):
-    global list_reports
+def view_set_grp_name(grp):
     session['grp_name'] = str(grp)
-    if debug_level > 3:
-        log.info(f'GRP: {grp}')
     if request.method == 'GET':
-        list_reports = get_list_reports()
-        if debug_level > 3:
-            log.info(f'GRP: {grp}, LIST_REPORTS: {list_reports}')
-        return render_template("list_reports.html", cursor=list_reports)
+        if debug_level > 2:
+            log.info(f'SET GRP NAME. GRP: {grp}')
+        return render_template("list_reports.html", cursor=get_list_reports())
 
 
-@app.route('/get/<int:rep_number>', methods=['GET', 'POST'])
+@app.route('/extract-params/<int:rep_number>', methods=['GET', 'POST'])
 @login_required
-def view_get_report(rep_number):
-    global list_params
+def view_extract_params(rep_number):
     rep_num = str(rep_number).zfill(2)
     session['rep_code'] = rep_num
     for rep in get_list_reports():
@@ -101,22 +95,22 @@ def view_get_report(rep_number):
             params = rep.get('params')
             session['rep_name'] = rep['name']
             if len(params)>0:
-                list_params = params
-                return redirect(url_for('view_edit_params'))
-    return redirect(url_for('view_list_reports', grp=session['grp_name']))
+                session['params'] = params
+                return redirect(url_for('view_set_params'))
+    return redirect(url_for('view_root'))
 
 
-@app.route('/edit_params', methods=['GET', 'POST'])
+@app.route('/set-params', methods=['GET', 'POST'])
 @login_required
-def view_edit_params():
-    global list_params
-    if not list_params:
-        log.info(f"EDIT_PARAMS. LIST_PARAMS is NULL")
+def view_set_params():
+    new_params = {}
+    if 'params' not in session:
+        log.info(f"EDIT_PARAMS. PARAMS not FOUND")
         return redirect(url_for('view_root'))
 
-    new_params = {}
-
+    list_params = session['params']
     if request.method == 'POST':
+        log.info(f'SET_PARAMS. LIST_PARAMS: {list_params}')
         #Вытащим значения параметров из формы в новый список
         for parm in list_params:
             p = request.form[parm]
@@ -126,7 +120,7 @@ def view_edit_params():
         #Если параметры вытащили, то вызовем отчет
         if new_params:
             rep_code = session['rep_code']
-            for rep in list_reports:
+            for rep in get_list_reports():
                 if rep_code == rep.get('num'):
                     report = rep
                     report['params'] = new_params
@@ -144,7 +138,7 @@ def view_edit_params():
                                 file_name = str(head_tail[1])
                                 log.info(f"EDIT_PARAMS. SEND REPORT. FILE_PATH: {file_path}, FILE_NAME: {file_name}")
                                 return send_from_directory(file_path, file_name)
-            return redirect(url_for('view_list_reports', grp=session['grp_name']))
+            return redirect(url_for('view_set_grp_name', grp=session['grp_name']))
     return render_template("edit_params.html", params=list_params)
 
 

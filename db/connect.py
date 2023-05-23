@@ -66,6 +66,7 @@ def select_one(stmt, args):
     except cx_Oracle.DatabaseError as e:
         error, = e.args
         mistake = 1
+        rec = ''
         err_mess = f"Oracle error: {error.code} : {error.message}"
         log.error(f"------select------> ERROR with: {stmt}.")
         log.error(err_mess)

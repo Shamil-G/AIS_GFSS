@@ -16,7 +16,7 @@
 {% block body %}
     {% for el in cursor %}
     <reports>
-        <a href="/get/{{el.num}}">{{el.num}}.&nbsp;{{ el.name }}</a>
+        <a href="/extract-params/{{el.num}}">{{el.num}}.&nbsp;{{ el.name }}</a>
     </reports>
     {% endfor %}
 {% endblock %}
