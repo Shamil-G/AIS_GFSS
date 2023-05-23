@@ -41,7 +41,7 @@ def view_root():
     # log.info("Static folder: " + app.static_folder)
     owners = get_owner_reports()
     if 'username' in session:
-        log.info(f"VIEW_ROOT. USERNAME: {session['username']}, {current_user}")
+        log.info(f"VIEW_ROOT. USERNAME: {session['username']}")
     #if not g or 'user' not in g or g.user.is_anonymous():
     #    log.info(f"VIEW MODELS. NOT LOGIN")
     #    return redirect(url_for('login_page'))
@@ -93,14 +93,10 @@ def view_list_reports(grp):
 @app.route('/get/<int:rep_number>', methods=['GET', 'POST'])
 @login_required
 def view_get_report(rep_number):
-    global list_reports
     global list_params
-    if not list_reports:
-        log.info(f"GET_REPORT. LIST_REPORTS is NULL")
-        return redirect(url_for('view_root'))
     rep_num = str(rep_number).zfill(2)
     session['rep_code'] = rep_num
-    for rep in list_reports:
+    for rep in get_list_reports():
         if rep_num == rep.get('num'):
             params = rep.get('params')
             session['rep_name'] = rep['name']
