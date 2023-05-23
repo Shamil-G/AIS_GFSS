@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block main_title %}
-<a href="/" styles="color: green">. .</a>-><a href="/dep/{{ session['dep_name'] }}">{{ session['dep_name'] }}</a>
+<a href="/"><dev class="image"><img src="/static/img/Home-1.png"></dev></a>&nbsp;. . .&nbsp;<a>{{ session['dep_name'] }}</a>
 {% endblock %}
 
 
 {% block navigate %}
-    <a href="/">{{ res_value('RETURN') }}</a>
+<a href="/">{{ res_value('RETURN') }}</a>
 {% endblock %}
 
 {% block body %}

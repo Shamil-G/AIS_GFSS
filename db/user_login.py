@@ -1,13 +1,13 @@
 from typing import List, Any
 from flask import render_template, request, redirect, flash, url_for, g, session
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user
-from util.utils import *
+from util.utils import ip_addr
 import cx_Oracle
 from werkzeug.security import check_password_hash, generate_password_hash
 from db.connect import get_connection
 from main_app import app, log
 import app_config as cfg
-from ais_gfss_parameter import app_name
+from ais_gfss_parameter import public_name
 
 
 login_manager = LoginManager(app)
@@ -49,9 +49,9 @@ class User:
         finally:
             cursor.close()
             conn.close()
-        if hasattr(self, 'password'):
+        if hasattr(self, 'password') and self.roles:
             if cfg.debug_level > 1:
-                log.info(f"LM. SUCCESS. USERNAME: {username}, ip_addr: {self.ip_addr},  password: {self.password}")
+                log.info(f"LM. SUCCESS. USERNAME: {username}, ip_addr: {self.ip_addr},  password: {self.password}, len_roles: {len(self.roles)}")
             return self
         else:
             log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {self.ip_addr}")
@@ -59,16 +59,18 @@ class User:
 
     def get_roles(self, cursor):
         my_var = cursor.var(cx_Oracle.CURSOR)
-        if cfg.debug_level > 3:
-            print("LM. Get Roles for: " + str(self.username) + ', id_user: ' + str(self.id_user))
         try:
-            cursor.callproc('cop.admin.get_roles', [app_name, self.id_user, my_var])
+            cursor.callproc('cop.admin.get_roles', [public_name, self.id_user, my_var])
             rows = my_var.getvalue().fetchall()
             self.roles.clear()
+            if cfg.debug_level > 2:
+                log.info(f"LM. USER: {str(self.username)} have got ROLES: {rows}")
             for row in rows:
-                # print(f'GET Role: {row[0]}')
+                log.info(f'GET ROLES. ROLE: {row[0]}')
                 self.roles.extend([row[0]])
             rows.clear()
+            if cfg.debug_level > 1:
+                log.info(f"LM. USER: {str(self.username)} have ROLES: {self.roles}")
         except cx_Oracle.DatabaseError as e:
             error, = e.args
             log.error(f'LM. GET ALL ROLES. {self.username}')
@@ -109,7 +111,7 @@ def loader_user(id_user):
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    log.info(f"LM. LOGOUT. NUM_ORDER: {User().num_order}, IIN: {User().iin}, ip_addr: {User().ip_addr}")
+    log.info(f"LM. LOGOUT. USERNAME: {session['username']}, ip_addr: {ip_addr()}")
     logout_user()
     return redirect(url_for('view_root'))
 
