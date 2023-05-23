@@ -151,3 +151,12 @@ nav > a:hover, .header-r > a:hover {
     text-decoration: none;
     border-radius: 4px;
 }
+
+.image {
+    display: flex;
+    width: 34px;
+    height: 28px;
+    background-color: #444;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}

@@ -1,6 +1,5 @@
 from app_config import debug_level
 from main_app import app, log, cfg
-import json
 from flask import  session, request, render_template, redirect, url_for, send_from_directory
 from flask_login import LoginManager, login_required, current_user
 from util.utils import get_i18n_value

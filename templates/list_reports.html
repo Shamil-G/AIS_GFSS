@@ -5,18 +5,18 @@
 {% endblock %}
 
 {% block main_title %}
-<a href="/">. .</a>-><a href="/dep/{{ session['dep_name'] }}">{{ session['dep_name'] }}</a>-><a>{{ session['grp_name'] }}</a>
+<a href="/"><dev class="image"><img src="/static/img/Home-1.png"></dev></a>&nbsp;. . .&nbsp;<a href="/dep/{{ session['dep_name'] }}">{{ session['dep_name'] }}</a>&nbsp;. . .&nbsp;<a>{{ session['grp_name'] }}</a>
 {% endblock %}
 
 
 {% block navigate %}
-    <a href="/">{{ res_value('RETURN') }}</a>
+<a href="/">{{ res_value('RETURN') }}</a>
 {% endblock %}
 
 {% block body %}
     {% for el in cursor %}
-    <reports>
-        <a href="/extract-params/{{el.num}}">{{el.num}}.&nbsp;{{ el.name }}</a>
-    </reports>
+<reports>
+    <a href="/extract-params/{{el.num}}">{{el.num}}.&nbsp;{{ el.name }}</a>
+</reports>
     {% endfor %}
 {% endblock %}
