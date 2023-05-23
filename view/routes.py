@@ -2,7 +2,7 @@ from app_config import debug_level
 from main_app import app, log, cfg
 import json
 from flask import  session, request, render_template, redirect, url_for, send_from_directory
-from flask_login import LoginManager, login_required
+from flask_login import LoginManager, login_required, current_user
 from util.utils import get_i18n_value
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
 from model.call_report import call_report
@@ -30,16 +30,18 @@ empty_call_response = """
 
 @app.context_processor
 def utility_processor():
-    log.info(f"CONTEXT PROCESSOR. APP_NAME {get_i18n_value('APP_NAME')}")
+    log.info(f"CP. {get_i18n_value('APP_NAME')}")
     return dict(res_value=get_i18n_value)
 
 
 @app.route('/')
-@app.route('/home')
-#@login_required
+@app.route('/home', methods=['POST', 'GET'])
+@login_required
 def view_root():
     # log.info("Static folder: " + app.static_folder)
     owners = get_owner_reports()
+    if 'username' in session:
+        log.info(f"VIEW_ROOT. USERNAME: {session['username']}, {current_user}")
     #if not g or 'user' not in g or g.user.is_anonymous():
     #    log.info(f"VIEW MODELS. NOT LOGIN")
     #    return redirect(url_for('login_page'))
@@ -47,7 +49,9 @@ def view_root():
     #cursor = models_list()
     return render_template("index.html", owner_cursor=owners)
 
+
 @app.route('/dep/<string:dep_name>', methods=['GET','POST'])
+@login_required
 def view_set_dep(dep_name):
     log.info(f'SET_DEP: {dep_name}')
     #if request.method == 'POST':
@@ -73,6 +77,7 @@ def view_set_dep(dep_name):
 
 
 @app.route('/list_reports/<int:grp>', methods=['POST', 'GET'])
+@login_required
 def view_list_reports(grp):
     global list_reports
     session['grp_name'] = str(grp)
@@ -86,6 +91,7 @@ def view_list_reports(grp):
 
 
 @app.route('/get/<int:rep_number>', methods=['GET', 'POST'])
+@login_required
 def view_get_report(rep_number):
     global list_reports
     global list_params
@@ -97,6 +103,7 @@ def view_get_report(rep_number):
     for rep in list_reports:
         if rep_num == rep.get('num'):
             params = rep.get('params')
+            session['rep_name'] = rep['name']
             if len(params)>0:
                 list_params = params
                 return redirect(url_for('view_edit_params'))
@@ -104,10 +111,11 @@ def view_get_report(rep_number):
 
 
 @app.route('/edit_params', methods=['GET', 'POST'])
+@login_required
 def view_edit_params():
     global list_params
     if not list_params:
-        log.info(f"EDIT_PARAMS. LIST+PARAMS is NULL")
+        log.info(f"EDIT_PARAMS. LIST_PARAMS is NULL")
         return redirect(url_for('view_root'))
 
     new_params = {}

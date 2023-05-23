@@ -20,8 +20,8 @@ else:
     pool_inc = 4
     Debug = True
 
-#dsn = '192.168.20.64:1521/gfss'
-dsn = '172.16.17.12:1521/gfss'
+dsn = '192.168.20.60:1521/gfssdb.gfss.kz'
+#dsn = '172.16.17.12:1521/gfss'
 username = 'sswh'
 password = 'sswh'
 encoding = 'UTF-8'
@@ -39,11 +39,12 @@ class SessionConfig:
     # secret_key = 'this is secret key qer:ekjf;keriutype2tO287'
     SECRET_KEY = 'this is secret key 12345 -'
     if using.startswith('DEV'):
-        SESSION_TYPE = "filesystem"
-    else:
-        SESSION_TYPE = 'redis'
         #SESSION_TYPE = "filesystem"
-        # SESSION_REDIS = db_redis
+        SESSION_TYPE = 'redis'
+        SESSION_REDIS = redis.from_url('redis://@192.168.20.33:6379')
+    else:
+        #SESSION_TYPE = "filesystem"
+        SESSION_TYPE = 'redis'
         SESSION_REDIS = redis.from_url('redis://@192.168.20.33:6379')
     SESSION_USE_SIGNER = True
     # SESSION_REDIS = Redis(host='10.15.15.11', port='6379')

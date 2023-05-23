@@ -1,17 +1,9 @@
 import db_config as cfg
 from util.logger import log
-from flask import request
 from ais_gfss_parameter import using
 import cx_Oracle
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
-
-
-def ip_addr():
-    if using[0:3] != 'DEV':
-        return request.environ.get('HTTP_X_REAL_IP')
-    else:
-        return request.remote_addr
 
 
 def init_session(connection, requestedTag_ignored):

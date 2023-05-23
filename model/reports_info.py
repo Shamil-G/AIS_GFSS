@@ -1,6 +1,6 @@
 from util.logger import log
 from app_config import debug_level
-from flask import session
+from flask import session,redirect, url_for
 from model.list_reports import dict_reports
 
 
@@ -14,14 +14,18 @@ def get_owner_reports():
     return list_owner
 
 def get_list_groups():
-    dep_name = session['dep_name']
-    dep_reps = dict_reports.get(dep_name)
-    list_grp = []
-    for grp in dep_reps:
-        list_grp.append({"grp": grp})
-    if debug_level > 3:
-        log.info(f'List groups: {list_grp}')
-    return list_grp
+    if 'dep_name' in session:
+        dep_name = session['dep_name']
+        dep_reps = dict_reports.get(dep_name)
+        if dep_reps:
+            list_grp = []
+            for grp in dep_reps:
+                list_grp.append({"grp": grp})
+            if debug_level > 3:
+                log.info(f'List groups: {list_grp}')
+            return list_grp
+    return redirect(url_for('view_root'))
+
 
 def get_list_reports():
     names_reps = []
