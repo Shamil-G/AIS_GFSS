@@ -1,4 +1,4 @@
-.form_parms {
+.form_parms, .form_login {
     grid-gap: 4px;
     padding: 30px;
     margin: auto;
@@ -6,12 +6,12 @@
     border: 1px solid rgba(180, 180, 180, 0.3);
 }
 
-.form_parms > input:hover {
+.form_parms > input:hover, .form_login > input:hover {
     background: #f5f5b8;
     color: brown;
 }
 
-.form_parms > label {
+.form_parms > label, .form_login > label{
     display: flex;
 }
 
@@ -26,7 +26,7 @@ input[type="date"]{
  padding: 4px;
 }
 
-.form_parms > input {
+.form_parms > input, .form_login > input {
     border-radius: 4px;
     background: #f5f5d8;
 }
