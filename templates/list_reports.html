@@ -14,9 +14,11 @@
 {% endblock %}
 
 {% block body %}
+<form class="form_r">
     {% for el in cursor %}
-<reports>
-    <a href="/extract-params/{{el.num}}">{{el.num}}.&nbsp;{{ el.name }}</a>
-</reports>
+    <reports>
+        <a href="/extract-params/{{el.num}}">{{el.num}}.&nbsp;{{ el.name }}</a>
+    </reports>
     {% endfor %}
+</form>
 {% endblock %}

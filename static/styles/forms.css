@@ -1,33 +1,88 @@
-.form_parms, .form_login {
-    grid-gap: 4px;
-    padding: 30px;
-    margin: auto;
+.form_s, .form_r {
+    margin: 4px;
+    padding: 6px;
     border-radius: 5px;
     border: 1px solid rgba(180, 180, 180, 0.3);
 }
 
-.form_parms > input:hover, .form_login > input:hover {
-    background: #f5f5b8;
-    color: brown;
+.form_r {
+    margin: 4px;
+    padding: 12px 24px 24px 24px;
+    border-radius: 5px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
 }
 
-.form_parms > label, .form_login > label{
+.input_s {
+    color: #ddd;
+    margin: 4px;
+    padding: 9px;
+    align-items: center;
+    background-color: #444;
+    border-radius: 5px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+
+    .input_s:hover {
+        /*color: bisque;*/
+        align-items: center;
+        background-color: #333;
+    }
+
+.name_system {
+    color: #ddd;
+    margin: 4px;
+    padding: 6px;
+    text-decoration: none;
+    align-items: center;
+}
+
+    .name_system:hover {
+        color: wheat;
+        margin: 4px;
+        padding: 6px;
+        font-weight: bold;
+    }
+
+.new_system {
+    margin: 4px 4px 4px 4px;
+    padding: 6px;
+    color: #ddd;
+    background: #555;
+    border-radius: 5px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+    text-decoration: none;
+}
+
+    .new_system:hover, .form_login > a:hover {
+        margin: 4px;
+        background: #f5f5b8;
+        color: brown;
+    }
+
+.div_s:hover {
     display: flex;
+    border-radius: 5px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+    background: #555;
 }
 
-input[name="edit_parms"]{
- margin-top: 25px;
- padding: 5px;
- color: green;
- font-weight: bold;
+.div_s {
+    display: flex;
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
 }
 
-input[type="date"]{
- padding: 4px;
+.div_role_users {
+    display: flex;
+    margin: 10px;
+    padding: 10px;
 }
 
-.form_parms > input, .form_login > input {
-    border-radius: 4px;
-    background: #f5f5d8;
+.div_users_all {
+    margin: 10px;
 }
 
+.div_users_selected {
+    margin: 10px;
+}

@@ -17,21 +17,38 @@
 
 {% block body %}
 
-<form class="form_parms" method="POST">
-    {% for el in params %}
-    {% if el[:1].lower() == 'd' %}
-    <label for="{{ el }}">{{ params.get(el) }}</label>
-    <input type="date" id="{{ el }}" name="{{ el }}"><br>
-    {% elif el[:1].lower() == 's' %}
-    {% set list_val = params.get(el).split(':') %}
-    <label for="{{ el }}">{{ list_val[0] }}</label>
-    <input type="text" id="{{ el }}" name="{{ el }}" pattern="{ {{list_val[1]}} }" maxlength="{{ list_val[1] }}" minlength="{{ list_val[1] }}"><br>
-    {% elif el[:1].lower() == 'n' %}
-    {% set list_val = params.get(el).split(':') %}
-    <label for="{{ el }}">{{ list_val[0] }}</label>
-    <input type="number" id="{{ el }}" name="{{ el }}" pattern="\d*" maxlength="{{ list_val[1] }}" minlength="{{ list_val[1] }}"><br>
-    {% endif %}
-    {% endfor %}
-    <input type="submit" name="edit_parms" value="Запросить отчёт">
+<form class="form_r" method="POST">
+    <table style="width: 20%">
+        {% for el in params %}
+        <tr>
+            {% if el[:1].lower() == 'd' %}
+            <td>
+                <label for="{{ el }}">{{ params.get(el) }}</label>
+            </td>
+            <td>
+                <input class="input_s" type="date" id="{{ el }}" name="{{ el }}">
+            </td>
+            {% elif el[:1].lower() == 's' %}
+            {% set list_val = params.get(el).split(':') %}
+            <td>
+                <label for="{{ el }}">{{ list_val[0] }}</label>
+            </td>
+            <td>
+                <input class="input_s" type="text" id="{{ el }}" name="{{ el }}" pattern="{ {{list_val[1]}} }" maxlength="{{ list_val[1] }}" minlength="{{ list_val[1] }}">
+            </td>
+            {% elif el[:1].lower() == 'n' %}
+            {% set list_val = params.get(el).split(':') %}
+            <td>
+                <label for="{{ el }}">{{ list_val[0] }}</label>
+            </td>
+            <td>
+                <input class="input_s" type="number" id="{{ el }}" name="{{ el }}" pattern="\d*" maxlength="{{ list_val[1] }}" minlength="{{ list_val[1] }}">
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+    <br/>
+    <button class="bt_s" type="submit" name="edit_parms">Запросить отчёт</button>
 </form>
 {% endblock %}

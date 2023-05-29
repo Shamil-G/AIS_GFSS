@@ -1,0 +1,64 @@
+.bt_report {
+    display: inline-block;
+    vertical-align: middle;
+    width: 48px;
+    height: 48px;
+    background-image: url(printer_48.png);
+}
+
+.bt_s {
+    color: #ddd;
+    margin: 2px 2px;
+    padding: 6px 10px 6px 8px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    line-height: 1.5;
+    border-radius: 5px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+    text-decoration: none;
+    background-color: #333;
+    transition: color .2s ease-in-out,background-color .2s ease-in-out, border-color .2s ease-in-out, box-shadow .2s ease-in-out;
+}
+
+.bt {
+    color: #ddd;
+    margin: 2px 2px;
+    padding: 6px 10px 6px 8px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    line-height: 1.5;
+    border-radius: 5px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+    text-decoration: none;
+    transition: color .2s ease-in-out,background-color .2s ease-in-out, border-color .2s ease-in-out, box-shadow .2s ease-in-out;
+}
+
+.bt.danger {
+    color: white;
+    margin-right: 30px;
+    margin-left: 30px;
+    background-color: #971c2c;
+    border-color: #de3a4b;
+}
+
+.bt:hover, .bt_s:hover {
+    color: #307080;
+    text-decoration: none;
+    color: lightgoldenrodyellow;
+    background-color: #20608F;
+}
+
+.bt.danger:hover {
+    color: yellow;
+    background-color: #de3a4b;
+    border-color: #971c2c;
+    text-decoration: none;
+}
+
+.bt:not(:disabled):not(.disabled) {
+    cursor: pointer;
+}
