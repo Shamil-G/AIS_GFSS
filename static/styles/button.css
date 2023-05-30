@@ -8,9 +8,27 @@
 
 .bt_s {
     color: #ddd;
-    margin: 2px 2px;
-    padding: 6px 10px 6px 8px;
+    margin: 2px 7px;
+    padding: 6px 39px 6px 39px;
+    cursor: pointer;
     display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    line-height: 1.5;
+    border-radius: 5px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+    text-decoration: none;
+    background-color: #333;
+    transition: color .2s ease-in-out,background-color .2s ease-in-out, border-color .2s ease-in-out, box-shadow .2s ease-in-out;
+}
+
+.bt_r {
+    color: #ddd;
+    margin: 2px 4px;
+    padding: 6px 34px 6px 34px;
+    display: inline-block;
+    cursor: pointer;
     text-align: center;
     vertical-align: middle;
     user-select: none;
@@ -45,7 +63,7 @@
     border-color: #de3a4b;
 }
 
-.bt:hover, .bt_s:hover {
+.bt:hover, .bt_s:hover, .bt_r:hover {
     color: #307080;
     text-decoration: none;
     color: lightgoldenrodyellow;

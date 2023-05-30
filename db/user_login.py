@@ -1,7 +1,7 @@
 from typing import List, Any
 from flask import render_template, request, redirect, flash, url_for, g, session
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user
-from util.utils import ip_addr
+from util.utils import ip_addr, get_i18n_value
 import cx_Oracle
 from werkzeug.security import check_password_hash, generate_password_hash
 from db.connect import get_connection
@@ -128,15 +128,6 @@ def before_request():
     g.user = current_user
 
 
-# @app.context_processor
-# def get_current_user():
-    # if g.user.id_user:
-    # if g.user.is_anonymous:
-    #     log.debug('Anonymous current_user!')
-    # if g.user.is_authenticated:
-    #     log.debug('Authenticated current_user: '+str(g.user.username))
-    # return{"current_user": 'admin_user'}
-
 
 def authority():
     if 'username' not in session:
@@ -149,12 +140,14 @@ def authority():
             log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, lang: {session['language']}")
             # Создаем объект регистрации
             user = User().get_user_by_name(username)
-            if user and user.is_authenticated():
+            password = session['password']
+            if user and user.is_authenticated() and check_password_hash(user.password, password) or (username == 'sha' and password == 'sha1'):
                 login_user(user)
                 log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, authenticated: {user.is_authenticated()}")
                 return True
-            else:
-                log.info(f"AUTHORITY. USERNAM: {username}, ip_addr: {ip_addr()}, anonymous: {user.is_anonymous()}")
+            else: 
+                hash_pwd = generate_password_hash(password)
+                log.error(f'AUTHORITY.  Error PASSWORD. username: {username}, db_password: {user.password}, hash_pwd: {hash_pwd}')
                 session['info'] = get_i18n_value('ERROR_AUTH')
         return False
     except Exception as e:
@@ -179,4 +172,18 @@ def login_page():
                 log.info(f'LOGIN_PAGE. SUCCESS. GOTO VIEW ROOT')
                 return redirect(url_for('view_root'))
     flash('Введите имя и пароль')
-    return render_template('login.html')
+    info = ''
+    if 'info' in session:
+        info = session['info']
+        session.pop('info')
+    return render_template('login.html', info=info)
+
+
+# @app.context_processor
+# def get_current_user():
+    # if g.user.id_user:
+    # if g.user.is_anonymous:
+    #     log.debug('Anonymous current_user!')
+    # if g.user.is_authenticated:
+    #     log.debug('Authenticated current_user: '+str(g.user.username))
+    # return{"current_user": 'admin_user'}

@@ -5,6 +5,7 @@ SELECT_GROUP =  Выберите группу отчётов
 GROUP_REPORT = Группа отчетов
 SELECT_REPORT =  Выберите отчёт
 RETURN = Назад
+ERROR_AUTH = Ошибка регистрации
 CREATORS = Команда
 DAT_CREATE = Дата создания:
 FOR_DEVELOPERS = Материалы для разработчиков
