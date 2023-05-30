@@ -5,6 +5,7 @@ SELECT_GROUP =  Выберите группу отчётов
 GROUP_REPORT = Группа отчетов
 SELECT_REPORT =  Выберите отчёт
 RETURN = Назад
+ERROR_AUTH = Ошибка регистрации
 ADDING_MODEL = Добавление модели
 AKTUAR_MODELS = Актуарные модели
 BUTTON_EDIT = Редактировать
