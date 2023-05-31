@@ -8,6 +8,7 @@ from db.connect import get_connection
 from main_app import app, log
 import app_config as cfg
 from ais_gfss_parameter import public_name
+import requests
 
 
 login_manager = LoginManager(app)
@@ -16,6 +17,13 @@ login_manager.login_message = "Необходимо зарегистрирова
 login_manager.login_message_category = "warning"
 
 log.debug("UserLogin стартовал...")
+
+def get_user_roles(app_name, username, passwd):
+    request_json = { "app_name": app_name, "username": username, "passwd": passwd }
+    resp = requests.post(cfg.URL_GET_ROLES, json=request_json)
+    resp_json = resp.json()
+    log.info(f'-----> resp_json: {resp_json}, type: {type(resp_json)}')
+    return resp_json
 
 
 class User:
@@ -102,11 +110,51 @@ class User:
         # return self.id_user
 
 
+class User2:
+    def get_user_by_name(self, username):
+        if 'password' in session:
+            rl = get_user_roles(public_name, session['username'], session['password'])
+            if len(rl) > 0 and 'roles' in rl:
+                self.username = username
+                self.password = session['password']
+                self.ip_addr = ip_addr()
+                self.roles = rl['roles']
+                log.info(f"LM. SUCCESS. USERNAME: {self.username}, ip_addr: {self.ip_addr}, password: {self.password}, roles: {self.roles}")
+                return self
+        log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {self.ip_addr}, password: {session['password']}")
+        return None
+
+    def have_role(self, role_name):
+        return role_name in self.roles
+
+    def is_authenticated(self):
+        if self.id_user < 1:
+            return False
+        else:
+            return True
+
+    def is_active(self):
+        if self.id_user > 0:
+            return True
+        else:
+            return False
+
+    def is_anonymous(self):
+        if self.id_user < 1:
+            return True
+        else:
+            return False
+
+    def get_id(self):
+        return self.username
+        # return self.id_user
+
+
 @login_manager.user_loader
 def loader_user(id_user):
     if cfg.debug_level > 1:
         log.debug(f"LM. Loader ID User: {id_user}")
-    return User().get_user_by_name(id_user)
+    return User2().get_user_by_name(id_user)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -128,7 +176,43 @@ def before_request():
     g.user = current_user
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login_page():
+    if cfg.debug_level > 0:
+        log.info(f"Login Page. Method: {request.method}")
+    if request.method == "POST":
+        session['username'] = request.form.get('username')
+        session['password'] = request.form.get('password')
 
+        user = User2().get_user_by_name(session['username'])
+        if user and user.have_role('Оператор'):
+            login_user(user)
+            #if authority():
+            next_page = request.args.get('next')
+            if next_page is not None:
+                log.info(f'LOGIN_PAGE. SUCCESS. GOTO NEXT PAGE: {next_page}')
+                return redirect(next_page)
+            else:
+                log.info(f'LOGIN_PAGE. SUCCESS. GOTO VIEW ROOT')
+                return redirect(url_for('view_root'))
+    flash('Введите имя и пароль')
+    info = ''
+    if 'info' in session:
+        info = session['info']
+        session.pop('info')
+    return render_template('login.html', info=info)
+
+
+# @app.context_processor
+# def get_current_user():
+    # if g.user.id_user:
+    # if g.user.is_anonymous:
+    #     log.debug('Anonymous current_user!')
+    # if g.user.is_authenticated:
+    #     log.debug('Authenticated current_user: '+str(g.user.username))
+    # return{"current_user": 'admin_user'}
+
+# При использовании класса User2, потребности в Authority нет
 def authority():
     if 'username' not in session:
         log.info(f"AUTHORITY. Absent USERNAME. ip_addr: {ip_addr()}")
@@ -155,35 +239,3 @@ def authority():
         return False
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login_page():
-    if cfg.debug_level > 0:
-        log.info(f"Login Page. Method: {request.method}")
-    if request.method == "POST":
-        session['username'] = request.form.get('username')
-        session['password'] = request.form.get('password')
-        if authority():
-            log.info("Login Page. AUTHORITY SUCCESS")
-            next_page = request.args.get('next')
-            if next_page is not None:
-                log.info(f'LOGIN_PAGE. SUCCESS. GOTO NEXT PAGE: {next_page}')
-                return redirect(next_page)
-            else:
-                log.info(f'LOGIN_PAGE. SUCCESS. GOTO VIEW ROOT')
-                return redirect(url_for('view_root'))
-    flash('Введите имя и пароль')
-    info = ''
-    if 'info' in session:
-        info = session['info']
-        session.pop('info')
-    return render_template('login.html', info=info)
-
-
-# @app.context_processor
-# def get_current_user():
-    # if g.user.id_user:
-    # if g.user.is_anonymous:
-    #     log.debug('Anonymous current_user!')
-    # if g.user.is_authenticated:
-    #     log.debug('Authenticated current_user: '+str(g.user.username))
-    # return{"current_user": 'admin_user'}
