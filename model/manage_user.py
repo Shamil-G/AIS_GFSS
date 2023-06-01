@@ -7,10 +7,14 @@ import requests
 def get_user_roles(username, passwd):
     request_json = { "app_name": public_name, "username": username, "passwd": passwd }
     resp = requests.post(URL_GET_ROLES, json=request_json)
-    log.info(f'---> GET USER ROLES. RESP: {resp}')
-    resp_json = resp.json()
-    log.info(f'-----> resp_json: {resp_json}, type: {type(resp_json)}')
-    return resp_json
+    log.info(f'---> GET USER ROLES. RESP: {resp} : {type(resp)}')
+    try:
+        resp_json = resp.json()
+    except Exception as e:
+        resp_json = {'status': 'ERROR', 'mess': f'{e}'}
+    finally:
+        log.info(f'-----> resp_json: {resp_json}, type: {type(resp_json)}')
+        return resp_json
 
 
 def change_passwd(username, passwd, new_passwd):

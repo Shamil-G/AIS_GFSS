@@ -30,7 +30,8 @@ class User:
                 self.roles = rl['roles']
                 log.info(f"LM. SUCCESS. USERNAME: {self.username}, ip_addr: {self.ip_addr}, password: {self.password}, roles: {self.roles}")
                 return self
-        log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {self.ip_addr}, password: {session['password']}")
+            log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {ip_addr()}, password: {session['password']}")
+        log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {ip_addr()}, password: {session['password']}")
         return None
 
     def have_role(self, role_name):
