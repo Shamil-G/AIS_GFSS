@@ -1,11 +1,12 @@
 from app_config import debug_level
 from main_app import app, log, cfg
-from flask import  session, request, render_template, redirect, url_for, send_from_directory
+from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory
 from flask_login import LoginManager, login_required, current_user
 from util.utils import get_i18n_value
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
 from model.call_report import call_report
 import os
+from model.manage_user import change_passwd
 
 #from model.call_report import call_report, call_report
 
@@ -141,26 +142,6 @@ def view_set_params():
     return render_template("edit_params.html", params=list_params)
 
 
-
-    #return render_template("list_reports.html", cursor=cursor)
-
-    #if request.method == 'POST':
-    #    data = request.json
-    #    log.info(f'VIEW GET REPORTS. POST. DATA: {data}')
-    #    dep = data['dep']
-    #    group = data['group']
-    #    code = data['code']
-    #    params = data['params']
-    #    if dep and group and code:
-    #        log.info(f'VIEW GET REPORTS. CALL REPORT. PARAMS: {params}')
-    #        try:
-    #            result = call_report(dep, group, code, params)
-    #            return result, 200, {'Content-Type': 'text/html;charset=utf-8'}
-    #        except TypeError:
-    #            return {"status": -100, "file_path": "TypeError in params"}, 200, {'Content-Type': 'text/html;charset=utf-8'}
-    #return empty_call_response, 200, {'Content-Type': 'text/html;charset=utf-8'}
-
-
 @app.route('/language/<string:lang>')
 def set_language(lang):
     log.info(f"Set language. LANG: {lang}, предыдущий язык: {session['language']}")
@@ -172,3 +153,19 @@ def set_language(lang):
         return redirect(current_page)
     else:
         return redirect(url_for('view_root'))
+
+
+@app.route('/change-passwd', methods=['POST', 'GET'])
+def view_change_password():
+    log.info(f"CHANGE PASSWORD")
+    if '_flashes' in session:
+        session['_flashes'].clear()
+    if request.method == "POST":
+        passwd_1 = request.form['password_1']
+        passwd_2 = request.form['password_2']
+        if passwd_1 != passwd_2:
+            flash('Пароли не совпадают')
+        else:
+            change_passwd(session['username'], session['password'], passwd_1)
+            return redirect(url_for('view_root'))
+    return render_template("change_passwd.html")

@@ -28,6 +28,10 @@
 
         <nav class="nav">
             {% block navigate %}{% endblock %}
+            {% if g.user.is_active %}
+                <a class="title2" href="/change-passwd">{{ res_value('CHANGE_PASSWORD') }}</a>
+                <a class="title2" href="/logout">{{ res_value('LOGOUT') }}</a>
+            {% endif %}
         </nav>
 
         <div class="article_title">

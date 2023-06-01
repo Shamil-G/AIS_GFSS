@@ -20,6 +20,7 @@ src_lang = 'file'
 language = 'ru'
 debug = True
 URL_GET_ROLES = 'http://192.168.1.35:8085/get-roles'
+URL_CHANGE_PASSWD = 'http://192.168.1.35:8085/change-passwd'
 LOG_PATH = f"{BASE}/logs"
 REPORT_MODULE_PATH = f"reports"
 REPORT_PATH = f"{BASE}/spool"
