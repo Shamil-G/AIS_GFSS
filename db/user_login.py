@@ -8,7 +8,7 @@ from db.connect import get_connection
 from main_app import app, log
 import app_config as cfg
 from ais_gfss_parameter import public_name
-import requests
+from model.manage_user import get_user_roles
 
 
 login_manager = LoginManager(app)
@@ -18,15 +18,150 @@ login_manager.login_message_category = "warning"
 
 log.debug("UserLogin стартовал...")
 
-def get_user_roles(app_name, username, passwd):
-    request_json = { "app_name": app_name, "username": username, "passwd": passwd }
-    resp = requests.post(cfg.URL_GET_ROLES, json=request_json)
-    resp_json = resp.json()
-    log.info(f'-----> resp_json: {resp_json}, type: {type(resp_json)}')
-    return resp_json
-
 
 class User:
+    def get_user_by_name(self, username):
+        if 'password' in session:
+            rl = get_user_roles(session['username'], session['password'])
+            if len(rl) > 0 and 'roles' in rl:
+                self.username = username
+                self.password = session['password']
+                self.ip_addr = ip_addr()
+                self.roles = rl['roles']
+                log.info(f"LM. SUCCESS. USERNAME: {self.username}, ip_addr: {self.ip_addr}, password: {self.password}, roles: {self.roles}")
+                return self
+        log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {self.ip_addr}, password: {session['password']}")
+        return None
+
+    def have_role(self, role_name):
+        if hasattr(self, 'username'):
+            return role_name in self.roles
+
+    def is_authenticated(self):
+        if not hasattr(self, 'username'):
+            return False
+        else:
+            return True
+
+    def is_active(self):
+        if hasattr(self, 'username'):
+            return True
+        else:
+            return False
+
+    def is_anonymous(self):
+        if not self.username:
+            return True
+        else:
+            return False
+
+    def get_id(self):
+        if hasattr(self, 'username'):
+            return self.username
+        else: 
+            return None
+
+
+@login_manager.user_loader
+def loader_user(id_user):
+    if cfg.debug_level > 1:
+        log.debug(f"LM. Loader ID User: {id_user}")
+    return User().get_user_by_name(id_user)
+
+
+@app.after_request
+def redirect_to_signing(response):
+    if response.status_code == 401:
+        return redirect(url_for('view_root') + '?next=' + request.url)
+    return response
+    
+
+@app.before_request
+def before_request():
+    g.user = current_user
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+@login_required
+def logout():
+    log.info(f"LM. LOGOUT. USERNAME: {session['username']}, ip_addr: {ip_addr()}")
+    logout_user()
+    if 'username' in session:
+        session.pop('username')
+    if 'password' in session:
+        session.pop('password')
+    if 'info' in session:
+        session.pop('info')
+    if '_flashes' in session:
+        session['_flashes'].clear()
+    return redirect(url_for('login_page'))
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login_page():
+    if cfg.debug_level > 0:
+        log.info(f"Login Page. Method: {request.method}")
+    if request.method == "POST":
+        session['username'] = request.form.get('username')
+        session['password'] = request.form.get('password')
+
+        user = User().get_user_by_name(session['username'])
+        if user and user.have_role('Оператор'):
+            login_user(user)
+            #if authority():
+            next_page = request.args.get('next')
+            if next_page is not None:
+                log.info(f'LOGIN_PAGE. SUCCESS. GOTO NEXT PAGE: {next_page}')
+                return redirect(next_page)
+            else:
+                log.info(f'LOGIN_PAGE. SUCCESS. GOTO VIEW ROOT')
+                return redirect(url_for('view_root'))
+    flash('Введите имя и пароль')
+    info = ''
+    if 'info' in session:
+        info = session['info']
+        session.pop('info')
+    return render_template('login.html', info=info)
+
+
+# @app.context_processor
+# def get_current_user():
+    # if g.user.id_user:
+    # if g.user.is_anonymous:
+    #     log.debug('Anonymous current_user!')
+    # if g.user.is_authenticated:
+    #     log.debug('Authenticated current_user: '+str(g.user.username))
+    # return{"current_user": 'admin_user'}
+
+#############################################################################
+# При использовании нового класса User, потребности в Authority нет
+def authority():
+    if 'username' not in session:
+        log.info(f"AUTHORITY. Absent USERNAME. ip_addr: {ip_addr()}")
+        session['info'] = 'USERNAME IS NULL'
+        return redirect(url_for('login_page'))
+    username = session['username']
+    try:
+        if username:
+            log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, lang: {session['language']}")
+            # Создаем объект регистрации
+            user = User().get_user_by_name(username)
+            password = session['password']
+            if user and user.is_authenticated() and check_password_hash(user.password, password) or (username == 'sha' and password == 'sha1'):
+                login_user(user)
+                log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, authenticated: {user.is_authenticated()}")
+                return True
+            else: 
+                hash_pwd = generate_password_hash(password)
+                log.error(f'AUTHORITY.  Error PASSWORD. username: {username}, db_password: {user.password}, hash_pwd: {hash_pwd}')
+                session['info'] = get_i18n_value('ERROR_AUTH')
+        return False
+    except Exception as e:
+        log.error(f"ERROR AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, Error Message: {e}")
+        return False
+
+
+class User2:
     roles = ''
     debug = False
     msg = ''
@@ -108,134 +243,3 @@ class User:
     def get_id(self):
         return self.username
         # return self.id_user
-
-
-class User2:
-    def get_user_by_name(self, username):
-        if 'password' in session:
-            rl = get_user_roles(public_name, session['username'], session['password'])
-            if len(rl) > 0 and 'roles' in rl:
-                self.username = username
-                self.password = session['password']
-                self.ip_addr = ip_addr()
-                self.roles = rl['roles']
-                log.info(f"LM. SUCCESS. USERNAME: {self.username}, ip_addr: {self.ip_addr}, password: {self.password}, roles: {self.roles}")
-                return self
-        log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {self.ip_addr}, password: {session['password']}")
-        return None
-
-    def have_role(self, role_name):
-        return role_name in self.roles
-
-    def is_authenticated(self):
-        if self.id_user < 1:
-            return False
-        else:
-            return True
-
-    def is_active(self):
-        if self.id_user > 0:
-            return True
-        else:
-            return False
-
-    def is_anonymous(self):
-        if self.id_user < 1:
-            return True
-        else:
-            return False
-
-    def get_id(self):
-        return self.username
-        # return self.id_user
-
-
-@login_manager.user_loader
-def loader_user(id_user):
-    if cfg.debug_level > 1:
-        log.debug(f"LM. Loader ID User: {id_user}")
-    return User2().get_user_by_name(id_user)
-
-
-@app.route('/logout', methods=['GET', 'POST'])
-def logout():
-    log.info(f"LM. LOGOUT. USERNAME: {session['username']}, ip_addr: {ip_addr()}")
-    logout_user()
-    return redirect(url_for('view_root'))
-
-
-@app.after_request
-def redirect_to_signing(response):
-    if response.status_code == 401:
-        return redirect(url_for('view_root') + '?next=' + request.url)
-    return response
-    
-
-@app.before_request
-def before_request():
-    g.user = current_user
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login_page():
-    if cfg.debug_level > 0:
-        log.info(f"Login Page. Method: {request.method}")
-    if request.method == "POST":
-        session['username'] = request.form.get('username')
-        session['password'] = request.form.get('password')
-
-        user = User2().get_user_by_name(session['username'])
-        if user and user.have_role('Оператор'):
-            login_user(user)
-            #if authority():
-            next_page = request.args.get('next')
-            if next_page is not None:
-                log.info(f'LOGIN_PAGE. SUCCESS. GOTO NEXT PAGE: {next_page}')
-                return redirect(next_page)
-            else:
-                log.info(f'LOGIN_PAGE. SUCCESS. GOTO VIEW ROOT')
-                return redirect(url_for('view_root'))
-    flash('Введите имя и пароль')
-    info = ''
-    if 'info' in session:
-        info = session['info']
-        session.pop('info')
-    return render_template('login.html', info=info)
-
-
-# @app.context_processor
-# def get_current_user():
-    # if g.user.id_user:
-    # if g.user.is_anonymous:
-    #     log.debug('Anonymous current_user!')
-    # if g.user.is_authenticated:
-    #     log.debug('Authenticated current_user: '+str(g.user.username))
-    # return{"current_user": 'admin_user'}
-
-# При использовании класса User2, потребности в Authority нет
-def authority():
-    if 'username' not in session:
-        log.info(f"AUTHORITY. Absent USERNAME. ip_addr: {ip_addr()}")
-        session['info'] = 'USERNAME IS NULL'
-        return redirect(url_for('login_page'))
-    username = session['username']
-    try:
-        if username:
-            log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, lang: {session['language']}")
-            # Создаем объект регистрации
-            user = User().get_user_by_name(username)
-            password = session['password']
-            if user and user.is_authenticated() and check_password_hash(user.password, password) or (username == 'sha' and password == 'sha1'):
-                login_user(user)
-                log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, authenticated: {user.is_authenticated()}")
-                return True
-            else: 
-                hash_pwd = generate_password_hash(password)
-                log.error(f'AUTHORITY.  Error PASSWORD. username: {username}, db_password: {user.password}, hash_pwd: {hash_pwd}')
-                session['info'] = get_i18n_value('ERROR_AUTH')
-        return False
-    except Exception as e:
-        log.error(f"ERROR AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, Error Message: {e}")
-        return False
-
-
