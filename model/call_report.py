@@ -6,7 +6,7 @@ from   app_config import REPORT_PATH, debug_level
 from   model.list_reports import dict_reports
 import os
 import os as platform
-
+from   model.reports import reps
 
 
 stmt_table = """
@@ -143,10 +143,12 @@ def call_report(dep: str, group: str, code: str, params: dict):
                             log.info(f'CALL REPORT. Отчет готовится. status: {status}. {file_name}')
                         if status == 2:
                             log.info(f'CALL REPORT. Отчет готов. status: {status}. {file_name}')
+                        reps.set_status(f'{group}.{code}', status)
                         return {"status": status, "file_path": file_name}
 
                     # Если запись об отчете в БД отсутствует, то ее надо сделать
                     if status in (0,10):
+                        reps.add(f'{group}.{code}', file_name)
                         init_report(file_name, live_time)
 
                         log.info(f'MAKE_REPORT. Start DO REPORT: {file_name}')

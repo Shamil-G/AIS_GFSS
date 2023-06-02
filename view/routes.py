@@ -7,6 +7,7 @@ from model.reports_info import get_owner_reports, get_list_groups, get_list_repo
 from model.call_report import call_report
 import os
 from model.manage_user import change_passwd
+from model.reports import reps, check_reps_status
 
 #from model.call_report import call_report, call_report
 
@@ -169,3 +170,27 @@ def view_change_password():
             change_passwd(session['username'], session['password'], passwd_1)
             return redirect(url_for('view_root'))
     return render_template("change_passwd.html")
+
+
+@app.route('/running-reports', methods=['POST', 'GET'])
+def view_running_reports():
+    if '_flashes' in session:
+        session['_flashes'].clear()
+    
+    list_rep = reps.list()
+    check_reps_status()
+    return render_template("running_reports.html", list = list_rep)
+
+
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    dir_path, f_name = os.path.split(filename)
+    log.info(f"UPLOADED_FILE. PATH: {dir_path}/{f_name}")
+    return send_from_directory(dir_path, f_name)
+
+
+@app.route('/remove-reports/<path:filename>')
+def remove_report(filename):
+    log.info(f'REMOVE REPORT. FILENAME: {filename}')
+    reps.remove(filename)
+    return redirect(url_for('view_running_reports'))

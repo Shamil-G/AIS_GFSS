@@ -1,0 +1,56 @@
+.title, .title2 {
+    padding: 4px;
+    margin-left: 5px;
+}
+.title{
+    font-size: 20px;
+}
+.title2 {
+    font-size: 16px;
+}
+/* Форма ABOUT*/
+.table_s {
+    margin: 12px;
+}
+.th_s, .td_s, .td_s2 {
+    text-align: center;
+    text-decoration: none;
+    padding: 3px 12px;
+    font-weight: normal;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+/* Подсвечиваем строки на котором стоит курсор*/
+.tr_s:hover {
+    border: 1px solid rgba(180, 180, 180, 0.3);
+    background: #555;
+}
+/* Если отчет выбирали то установим новый цвет */
+.a_s {
+    color: #ddd;
+    text-decoration: none;
+}
+.a_s:visited {
+    color: #ddd;
+    text-decoration: none;
+}
+.a_s:link {
+    color: #ddd;
+    text-decoration: none;
+}
+.a_s2 {
+    color:moccasin;
+    text-decoration: none;
+}
+.a_s2:hover {
+    color:palevioletred;
+}
+
+/*
+.a_s2:visited {
+    color: blanchedalmond;
+    text-decoration: none;
+}
+*/*, *:after, *:before {
+    box-sizing: border-box;
+}
+

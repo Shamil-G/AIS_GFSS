@@ -11,9 +11,7 @@
 
 {% block navigate %}
    {% for el in owner_cursor %}
-        <!--<form class="form_model_list">-->
             <a class="title2" href="/dep/{{el.dep_name}}">{{ el.dep_name }}</a>
-        <!--</form>-->
    {% endfor %}
 {% endblock %}
 

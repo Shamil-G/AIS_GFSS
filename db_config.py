@@ -22,8 +22,8 @@ else:
 
 dsn = '192.168.20.60:1521/gfssdb.gfss.kz'
 #dsn = '172.16.17.12:1521/gfss'
-username = 'sswh'
-password = 'sswh'
+username = 'reports'
+password = 'reports'
 encoding = 'UTF-8'
 timeout = 60       # В секундах. Время простоя, после которого курсор освобождается
 wait_timeout = 15000  # Время (в миллисекундах) ожидания доступного сеанса в пуле, перед тем как выдать ошибку
