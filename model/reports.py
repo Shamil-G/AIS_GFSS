@@ -1,5 +1,5 @@
 from main_app import log
-from db.connect import select_one
+from db.connect import plsql_proc_s, select_one
 
 class Reports():
     def  add(self, name_report, path_report):
@@ -11,7 +11,6 @@ class Reports():
             self.list_reports = list_reports
         else:
             self.list_reports.append(rep)
-        log.info(f'===\nReports. list_reports: {self.list_reports}\n===')
    
     def list(self):
         if hasattr(self,'list_reports'):
@@ -21,29 +20,33 @@ class Reports():
             return None
 
     def get_status(self, name_report):
-        if hasattr(self,'list_reports') and name_report in self.list_reports:
+        if hasattr(self,'list_reports'):
             for rep in self.list_reports:
                 if rep['name'] == name_report:
                     return rep['status']
         return None
 
     def set_status(self, name_report, status):
-        if hasattr(self,'list_reports') and name_report in self.list_reports:
+        if hasattr(self,'list_reports'):
             for rep in self.list_reports:
                 if rep['name'] == name_report:
                     rep['status'] = status
 
     def remove(self, path):
         if hasattr(self,'list_reports'):
-            log.info(f'Reports. REMOVE. PATH: {path}')
             for rep in self.list_reports:
-                log.info(f'Reports. REMOVE. REP: {rep}')
                 if rep['path'] == path:
-                    log.info(f'Reports. REMOVE. REP DELETE: {rep}')
                     self.list_reports.remove(rep)
+                    remove_by_file_name(path)
 
 
 reps = Reports()
+
+
+def remove_by_file_name(full_file_path):
+    plsql_proc_s('REMOVE BY FILE NAME', 'reports.reps.remove', [full_file_path])
+    log.info(f'REMOVE BY FILE NAME')
+
 
 def get_status(full_file_path):
     stmt = f"select st.status from load_report_status st where st.file_path = '{full_file_path}'"
