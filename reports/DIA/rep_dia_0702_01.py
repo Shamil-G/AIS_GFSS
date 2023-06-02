@@ -1,7 +1,7 @@
 import xlsxwriter
 import datetime
 import os.path
-from logger import log
+from   util.logger import log
 import cx_Oracle
 
 # from cx_Oracle import SessionPool
