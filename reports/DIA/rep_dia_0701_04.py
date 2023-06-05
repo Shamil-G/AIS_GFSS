@@ -169,7 +169,7 @@ def get_file_path(file_name: str, date_from: str, date_to: str):
 def thread_report(file_name: str, date_from: str, date_to: str):
 	import threading
 	log.info(f'THREAD REPORT. {datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} -> {file_name}')
-	log.info(f'THREAD REPORT. PARAMS: rfpm_id: 0702, date_from: {date_from}, date_to: {date_to}')
+	log.info(f'THREAD REPORT. PARAMS: rfpm_id: 0701, date_from: {date_from}, date_to: {date_to}')
 	threading.Thread(target=do_report, args=(file_name, date_from, date_to), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
 
