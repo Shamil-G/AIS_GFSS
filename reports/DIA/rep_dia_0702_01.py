@@ -143,11 +143,11 @@ with sum_calc  as(
            sum(case when num_month = 12 then sum_pay else 0 end) sum_m_12
     from (
         select /*+ full(si)*/
-        sicid, trunc(months_between(:dt_from, trunc(si.pay_date,'MM'))) num_month, si.sum_pay
+        sicid, trunc(months_between(to_date(:dt_from,'YYYY-MM-DD'), trunc(si.pay_date,'MM'))) num_month, si.sum_pay
         from si_member_2 si
-        where trunc(months_between(:dt_from, trunc(si.pay_date,'MM'))) between 1 and 12
-        and   si.pay_date >= add_months(:dt_from , -12)
-        and   si.pay_date < :dt_from
+        where trunc(months_between(to_date(:dt_from,'YYYY-MM-DD'), trunc(si.pay_date,'MM'))) between 1 and 12
+        and   si.pay_date >= add_months( trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM') , -12)
+        and   si.pay_date < trunc(to_date(:dt_from,'YYYY-MM-DD'),'MM')
     )
     group by sicid
 )
@@ -169,7 +169,7 @@ select /*+ Parallel(8) */
        sc.sum_m_9, sc.sum_m_10, sc.sum_m_11,sc.sum_m_12
 from  payment_history ph, sipr_maket_first_approve_2 sfa, sum_calc sc
       ,person p
-where trunc(ph.act_month,'MM') = :dt_from
+where trunc(ph.act_month,'MM') = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
 and   substr(ph.rfpm_id,1,4)='0702'
 and   ph.pnpt_id = sfa.pnpt_id(+)
 and   ph.pncd_id = sc.sicid(+)
@@ -234,20 +234,18 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(3, 23, '12', common_format)
 
 
-def make_report(rfpm_id: str, date_from: str):
-	file_name = f'{report_code}_{date_from}.xlsx'
-	file_path = f'{file_name}'
+def do_report(file_name: str, date_from: str):
 
 	print(f'MAKE REPORT started...')
-	if os.path.isfile(file_path):
+	if os.path.isfile(file_name):
 		print(f'Отчет уже существует {file_name}')
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 	else:
-		cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
+		#cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
 		#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
 		with cx_Oracle.connect(user='sswh', password='sswh', dsn="172.16.17.12/gfss", encoding="UTF-8") as connection:
-			workbook = xlsxwriter.Workbook(file_path)
+			workbook = xlsxwriter.Workbook(file_name)
 
 			title_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'font_color': 'black'})
 			title_format.set_align('vcenter')
@@ -341,7 +339,23 @@ def make_report(rfpm_id: str, date_from: str):
 			return file_name
 
 
+def get_file_path(file_name: str, date_from: str):
+	format = '%Y-%m-%d'
+	dt = datetime.datetime.strptime(date_from, format)
+	dt_format = dt.strftime('%Y-%m-01')
+	full_file_name = f'{file_name}.0702_01.{dt_format}.xlsx'
+	return full_file_name
+
+
+def thread_report(file_name: str, date_from: str):
+	import threading
+	log.info(f'THREAD REPORT. {datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} -> {file_name}')
+	log.info(f'THREAD REPORT. PARAMS: rfpm_id: 0702, date_from: {date_from}')
+	threading.Thread(target=do_report, args=(file_name, date_from), daemon=True).start()
+	return {"status": 1, "file_path": file_name}
+
+
 if __name__ == "__main__":
     log.info(f'Отчет {report_code} запускается.')
     #make_report('0701', '01.10.2022','31.10.2022')
-    make_report('0702', '01.01.2023')
+    do_report('01.01.2023')

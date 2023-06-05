@@ -38,11 +38,11 @@ dict_reports = {
                 "params": {"date_from": "C", "date_to": "по "},
             },
             "05": {
-                "name": "Получатели СВут 0702 за период",
+                "name": "Получатели СВут 0702 за период (месяц)",
                 "proc": "rep_dia_0702_01",
                 "data_approve": "14.02.2023",
                 "author": "Гусейнов Ш.",
-                "params": {"srfpm_id": "Код выплаты:4", "date_from": "C", "date_to": "по"},
+                "params": {"date_from": "На"},
             },
         },
         "3000": {},
