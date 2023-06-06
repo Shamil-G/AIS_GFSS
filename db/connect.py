@@ -109,7 +109,7 @@ def plsql_func(cursor, f_name, func_name, args):
         ret = cursor.callfunc(func_name, str, args)
     except cx_Oracle.DatabaseError as e:
         error, = e.args
-        log.error(f"-----plsql-func-----> ERROR. {f_name}. IP_Addr: {ip_addr()}, args: {args}")
+        log.error(f"-----plsql-func-----> ERROR. {f_name}. args: {args}")
         log.error(f"Oracle error: {error.code} : {error.message}")
     return ret
 

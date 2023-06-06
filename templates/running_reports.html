@@ -5,12 +5,15 @@
 {% endblock %}
 
 {% block main_title %}
-    <a href="/"><div class="image"><img src="/static/img/Home-1.png"></div></a>&nbsp;. . .&nbsp;<a href="/dep/{{ session['dep_name'] }}">{{ session['dep_name'] }}</a>&nbsp;. . .&nbsp;<a>{{ session['grp_name'] }}</a>
+<form method="POST">
+    <input class="input_s" type="date" id="request_date" name="request_date">
+    <button class="bt_s" type="submit" name="submit">{{ res_value('SELECT_BY_DATE') }}</button>
+</form>
 {% endblock %}
 
 
 {% block navigate %}
-    <a href="/">{{ res_value('RETURN') }}</a>
+    <a class="title2"  href="/">{{ res_value('RETURN') }}</a>
 {% endblock %}
 
 {% block body %}
@@ -20,11 +23,15 @@
             <thead class="th_s">
                 <tr>
                     <th class="th_s"><a>{{ res_value('REPORT_ID') }}</a></th>
+                    <th class="th_s"><a>{{ res_value('REPORT_NAME') }}</a></th>
                     <th class="th_s"><a>{{ res_value('REPORT_STATUS') }}</a></th>
                     <th class="th_s"></th>
                 </tr>
                 {% for el in list %}
                 <tr>
+                    <td class="td_s">
+                        <a class="a_s">{{ el['num'] }}</a>
+                    </td>
                     {% if el['status'] == 2 or el['status'] == '2' %}
                     <td class="td_s">
                         <a class="a_s2" href="/uploads/{{el['path']}}">{{ el['name'] }}</a>

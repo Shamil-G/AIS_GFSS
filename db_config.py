@@ -20,6 +20,7 @@ else:
     pool_inc = 4
     Debug = True
 
+report_db_dsn = '172.16.17.12:1521/gfss'
 dsn = '192.168.20.60:1521/gfssdb.gfss.kz'
 #dsn = '172.16.17.12:1521/gfss'
 username = 'reports'

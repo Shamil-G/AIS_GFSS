@@ -7,8 +7,8 @@ from model.reports_info import get_owner_reports, get_list_groups, get_list_repo
 from model.call_report import call_report
 import os
 from model.manage_user import change_passwd
-from model.reports import reps, check_reps_status
-
+from model.reports import list_reports_by_day, remove_by_file_name
+from datetime import date
 #from model.call_report import call_report, call_report
 
 list_params = []
@@ -38,15 +38,9 @@ def utility_processor():
 @app.route('/home', methods=['POST', 'GET'])
 @login_required
 def view_root():
-    # log.info("Static folder: " + app.static_folder)
     owners = get_owner_reports()
     if debug_level > 1 and 'username' in session:
         log.info(f"VIEW_ROOT. USERNAME: {session['username']}")
-    #if not g or 'user' not in g or g.user.is_anonymous():
-    #    log.info(f"VIEW MODELS. NOT LOGIN")
-    #    return redirect(url_for('login_page'))
-    #log.info(f"VIEW MODELS. USER: {g.user.username}")
-    #cursor = models_list()
     return render_template("index.html", owner_cursor=owners)
 
 
@@ -61,19 +55,6 @@ def view_set_dep(dep_name):
     cursor = get_list_groups()
     print(cursor)
     return render_template("list_grps.html", cursor=cursor)
-        #log.info(f'VIEW GET REPORTS. POST. DATA: {data}')
-        #dep = data['dep']
-        #group = data['group']
-        #code = data['code']
-        #params = data['params']
-        #if dep and group and code:
-        #    log.info(f'VIEW GET REPORTS. CALL REPORT. PARAMS: {params}')
-        #    try:
-        #        result = call_report(dep, group, code, params)
-        #        return result, 200, {'Content-Type': 'text/html;charset=utf-8'}
-        #    except TypeError:
-        #        return {"status": -100, "file_path": "TypeError in params"}, 200, {'Content-Type': 'text/html;charset=utf-8'}
-    #return empty_call_response, 200, {'Content-Type': 'text/html;charset=utf-8'}
 
 
 @app.route('/list-reports/<int:grp>', methods=['POST', 'GET'])
@@ -176,10 +157,12 @@ def view_change_password():
 def view_running_reports():
     if '_flashes' in session:
         session['_flashes'].clear()
-    
-    list_rep = reps.list()
-    check_reps_status()
-    return render_template("running_reports.html", list = list_rep)
+    request_date = date.today().strftime('%Y-%m-%d')
+    if request.method == "POST":
+        request_date = request.form['request_date']
+    if debug_level > 2:
+        log.info(f'RUNNING REPORTS. REQUEST DATE: {request_date}')
+    return render_template("running_reports.html", list = list_reports_by_day(request_date))
 
 
 @app.route('/uploads/<path:filename>')
@@ -192,5 +175,5 @@ def uploaded_file(filename):
 @app.route('/remove-reports/<path:filename>')
 def remove_report(filename):
     log.info(f'REMOVE REPORT. FILENAME: {filename}')
-    reps.remove(filename)
+    remove_by_file_name(filename)
     return redirect(url_for('view_running_reports'))

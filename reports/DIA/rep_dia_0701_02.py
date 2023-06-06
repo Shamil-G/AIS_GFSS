@@ -33,7 +33,6 @@ stmt_1 = """
       where pt.pnpt_id=doc.source_id
       and doc.pncd_id=p1.sicid
       and pt.pnpt_id=pd.pnpt_id(+)
-      and substr(doc.rfbn_id,1,2) = '16'
       and pd.sicid=p2.sicid(+)
       and substr(pt.rfpm_id,1,4) = '0701'
       and doc.pncp_date Between to_date(:dt_from,'yyyy-mm-dd') And to_date(:dt_to,'yyyy-mm-dd')
