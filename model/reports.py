@@ -1,69 +1,46 @@
+from app_config import debug_level
 from main_app import log
-from db.connect import plsql_proc_s, select_one
-
-class Reports():
-    def  add(self, name_report, path_report):
-        rep = {"name": name_report, "status": 0, "path": path_report}
-        if not hasattr(self,'list_reports'):
-            list_reports = []
-            log.info(f'TYPE: {type(list_reports)}')
-            list_reports.append(rep)
-            self.list_reports = list_reports
-        else:
-            self.list_reports.append(rep)
-   
-    def list(self):
-        if hasattr(self,'list_reports'):
-            log.info(f'===\nReports. LIST: {self.list_reports}\n===')
-            return self.list_reports
-        else:
-            return None
-
-    def get_status(self, name_report):
-        if hasattr(self,'list_reports'):
-            for rep in self.list_reports:
-                if rep['name'] == name_report:
-                    return rep['status']
-        return None
-
-    def set_status(self, name_report, status):
-        if hasattr(self,'list_reports'):
-            for rep in self.list_reports:
-                if rep['name'] == name_report:
-                    rep['status'] = status
-
-    def remove(self, path):
-        if hasattr(self,'list_reports'):
-            for rep in self.list_reports:
-                if rep['path'] == path:
-                    self.list_reports.remove(rep)
-                    remove_by_file_name(path)
-
-
-reps = Reports()
-
+from db.connect import plsql_proc_s, get_connection, plsql_proc, select_one
+import cx_Oracle
+import os
 
 def remove_by_file_name(full_file_path):
-    plsql_proc_s('REMOVE BY FILE NAME', 'reports.reps.remove', [full_file_path])
-    log.info(f'REMOVE BY FILE NAME')
+    plsql_proc_s('REMOVE BY FILE NAME', 'reports.reps.remove_report', [full_file_path])
+    if debug_level > 2:
+        log.info(f'REMOVE BY FILE NAME')
 
 
 def get_status(full_file_path):
     stmt = f"select st.status from load_report_status st where st.file_path = '{full_file_path}'"
     log.info(f'GET STATUS. STMT: {stmt}')
     mistake, rec, err_mess = select_one(stmt, [])
-    log.info(f'GET STATUS. STMT: {stmt}, rec: {rec}')
+    if debug_level > 2:
+        log.info(f'GET STATUS. STMT: {stmt}, rec: {rec}')
     if mistake == 0: 
         return rec[0]
     else:
         log.error(f'ERROR GET STATUS. err_mess: {err_mess}')
         return -100
 
-def check_reps_status():
-    if hasattr(reps, 'list_reports'):
-        for rep in reps.list():
-            status = get_status(rep['path'])
-            if status != -100:
-                log.info(f'CHECK REPS STATUS. STATUS: {status}')
-                rep['status'] = status
-        log.info(f'CHECK REPS STATUS. reps.list: {reps.list()}')
+
+def list_reports_by_day(request_day):
+    results = []
+    with get_connection().cursor() as cursor:
+        myCursor = cursor.var(cx_Oracle.CURSOR)
+        if debug_level > 2:
+            log.info(f'LIST REPORTS BY DAY. request_day: {request_day}')
+        plsql_proc(cursor, 'LIST REPORTS BY DAY', 'reports.reps.list_reports', [request_day, myCursor])
+        val_cursor = myCursor.getvalue() 
+        if val_cursor:
+            rows = val_cursor.fetchall()
+            for row in rows:
+                info = { "num": row[1], "name": row[2], "live_time": row[3], "status": row[4], "path": row[5]}
+                if row[4] == 2 and not os.path.exists(row[5]):
+                    if debug_level > 2:
+                        log.info(f'LIST REPORTS BY DAY. FILE NOT EXISTS. REMOVE FROM DB: {row[5]}.')
+                    remove_by_file_name(row[5])
+                else:
+                    log.info(f'LIST REPORTS BY DAY. DAY:{request_day}, INFO: {info}')
+                    results.append(info)
+            rows.clear()
+    return results

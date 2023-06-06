@@ -22,6 +22,7 @@ header, footer, .article_title {
   border: 1px solid rgba(180, 180, 180, 0.3);
 }
 .article {
+    padding: 6px 10px;
 }
 .common-container {
     min-height: 100%;
@@ -125,8 +126,8 @@ groups {
     float: left; /*Задаем обтекание*/
     text-align: center; /*Центрируем текст по горизонтали*/
     border-radius: 5px;
-    border: 1px solid rgba(180, 180, 180, 0.3);
-    margin: 5px;
+/*    border: 1px solid rgba(180, 180, 180, 0.3);
+*/    margin: 5px;
     background: #444;
 }
 reports > a {

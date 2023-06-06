@@ -2,6 +2,7 @@ import xlsxwriter
 import datetime
 import os.path
 from   util.logger import log
+from   db.connect import report_db_dsn, report_db_username, report_db_password
 import cx_Oracle
 
 # from cx_Oracle import SessionPool
@@ -244,7 +245,15 @@ def do_report(file_name: str, date_from: str):
 	else:
 		#cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
 		#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
-		with cx_Oracle.connect(user='sswh', password='sswh', dsn="172.16.17.12/gfss", encoding="UTF-8") as connection:
+		if report_db_dsn:
+			dsn = report_db_dsn
+			username = report_db_username
+			password = report_db_password  
+		else:
+			dsn="172.16.17.12/gfss"
+			username = 'sswh'
+			password = 'sswh'
+		with cx_Oracle.connect(user=username, password=password, dsn=dsn, encoding="UTF-8") as connection:
 			workbook = xlsxwriter.Workbook(file_name)
 
 			title_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'font_color': 'black'})

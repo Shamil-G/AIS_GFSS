@@ -30,3 +30,17 @@ def change_passwd(username, passwd, new_passwd):
     finally:
         log.info(f"CHANGE PASSWD. USERNAME: {username}, STATUS: {resp_json['status']}")
         return resp_json
+
+
+def user_info(username):
+    request_json = { "app_name": public_name, "username": username }
+    url = f'{URL_LOGIN}/user-info'
+    try:
+        resp = requests.post(url, json=request_json)
+        resp_json = resp.json()
+    except Exception as e:
+        log.error(f'USER INFO. ERROR. URL: {url}, ERROR: {e}')
+        resp_json = {'status': 'ERROR', 'mess': f'{e}'}
+    finally:
+        log.info(f"USER INFO. USERNAME: {username}, STATUS: {resp_json['status']}")
+        return resp_json

@@ -6,22 +6,58 @@ from   app_config import REPORT_PATH, debug_level
 from   model.list_reports import dict_reports
 import os
 import os as platform
-from   model.reports import reps
 
 
 stmt_table = """
 CREATE TABLE LOAD_REPORT_STATUS(
-date_execute date,
-live_time   number(6,2),
-status      varchar2(8),
-file_path        varchar2(512)
+  date_execute DATE,
+  num          number(3),
+  code         varchar2(16),
+  live_time    NUMBER(6,2),
+  status       VARCHAR2(8),
+  file_path    VARCHAR2(512)
 )
+tablespace DATA
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
 """
 
 stmt_index = """
-create unique index XU_LOAD_REPORT_STATUS_F_NAME on LOAD_REPORT_STATUS (file_path);
+create unique index XU_LOAD_REPORT_STATUS_F_NAME on LOAD_REPORT_STATUS (file_path)
+  tablespace DATA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
 """
-
+stmt_index_2 = """
+create index XN_LOAD_REPORT_STATUS_DATE_EXECUTE on LOAD_REPORT_STATUS (DATE_EXECUTE)
+  tablespace DATA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+"""
 
 def check_report(file_path: str):
     stmt = f"""
@@ -61,16 +97,8 @@ def check_report(file_path: str):
     return -100
 
 
-def init_report(file_path: str, live_time: str):
-    stmt_new = f"""
-      begin
-        insert into LOAD_REPORT_STATUS(date_execute, status, live_time, file_path)  values(sysdate, 1, {live_time}, '{file_path}');
-        commit;
-      end;
-    """
-    with get_connection().cursor() as cursor:
-        plsql_execute(cursor, 'INIT_REPORT', stmt_new, [])
-        log.info(f"INSERT into LOAD_REPORT_STATUS")
+def init_report(name_report: str, live_time: str, file_path: str):
+    plsql_proc_s('INIT REPORT', 'reports.reps.add_report', [name_report, live_time, file_path])
     # 0 - файл отсутствует
     # 1 - Файл готовится
     # 2 - Файл готов
@@ -148,8 +176,7 @@ def call_report(dep: str, group: str, code: str, params: dict):
 
                     # Если запись об отчете в БД отсутствует, то ее надо сделать
                     if status in (0,10):
-                        reps.add(f'{group}.{code}', file_name)
-                        init_report(file_name, live_time)
+                        init_report(f'{group}.{code}', live_time, file_name)
 
                         log.info(f'MAKE_REPORT. Start DO REPORT: {file_name}')
 
