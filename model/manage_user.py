@@ -1,4 +1,4 @@
-from app_config import URL_LOGIN
+from app_config import URL_LOGIN, debug_level
 from ais_gfss_parameter import public_name
 from main_app import log
 import requests
@@ -12,9 +12,10 @@ def get_user_roles(username, passwd):
         resp_json = resp.json()
     except Exception as e:
         log.error(f'---> GET USER ROLES. URL: {url}, ERROR: {e}')
-        resp_json = {'status': 'ERROR', 'mess': f'{e}'}
+        resp_json = {"status": 'ERROR', "username": username, "roles": [], "mess": f'{e}'}
     finally:
-        log.info(f'-----> resp_json: {resp_json}, type: {type(resp_json)}')
+        if debug_level > 2:
+            log.info(f'-----> resp_json: {resp_json}, type: {type(resp_json)}')
         return resp_json
 
 
@@ -28,7 +29,8 @@ def change_passwd(username, passwd, new_passwd):
         log.error(f'CHANGE PASSWD. ERROR. URL: {url}, ERROR: {e}')
         resp_json = {'status': 'ERROR', 'mess': f'{e}'}
     finally:
-        log.info(f"CHANGE PASSWD. USERNAME: {username}, STATUS: {resp_json['status']}")
+        if debug_level > 2:
+            log.info(f"CHANGE PASSWD. USERNAME: {username}, STATUS: {resp_json['status']}")
         return resp_json
 
 
@@ -42,5 +44,6 @@ def user_info(username):
         log.error(f'USER INFO. ERROR. URL: {url}, ERROR: {e}')
         resp_json = {'status': 'ERROR', 'mess': f'{e}'}
     finally:
-        log.info(f"USER INFO. USERNAME: {username}, STATUS: {resp_json['status']}")
+        if debug_level > 2:
+            log.info(f"USER INFO. USERNAME: {username}, STATUS: {resp_json['status']}")
         return resp_json
