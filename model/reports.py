@@ -36,7 +36,8 @@ def list_reports_by_day(request_day):
             for row in rows:
                 info = { "num": row[1], "name": row[2], "live_time": row[3], "status": row[4], "path": row[5]}
                 exist = os.path.exists(row[5])
-                log.info(f'LIST REPORTS BY DAY. status: {row[4]}, exist: {exist}, path: {row[5]}')
+                if debug_level > 2:
+                    log.info(f'LIST REPORTS BY DAY. status: {row[4]}, exist: {exist}, path: {row[5]}')
                 if int(row[4]) == 2 and not exist:
                     if debug_level > 2:
                         log.info(f'LIST REPORTS BY DAY. FILE NOT EXISTS. REMOVE FROM DB: {row[5]}.')
