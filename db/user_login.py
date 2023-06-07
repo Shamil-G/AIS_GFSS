@@ -23,7 +23,7 @@ class User:
     def get_user_by_name(self, username):
         if 'password' in session:
             rl = get_user_roles(session['username'], session['password'])
-            if len(rl) > 0 and 'roles' in rl:
+            if 'roles' in rl and len(rl) > 0:
                 self.username = username
                 self.password = session['password']
                 self.ip_addr = ip_addr()
