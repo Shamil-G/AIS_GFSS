@@ -22,7 +22,7 @@ header, footer, .article_title {
   border: 1px solid rgba(180, 180, 180, 0.3);
 }
 .article {
-    padding: 6px 10px;
+    padding: 6px 0px;
 }
 .common-container {
     min-height: 100%;
