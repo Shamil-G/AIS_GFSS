@@ -162,7 +162,10 @@ def view_running_reports():
         request_date = request.form['request_date']
     if debug_level > 2:
         log.info(f'RUNNING REPORTS. REQUEST DATE: {request_date}')
-    return render_template("running_reports.html", list = list_reports_by_day(request_date))
+    list_reports = list_reports_by_day(request_date)
+    if debug_level > 2:
+        log.info(f'RUNNING REPORTS. LIST REPORTS: {list_reports}')
+    return render_template("running_reports.html", list = list_reports)
 
 
 @app.route('/uploads/<path:filename>')

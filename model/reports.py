@@ -25,7 +25,11 @@ def get_status(full_file_path):
 
 def list_reports_by_day(request_day):
     results = []
+    if debug_level > 2:
+        log.info(f'LIST REPORTS BY DAY. request_day: {request_day}')
     with get_connection().cursor() as cursor:
+        if debug_level > 3:
+            log.info(f'LIST REPORTS BY DAY. CURSOR CREATED')
         myCursor = cursor.var(cx_Oracle.CURSOR)
         if debug_level > 2:
             log.info(f'LIST REPORTS BY DAY. request_day: {request_day}')
