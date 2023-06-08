@@ -21,7 +21,7 @@ log.debug("UserLogin стартовал...")
 
 class User:
     def get_user_by_name(self, username):
-        if 'password' in session:
+        if 'password' in session and 'password' in session:
             rl = get_user_roles(session['username'], session['password'])
             if 'roles' in rl and len(rl) > 0:
                 self.username = username
