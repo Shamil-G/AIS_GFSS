@@ -1,9 +1,8 @@
 import db_config as cfg
 from util.logger import log
-from ais_gfss_parameter import using
-import cx_Oracle
-# from cx_Oracle import SessionPool
-# con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
+#from ais_gfss_parameter import using
+from util.ip_addr import ip_addr 
+import oracledb
 
 
 def init_session(connection, requestedTag_ignored):
@@ -13,9 +12,10 @@ def init_session(connection, requestedTag_ignored):
     cursor.close()
 
 
-# cx_Oracle.init_oracle_client(lib_dir=cfg.LIB_DIR, config_dir=r"C:\oracle\your_config_dir")
-cx_Oracle.init_oracle_client(lib_dir=cfg.LIB_DIR)
-_pool = cx_Oracle.SessionPool(cfg.username, cfg.password, cfg.dsn,
+# Для работы "толстого клиента", сначала выполняется init_oracle_client
+#oracledb.init_oracle_client(lib_dir=cfg.LIB_DIR)
+
+_pool = oracledb.create_pool(user=cfg.username, password=cfg.password, dsn=cfg.dsn,
                                 timeout=cfg.timeout, wait_timeout=cfg.wait_timeout,
                                 max_lifetime_session=cfg.max_lifetime_session,
                                 encoding=cfg.encoding, 
@@ -50,7 +50,7 @@ def select(stmt):
             recs = cursor.fetchall()
             for rec in recs:
                 results.append(rec)
-    except cx_Oracle.DatabaseError as e:
+    except oracledb.DatabaseError as e:
         error, = e.args
         mistake = 1
         err_mess = f"Oracle error: {error.code} : {error.message}"
@@ -68,7 +68,7 @@ def select_one(stmt, args):
             #log_outcoming.info(f"\nВыбираем данные: {stmt}")
             cursor.execute(stmt, args)
             rec = cursor.fetchone()
-    except cx_Oracle.DatabaseError as e:
+    except oracledb.DatabaseError as e:
         error, = e.args
         mistake = 1
         rec = ''
@@ -82,7 +82,7 @@ def select_one(stmt, args):
 def plsql_execute(cursor, f_name, cmd, args):
     try:
         cursor.execute(cmd, args)
-    except cx_Oracle.DatabaseError as e:
+    except oracledb.DatabaseError as e:
         error, = e.args
         log.error(f"------execute------> ERROR. {f_name}. IP_Addr: {ip_addr()}, args: {args}")
         log.error(f"Oracle error: {error.code} : {error.message}")
@@ -101,7 +101,7 @@ def plsql_func_s(f_name, proc_name, args):
 def plsql_proc(cursor, f_name, proc_name, args):
     try:
         cursor.callproc(proc_name, args)
-    except cx_Oracle.DatabaseError as e:
+    except oracledb.DatabaseError as e:
         error, = e.args
         # log.error(f"-----plsql-proc-----> ERROR. {f_name}. IP_Addr: {ip_addr()}, args: {args}")
         log.error(f"-----plsql-proc-----> ERROR. {f_name}. ARGS: {args}")
@@ -112,7 +112,7 @@ def plsql_func(cursor, f_name, func_name, args):
     ret = ''
     try:
         ret = cursor.callfunc(func_name, str, args)
-    except cx_Oracle.DatabaseError as e:
+    except oracledb.DatabaseError as e:
         error, = e.args
         log.error(f"-----plsql-func-----> ERROR. {f_name}. args: {args}")
         log.error(f"Oracle error: {error.code} : {error.message}")

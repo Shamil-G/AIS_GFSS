@@ -10,9 +10,9 @@ else:
     LIB_DIR = r'C:\instantclient_21_3'
 
 if using == 'PROD':
-    pool_min = 8
+    pool_min = 20
     pool_max = 40
-    pool_inc = 8
+    pool_inc = 20
     Debug = True
 else:
     pool_min = 4
@@ -21,14 +21,15 @@ else:
     Debug = True
 
 report_db_dsn = '172.16.17.12:1521/gfss'
+report_db_username = 'sswh'
+report_db_password = 'sswh'
 dsn = '192.168.20.60:1521/gfssdb.gfss.kz'
-#dsn = '172.16.17.12:1521/gfss'
 username = 'reports'
 password = 'reports'
 encoding = 'UTF-8'
-timeout = 60       # В секундах. Время простоя, после которого курсор освобождается
+timeout = 15       # В секундах. Время простоя, после которого курсор освобождается
 wait_timeout = 15000  # Время (в миллисекундах) ожидания доступного сеанса в пуле, перед тем как выдать ошибку
-max_lifetime_session = 2800  # Время в секундах, в течении которого может существоват сеанс
+max_lifetime_session = 30  # Время в секундах, в течении которого может существоват сеанс
 
 log.info(f"=====> DB CONFIG. using: {using}, LIB_DIR: {LIB_DIR}, DSN: {dsn}")
 
