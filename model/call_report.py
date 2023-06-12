@@ -1,10 +1,9 @@
 from  db.connect import select_one, plsql_proc_s, get_connection, plsql_execute, plsql_proc_s
 from  main_app import log
 import importlib
-from   app_config import REPORT_PATH, debug_level
+from   app_config import REPORT_PATH, debug_level, platform
 from   model.list_reports import dict_reports
 import os
-import os as platform
 
 
 stmt_table = """

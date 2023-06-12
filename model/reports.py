@@ -55,8 +55,9 @@ def list_reports_by_day(request_day):
                             log.info(f'LIST REPORTS BY DAY. FILE NOT EXISTS. REMOVE FROM DB: {row[5]}.')
                         remove_by_file_name(row[5])
                     else:
+                        dir_path, f_name = os.path.split(row[5])
                         if debug_level > 2:
-                            log.info(f'LIST REPORTS BY DAY. DAY:{request_day}, INFO: {info}')
-                        results.append(info)
+                            log.info(f'LIST REPORTS BY DAY. DAY:{request_day}, FILENAME: {f_name}')
+                        results.append(f_name)
                 rows.clear()
     return results

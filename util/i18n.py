@@ -13,7 +13,7 @@ class I18N:
         file_object = ''
         return_value = ''
         file_name = f'{cfg.BASE}/i18n.{lang}'
-        if cfg.os == 'unix':
+        if cfg.platform == 'unix':
             file_name = f'{cfg.BASE}/i18nu.{lang}'
         n_objects = 0
         # if cfg.debug:
