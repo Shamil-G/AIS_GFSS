@@ -13,7 +13,8 @@ def init_session(connection, requestedTag_ignored):
 
 
 # Для работы "толстого клиента", сначала выполняется init_oracle_client
-#oracledb.init_oracle_client(lib_dir=cfg.LIB_DIR)
+# Для работы с версией БД ЦРТР требуется толлстый клиент
+oracledb.init_oracle_client(lib_dir=cfg.LIB_DIR)
 
 _pool = oracledb.create_pool(user=cfg.username, password=cfg.password, dsn=cfg.dsn,
                                 timeout=cfg.timeout, wait_timeout=cfg.wait_timeout,
