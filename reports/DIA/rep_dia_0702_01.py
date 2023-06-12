@@ -1,9 +1,10 @@
+from   db_config import report_db_user, report_db_password, report_db_dsn
 import xlsxwriter
 import datetime
 import os.path
 from   util.logger import log
 from   db.connect import report_db_dsn, report_db_username, report_db_password
-import cx_Oracle
+import oracledb
 
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
@@ -104,7 +105,7 @@ with sum_calc  as(
     from si_member_2 si
     where months_between(:dt_from, si.pay_date) between 1 and 12
     and   si.pay_date >= add_months(:dt_from , -12)
-    and   si.pay_date < :dt_from
+    and   si.pay_date < :dt_to
     group by sicid
 )
 select /*+ parallel(4) */ ph.rfbn_id, 
@@ -126,6 +127,7 @@ and   substr(ph.rfpm_id,1,4)='0702'
 and   ph.pnpt_id = sfa.pnpt_id
 and   ph.pncd_id = sc.sicid(+)
 """
+
 stmt_4 = """
 with sum_calc  as(
     select /*+ Parallel(8) full(si)*/
@@ -236,7 +238,6 @@ def format_worksheet(worksheet, common_format):
 
 
 def do_report(file_name: str, date_from: str):
-
 	print(f'MAKE REPORT started...')
 	if os.path.isfile(file_name):
 		print(f'Отчет уже существует {file_name}')
@@ -253,7 +254,8 @@ def do_report(file_name: str, date_from: str):
 			dsn="172.16.17.12/gfss"
 			username = 'sswh'
 			password = 'sswh'
-		with cx_Oracle.connect(user=username, password=password, dsn=dsn, encoding="UTF-8") as connection:
+	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
+		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
 			title_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'font_color': 'black'})
@@ -309,10 +311,8 @@ def do_report(file_name: str, date_from: str):
 			cnt_part = 0
 			m_val = [0]
 
-			cursor = connection.cursor()
 			log.info(f'{file_name}. Загружаем данные за период {date_from}')
-			cursor.execute(active_stmt, [date_from])
-			#cursor.execute(active_stmt, [date_from, date_to])
+			cursor.execute(active_stmt, date_from=date_from)
 
 			records = cursor.fetchall()
 			

@@ -1,14 +1,15 @@
 from typing import List, Any
 from flask import render_template, request, redirect, flash, url_for, g, session
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user
-from util.utils import ip_addr, get_i18n_value
-import cx_Oracle
+from util.get_i18n import get_i18n_value
 from werkzeug.security import check_password_hash, generate_password_hash
 from db.connect import get_connection
 from main_app import app, log
 import app_config as cfg
 from ais_gfss_parameter import public_name
 from model.manage_user import get_user_roles
+from util.ip_addr import ip_addr
+import oracledb
 
 
 login_manager = LoginManager(app)
@@ -169,40 +170,43 @@ class User2:
     language = ''
 
     def get_user_by_name(self, username):
-        conn = get_connection()
-        cursor = conn.cursor()
-        password = cursor.var(cx_Oracle.DB_TYPE_VARCHAR)
-        id_user  = cursor.var(cx_Oracle.DB_TYPE_NUMBER)
-        mess      = cursor.var(cx_Oracle.DB_TYPE_VARCHAR)
+        with get_connection() as connection:
+            with connection.cursor() as cursor:
+                password = cursor.var(oracledb.DB_TYPE_VARCHAR)
+                id_user  = cursor.var(oracledb.DB_TYPE_NUMBER)
+                mess      = cursor.var(oracledb.DB_TYPE_VARCHAR)
+                try:
+                    cursor.callproc('cop.admin.get_password', (username, id_user, password, mess))
+                    self.id_user = int(id_user.getvalue())
+                    if self.id_user==0:
+                        log.error(f"LM. ORACLE ERROR. USERNAME: {username}, ip_addr: {ip_addr()}, Error: {mess.getvalue()}")
+                        return None
+                    self.username = username
+                    self.password = password.getvalue()
+                    self.ip_addr = ip_addr()
+                    self.roles = []
+                    self.get_roles(cursor)
+                    if hasattr(self, 'password') and self.roles:
+                        if cfg.debug_level > 1:
+                            log.info(f"LM. SUCCESS. USERNAME: {username}, ip_addr: {self.ip_addr},  password: {self.password}, len_roles: {len(self.roles)}")
+                        return self
+                    else:
+                        log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {self.ip_addr}")
+                except oracledb.DatabaseError as e:
+                    error, = e.args
+                    log.error(f"LM. ORACLE EXCEPTION. USER_NAME: {username}, ip_addr: {ip_addr()}, "
+                              f"Error: {error.code} : {error.message}")
 
-        try:
-            cursor.callproc('cop.admin.get_password', (username, id_user, password, mess))
-            self.id_user = int(id_user.getvalue())
-            if self.id_user==0:
-                log.error(f"LM. ORACLE ERROR. USERNAME: {username}, ip_addr: {ip_addr()}, Error: {mess.getvalue()}")
-                return None
-            self.username = username
-            self.password = password.getvalue()
-            self.ip_addr = ip_addr()
-            self.roles = []
-            self.get_roles(cursor)
-        except cx_Oracle.DatabaseError as e:
-            error, = e.args
-            log.error(f"LM. ORACLE EXCEPTION. USER_NAME: {username}, ip_addr: {ip_addr()}, "
-                      f"Error: {error.code} : {error.message}")
-        finally:
-            cursor.close()
-            conn.close()
-        if hasattr(self, 'password') and self.roles:
-            if cfg.debug_level > 1:
-                log.info(f"LM. SUCCESS. USERNAME: {username}, ip_addr: {self.ip_addr},  password: {self.password}, len_roles: {len(self.roles)}")
-            return self
-        else:
-            log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {self.ip_addr}")
-            return None
+                if hasattr(self, 'password') and self.roles:
+                    if cfg.debug_level > 1:
+                        log.info(f"LM. SUCCESS. USERNAME: {username}, ip_addr: {self.ip_addr},  password: {self.password}, len_roles: {len(self.roles)}")
+                    return self
+                else:
+                    log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {self.ip_addr}")
+                    return None
 
     def get_roles(self, cursor):
-        my_var = cursor.var(cx_Oracle.CURSOR)
+        my_var = cursor.var(oracledb.CURSOR)
         try:
             cursor.callproc('cop.admin.get_roles', [public_name, self.id_user, my_var])
             rows = my_var.getvalue().fetchall()
@@ -215,7 +219,7 @@ class User2:
             rows.clear()
             if cfg.debug_level > 1:
                 log.info(f"LM. USER: {str(self.username)} have ROLES: {self.roles}")
-        except cx_Oracle.DatabaseError as e:
+        except oracledb.DatabaseError as e:
             error, = e.args
             log.error(f'LM. GET ALL ROLES. {self.username}')
             log.error(f'Oracle Error: {error.code} : {error.message}')

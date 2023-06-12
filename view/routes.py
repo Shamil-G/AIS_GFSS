@@ -1,14 +1,15 @@
+from ais_gfss_parameter import using
 from app_config import debug_level
 from main_app import app, log, cfg
 from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory
 from flask_login import LoginManager, login_required, current_user
-from util.utils import get_i18n_value
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
 from model.call_report import call_report
 import os
 from model.manage_user import change_passwd
 from model.reports import list_reports_by_day, remove_by_file_name
 from datetime import date
+from util.get_i18n import get_i18n_value
 #from model.call_report import call_report, call_report
 
 list_params = []
