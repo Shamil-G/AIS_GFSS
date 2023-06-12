@@ -1,5 +1,4 @@
 from  db.connect import select_one, plsql_proc_s, get_connection, plsql_execute, plsql_proc_s
-from  ast import Num
 from  main_app import log
 import importlib
 from   app_config import REPORT_PATH, debug_level
@@ -171,7 +170,6 @@ def call_report(dep: str, group: str, code: str, params: dict):
                             log.info(f'CALL REPORT. Отчет готовится. status: {status}. {file_name}')
                         if status == 2:
                             log.info(f'CALL REPORT. Отчет готов. status: {status}. {file_name}')
-                        reps.set_status(f'{group}.{code}', status)
                         return {"status": status, "file_path": file_name}
 
                     # Если запись об отчете в БД отсутствует, то ее надо сделать
