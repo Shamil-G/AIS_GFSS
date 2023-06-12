@@ -6,12 +6,12 @@ else:
     BASE = f'/home/ais_gfss/{app_name}'
 
 if using.startswith('DEV_WIN'):
-    os = '!unix'
+    platform = '!unix'
     host = '192.168.5.17'
     debug_level = 3
     port = 8080
 else:
-    os = 'unix'
+    platform = 'unix'
     debug_level = 2
     host = 'localhost'
     port = 80

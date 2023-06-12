@@ -1,5 +1,5 @@
 from ais_gfss_parameter import using
-from app_config import debug_level
+from app_config import debug_level, REPORT_PATH
 from main_app import app, log, cfg
 from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory
 from flask_login import LoginManager, login_required, current_user
@@ -171,13 +171,12 @@ def view_running_reports():
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
-    dir_path, f_name = os.path.split(filename)
-    log.info(f"UPLOADED_FILE. PATH: {dir_path}/{f_name}")
-    return send_from_directory(dir_path, f_name)
+    log.info(f"UPLOADED_FILE. FILENAME: {filename}")
+    return send_from_directory(REPORT_PATH, filename)
 
 
 @app.route('/remove-reports/<path:filename>')
 def remove_report(filename):
     log.info(f'REMOVE REPORT. FILENAME: {filename}')
-    remove_by_file_name(filename)
+    remove_by_file_name(f'{REPORT_PATH}/{filename}')
     return redirect(url_for('view_running_reports'))
