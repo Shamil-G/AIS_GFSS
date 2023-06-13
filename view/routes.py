@@ -172,14 +172,17 @@ def view_running_reports():
 def uploaded_file(full_path):
     path, file_name = os.path.split(full_path)
     status = check_report(f'{REPORT_PATH}/{file_name}')
+    if debug_level > 2:
+        log.info(f"UPLOADED_FILE. STATUS: {status} : {type(status)}, PATH: {path}, file_name: {file_name}, REPORT_PATH: {REPORT_PATH}")
     if status == 2:
-        log.info(f"UPLOADED_FILE. PATH: {path}, file_name: {file_name}")
+        log.info(f"UPLOADED_FILE. PATH: {path}, FILE_NAME: {file_name}")
         return send_from_directory(REPORT_PATH, file_name)
     return redirect(url_for('view_running_reports'))
 
 
 @app.route('/remove-reports/<string:date_report>/<int:num_report>')
 def view_remove_report(date_report,num_report):
-    log.info(f'REMOVE REPORT. DATE_REPORT: {date_report}, NUM_REPORT: {num_report}')
+    if debug_level > 2:
+        log.info(f'REMOVE REPORT. DATE_REPORT: {date_report}, NUM_REPORT: {num_report}')
     remove_report(date_report, num_report)
     return redirect(url_for('view_running_reports'))

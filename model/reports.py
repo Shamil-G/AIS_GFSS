@@ -21,9 +21,31 @@ stmt_list_reports = """
     where trunc(st.date_execute,'DD') = to_date(:i_date,'YYYY-MM-DD')
 """
 
+stmt_file_path = f"""
+    select st.file_path
+    from LOAD_REPORT_STATUS st 
+    where to_char(st.date_execute, 'YYYY-MM-DD') = :i_date_report
+    and   st.num = :i_num
+"""
+
+
+def remove_file(date_report: str, num_report: int):
+    mistake, result, err_msg = select_one(stmt_file_path, [date_report, num_report])
+    log.info(f"CHECK_REPORT. MISTAKE: {mistake},  err_msg: {err_msg}, result: {result}")
+    if mistake == 0:
+        if result:
+            file_path = result[0]
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                if debug_level > 2:
+                    log.info(f"CHECK_REPORT. REMOVE_FILE. date_report: {date_report}, num_report: {num_report}, file_path: {file_path}")
+                return True
+    return False
+
 
 def remove_report(date_report: str, num_report: int):
-    plsql_proc_s('REMOVE BY FILE NAME', 'reports.reps.remove_report', [date_report, num_report])
+    if remove_file(date_report, num_report):
+        plsql_proc_s('REMOVE BY FILE NAME', 'reports.reps.remove_report', [date_report, num_report])
     if debug_level > 2:
         log.info(f'REMOVE BY FILE NAME')
 
@@ -44,12 +66,13 @@ def list_reports_by_day(request_day):
                 for row in rows:
                     remain_time = row[10]
                     file_exist = os.path.exists(row[9])
+                    status = int(row[8])
                     if remain_time <= 0:
                         log.info(f"CHECK_REPORT. REMOVE. REMAIN TIME: {remain_time} <= 0, date_report: {request_day}, inum_report: {row[1]}")
                         remove_report(row[0], row[1])
                         if file_exist:
                             os.remove(row[9])
-                    elif not file_exist:
+                    elif not file_exist and status == 2:
                         remove_report(row[0], row[1])
                         log.info(f"CHECK_REPORT. REMOVE. FILE NOT EXISTS. date_report: {request_day}, num_report: {row[1]}, file: {row[9]}")
                     else:
