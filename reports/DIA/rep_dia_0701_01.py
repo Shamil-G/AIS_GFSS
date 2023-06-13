@@ -5,6 +5,7 @@ from   os import path
 from   util.logger import log
 import oracledb
 from   model.call_report import set_status_report
+import os.path
 
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
@@ -29,7 +30,7 @@ from (
     from pnpt_payment pt,
          pnpd_document doc
     where pt.pnpt_id=doc.source_id
-    and substr(pt.rfpm_id,1,4) = :p1
+    and substr(pt.rfpm_id,1,4) = :i_rfpm_id
 	and doc.ridt_id in (6,7,8)
 	and doc.status in (0,1,2)
     and doc.pncp_date Between to_date(:dt_from,'yyyy-mm-dd') And to_date(:dt_to,'yyyy-mm-dd')
@@ -43,7 +44,7 @@ from (
     from pnpt_payment pt,
          pnpd_document doc,
          pnpd_payment_dependant pd
-    where substr(pt.rfpm_id,1,4) = :p1
+    where substr(pt.rfpm_id,1,4) = :i_rfpm_id
     and doc.pncp_date Between to_date(:dt_from,'yyyy-mm-dd') And to_date(:dt_to,'yyyy-mm-dd')
 	and doc.ridt_id in (6,7,8)
 	and doc.status in (0,1,2)
@@ -69,7 +70,7 @@ from (
     from payment_history pt,
          pnpd_document doc
     where pt.pnpt_id=doc.source_id
-    and substr(pt.rfpm_id,1,4) = :p1
+    and substr(pt.rfpm_id,1,4) = :i_rfpm_id
 	and doc.ridt_id in (6,7,8)
 	and doc.status in (0,1,2)
     and doc.pncp_date Between to_date(:dt_from,'yyyy-mm-dd') And to_date(:dt_to,'yyyy-mm-dd')
@@ -84,7 +85,7 @@ from (
     from payment_history pt,
          pnpd_document doc,
          pnpd_payment_dependant pd
-    where substr(pt.rfpm_id,1,4) = :p1
+    where substr(pt.rfpm_id,1,4) = :i_rfpm_id
     and doc.pncp_date Between to_date(:dt_from,'yyyy-mm-dd') And to_date(:dt_to,'yyyy-mm-dd')
 	and doc.ridt_id in (6,7,8)
 	and doc.status in (0,1,2)
@@ -117,8 +118,11 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2, 4, 'Сумма выплат', common_format)
 
 
-def do_report(file_name: str, date_from: str, date_to: str):
-	log.info(f'DO REPORT. START {report_code}. RFPM_ID: 0701, DATE_FROM: {date_from}, FILE_PATH: {file_name}')
+def do_report(file_name: str, date_first: str, date_second: str):
+	if os.path.isfile(file_name):
+		log.info(f'Отчет уже существует {file_name}')
+		return file_name
+	log.info(f'DO REPORT. START {report_code}. RFPM_ID: 0701, DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
@@ -169,7 +173,7 @@ def do_report(file_name: str, date_from: str, date_to: str):
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'За период: {date_from} - {date_to}', title_name_report)
+			worksheet.write(1, 0, f'За период: {date_first} - {date_second}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 2
@@ -177,10 +181,10 @@ def do_report(file_name: str, date_from: str, date_to: str):
 			m_val = [0,0,0,0]
 			rec_num = 3
 
-			log.info(f'Загружаем данные за период {date_from} : {date_to} -> {file_name}')
+			log.info(f'Загружаем данные за период {date_first} : {date_second} -> {file_name}')
 			try:
 				rfpm_id = '0701'
-				cursor.execute(active_stmt, [rfpm_id, date_from, date_to])
+				cursor.execute(active_stmt, i_rfpm_id=rfpm_id, dt_from=date_first, dt_to=date_second)
 			except oracledb.DatabaseError as e:
 				error, = e.args
 				log.error(f"Oracle error: {error.code} : {error.message}")
@@ -227,16 +231,16 @@ def do_report(file_name: str, date_from: str, date_to: str):
 			set_status_report(file_name, 2)
 
 
-def get_file_path(file_name: str, date_from: str, date_to: str):
-	full_file_name = f'{file_name}.0701_01.{date_from}_{date_to}.xlsx'
+def get_file_path(file_name: str, date_first: str, date_second: str):
+	full_file_name = f'{file_name}.0701_01.{date_first}_{date_second}.xlsx'
 	return full_file_name
 
 
-def thread_report(file_name: str, date_from: str, date_to: str):
+def thread_report(file_name: str, date_first: str, date_second: str):
 	import threading
 	log.info(f'THREAD REPORT. {datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} -> {file_name}')
-	log.info(f'THREAD REPORT. PARAMS: date_from: {date_from}, date_to: {date_to}')
-	threading.Thread(target=do_report, args=(file_name, date_from, date_to), daemon=True).start()
+	log.info(f'THREAD REPORT. PARAMS: date_from: {date_first}, date_to: {date_second}')
+	threading.Thread(target=do_report, args=(file_name, date_first, date_second), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
 
 	

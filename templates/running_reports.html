@@ -22,36 +22,64 @@
         <table>
             <thead class="th_s">
                 <tr>
+                    <th class="th_s"><a>{{ res_value('REPORT_DATE') }}</a></th>
                     <th class="th_s"><a>{{ res_value('REPORT_ID') }}</a></th>
                     <th class="th_s"><a>{{ res_value('REPORT_NAME') }}</a></th>
                     <th class="th_s"><a>{{ res_value('REPORT_STATUS') }}</a></th>
+                    <th class="th_s"><a>{{ res_value('RFPM_ID') }}</a></th>
+                    <th class="th_s"><a>{{ res_value('DATE_FIRST') }}</a></th>
+                    <th class="th_s"><a>{{ res_value('DATE_SECOND') }}</a></th>
+                    <th class="th_s"><a>{{ res_value('RFBN_ID') }}</a></th>
                     <th class="th_s"></th>
                 </tr>
                 {% for el in list %}
                 <tr>
                     <td class="td_s">
+                        <a class="a_s">{{ el['date_event'] }}</a>
+                    </td>
+                    <td class="td_s">
                         <a class="a_s">{{ el['num'] }}</a>
                     </td>
-                    {% if el['status'] == 2 or el['status'] == '2' %}
-                    <td class="td_s">
-                        <a class="a_s2" href="/uploads/{{el['path']}}">{{ el['name'] }}</a>
-                    </td>
-                    <td class="td_s">
-                        <a class="a_s2" href="/uploads/{{el['path']}}">{{ res_value('REPORT_GET') }}</a>
-                    </td>
-                    <td class="td_s">
-                        <a class="a_s2" href="/remove-reports/{{ el['path'] }}">{{ res_value('REMOVE_REPORT') }}</a>
-                    </td>
-                    {% else %}
                     <td class="td_s">
                         <a class="a_s">{{ el['name'] }}</a>
                     </td>
+
+                    {% if el['status'] == 2 or el['status'] == '2' %}
+                    <td class="td_s">
+                        <a class="a_s2" href="/uploads/{{el['path']}}">{{ res_value('REPORT_GET') }}</a>
+                    </td>
+                    {% else %}
                     <td class="td_s">
                         <a class="a_s">{{ res_value('REPORT_PREPARING') }}</a>
                     </td>
+                    {% endif %}
                     <td class="td_s">
-                        <a class="a_s2" href="/remove-reports/{{ el['path'] }}">{{ res_value('REMOVE_REPORT') }}</a>
+                        {% if el['rfpm_id'] %}
+                        <a class="a_s">{{ el['rfpm_id'] }}</a>
+                        {% endif %}
                     </td>
+                    <td class="td_s">
+                        {% if el['date_first'] %}
+                        <a class="a_s">{{ el['date_first'] }}</a>
+                        {% endif %}
+                    </td>
+                    <td class="td_s">
+                        {% if el['date_second'] %}
+                        <a class="a_s">{{ el['date_second'] }}</a>
+                        {% endif %}
+                    </td>
+                    <td class="td_s">
+                        {% if el['rfbn_id'] %}
+                        <a class="a_s">{{ el['rfbn_id'] }}</a>
+                        {% endif %}
+                    </td>
+
+                    {% if el['status'] == 2 %}
+                    <td class="td_s">
+                        <a class="a_s2" href="/remove-reports/{{ el['date_event'] }}/{{ el['num'] }}">{{ res_value('REMOVE_REPORT') }}</a>
+                    </td>
+                    {% else %}
+                    <td class="td_s"></td>
                     {% endif %}
                 </tr>
                 {% endfor %}
