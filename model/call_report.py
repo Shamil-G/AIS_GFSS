@@ -3,6 +3,7 @@ from  main_app import log
 import importlib
 from   app_config import REPORT_PATH, debug_level, platform
 from   model.list_reports import dict_reports
+from   model.reports import remove_report
 import os
 
 
@@ -59,34 +60,30 @@ create index XN_LOAD_REPORT_STATUS_DATE_EXECUTE on LOAD_REPORT_STATUS (DATE_EXEC
 
 def check_report(file_path: str):
     stmt = f"""
-      select status, 
-             case when status = 2 then
-                        date_execute + 
-                        (case when live_time>0 then live_time/24 else 1 end) -
-                        (case when live_time>0 then sysdate else date_execute end) 
-                  else live_time end
-      from LOAD_REPORT_STATUS lr 
-      where lr.file_path = '{file_path}'
+      select st.date_execute, st.num, st.status, 
+            case when st.status = 2 then
+                    date_execute + 
+                    (case when st.live_time>0 then st.live_time/24 else 1 end) -
+                    (case when st.live_time>0 then st.sysdate else st.date_execute end) 
+                when trunc(st.date_execute) != trunc(sysdate) and st.status = 1 then
+                     0
+                else st.live_time 
+            end           
+      from LOAD_REPORT_STATUS st 
+      where st.file_path = :file_path
     """
-    mistake, result, err_msg = select_one(stmt, [])
-    log.info(f"CHECK_REPORT. MISTAKE: {mistake},  err_msg: {err_msg}, FILE_PATH: {file_path}")
+    mistake, result, err_msg = select_one(stmt, [file_path])
+    log.info(f"CHECK_REPORT. MISTAKE: {mistake},  err_msg: {err_msg}, file_path: {file_path}")
     if mistake == 0:
         if result:
-            status = result[0]
-            remain_time = result[1]
-            log.info(f"CHECK_REPORT. RESULT: {result}, status: {status}")
-            if remain_time<0:
-                log.info(f"CHECK_REPORT. REMAIN TIME: {remain_time}, FILE_PATH: {file_path}")
-                # Delete active record
-                stmt_del = f"""
-                begin 
-                    delete from LOAD_REPORT_STATUS lr where lr.file_path = '{file_path}'; 
-                    commit; 
-                end;
-                """
-                with get_connection().cursor() as cursor:
-                    plsql_execute(cursor, 'CHECK_REPORT', stmt_del, [])
-                # Remove report
+            date_report = result[0]
+            num_report = result[1]
+            status = result[2]
+            remain_time = result[3]
+            log.info(f"CHECK_REPORT. RESULT: {result}, status: {status}, idate_report: {date_report}, inum_report: {num_report}")
+            if remain_time <= 0:
+                log.info(f"CHECK_REPORT. REMAIN TIME: {remain_time}, idate_report: {date_report}, inum_report: {num_report}")
+                remove_report(date_report, num_report)
                 if os.path.exists(file_path):
                     os.remove(file_path)
                 status = 0
@@ -95,8 +92,8 @@ def check_report(file_path: str):
     return -100
 
 
-def init_report(name_report: str, live_time: str, file_path: str):
-    plsql_proc_s('INIT REPORT', 'reports.reps.add_report', [name_report, live_time, file_path])
+def init_report(name_report: str, date_first: str, date_second: str, rfpm_id: str, rfbn_id: str, live_time: str, file_path: str):
+    plsql_proc_s('INIT REPORT', 'reports.reps.add_report', [name_report, date_first, date_second, rfpm_id, rfbn_id, live_time, file_path])
     # 0 - файл отсутствует
     # 1 - Файл готовится
     # 2 - Файл готов
@@ -173,7 +170,20 @@ def call_report(dep: str, group: str, code: str, params: dict):
 
                     # Если запись об отчете в БД отсутствует, то ее надо сделать
                     if status in (0,10):
-                        init_report(f'{group}.{code}', live_time, file_name)
+                        date_first = ''
+                        date_second = ''
+                        rfpm_id = ''
+                        rfbn_id = ''
+                        if 'date_first' in params:
+                            date_first = params['date_first']
+                        if 'date_second' in params:
+                            date_second = params['date_second']
+                        if 'srfpm_id' in params:
+                            rfpm_id = params['srfpm_id']
+                        if 'srfbn_id' in params:
+                            rfbn_id = params['srfbn_id']
+
+                        init_report(f'{group}.{code}', date_first, date_second, rfpm_id, rfbn_id, live_time, file_name)
 
                         log.info(f'MAKE_REPORT. Start DO REPORT: {file_name}')
 
