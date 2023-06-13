@@ -73,16 +73,18 @@ def check_report(file_path: str):
       where st.file_path = :file_path
     """
     mistake, result, err_msg = select_one(stmt, [file_path])
-    log.info(f"CHECK_REPORT. MISTAKE: {mistake},  err_msg: {err_msg}, file_path: {file_path}")
+    if debug_level > 2:
+        log.info(f"CHECK_REPORT. MISTAKE: {mistake},  err_msg: {err_msg}, file_path: {file_path}")
     if mistake == 0:
         if result:
             date_report = result[0]
             num_report = result[1]
-            status = result[2]
+            status = int(result[2])
             remain_time = result[3]
-            log.info(f"CHECK_REPORT. RESULT: {result}, status: {status}, idate_report: {date_report}, inum_report: {num_report}")
+            if debug_level > 2:
+                log.info(f"CHECK_REPORT. RESULT: {result}, status: {status}, idate_report: {date_report}, inum_report: {num_report}")
             if remain_time <= 0:
-                log.info(f"CHECK_REPORT. REMAIN TIME: {remain_time}, idate_report: {date_report}, inum_report: {num_report}")
+                log.info(f"CHECK_REPORT. REMOVE. REMAIN TIME: {remain_time}, idate_report: {date_report}, inum_report: {num_report}")
                 remove_report(date_report, num_report)
                 if os.path.exists(file_path):
                     os.remove(file_path)
