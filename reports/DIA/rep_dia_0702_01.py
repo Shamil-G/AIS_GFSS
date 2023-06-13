@@ -1,10 +1,10 @@
-from   db_config import report_db_user, report_db_password, report_db_dsn
 import xlsxwriter
 import datetime
 import os.path
-from   util.logger import log
-from   db.connect import report_db_dsn, report_db_username, report_db_password
 import oracledb
+from   util.logger import log
+from   db_config import report_db_user, report_db_password, report_db_dsn
+from   model.call_report import set_status_report
 
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
@@ -237,23 +237,12 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(3, 23, '12', common_format)
 
 
-def do_report(file_name: str, date_from: str):
-	print(f'MAKE REPORT started...')
+def do_report(file_name: str, date_first: str):
 	if os.path.isfile(file_name):
-		print(f'Отчет уже существует {file_name}')
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	else:
-		#cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
-		#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
-		if report_db_dsn:
-			dsn = report_db_dsn
-			username = report_db_username
-			password = report_db_password  
-		else:
-			dsn="172.16.17.12/gfss"
-			username = 'sswh'
-			password = 'sswh'
+	#cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
+	#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
 	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
@@ -304,15 +293,15 @@ def do_report(file_name: str, date_from: str):
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'За период: {date_from}', title_name_report)
+			worksheet.write(1, 0, f'За период: {date_first}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 3
 			cnt_part = 0
 			m_val = [0]
 
-			log.info(f'{file_name}. Загружаем данные за период {date_from}')
-			cursor.execute(active_stmt, date_from=date_from)
+			log.info(f'{file_name}. Загружаем данные за период {date_first}')
+			cursor.execute(active_stmt, dt_from=date_first)
 
 			records = cursor.fetchall()
 			
@@ -345,22 +334,20 @@ def do_report(file_name: str, date_from: str):
 			workbook.close()
 			now = datetime.datetime.now()
 			log.info(f'Формирование отчета {file_name} завершено: {now.strftime("%d-%m-%Y %H:%M:%S")}')
+			set_status_report(file_name, 2)
 			return file_name
 
 
-def get_file_path(file_name: str, date_from: str):
-	format = '%Y-%m-%d'
-	dt = datetime.datetime.strptime(date_from, format)
-	dt_format = dt.strftime('%Y-%m-01')
-	full_file_name = f'{file_name}.0702_01.{dt_format}.xlsx'
+def get_file_path(file_name: str, date_first: str):
+	full_file_name = f'{file_name}.0702_01.{date_first}.xlsx'
 	return full_file_name
 
 
-def thread_report(file_name: str, date_from: str):
+def thread_report(file_name: str, date_first: str):
 	import threading
 	log.info(f'THREAD REPORT. {datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} -> {file_name}')
-	log.info(f'THREAD REPORT. PARAMS: rfpm_id: 0702, date_from: {date_from}')
-	threading.Thread(target=do_report, args=(file_name, date_from), daemon=True).start()
+	log.info(f'THREAD REPORT. PARAMS: rfpm_id: 0702, date_from: {date_first}')
+	threading.Thread(target=do_report, args=(file_name, date_first), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
 
 

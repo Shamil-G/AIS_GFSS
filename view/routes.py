@@ -1,16 +1,15 @@
-from ais_gfss_parameter import using
 from app_config import debug_level, REPORT_PATH
-from main_app import app, log, cfg
+from main_app import app, log
 from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory
-from flask_login import LoginManager, login_required, current_user
+from flask_login import  login_required
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
 from model.call_report import call_report
 import os
 from model.manage_user import change_passwd
-from model.reports import list_reports_by_day, remove_by_file_name
+from model.reports import list_reports_by_day, remove_report
 from datetime import date
 from util.get_i18n import get_i18n_value
-#from model.call_report import call_report, call_report
+from model.call_report import check_report
 
 list_params = []
 
@@ -169,14 +168,18 @@ def view_running_reports():
     return render_template("running_reports.html", list = list_reports)
 
 
-@app.route('/uploads/<path:filename>')
-def uploaded_file(filename):
-    log.info(f"UPLOADED_FILE. FILENAME: {filename}")
-    return send_from_directory(REPORT_PATH, filename)
+@app.route('/uploads/<path:full_path>')
+def uploaded_file(full_path):
+    path, file_name = os.path.split(full_path)
+    status = check_report(f'{REPORT_PATH}/{file_name}')
+    if status == 2:
+        log.info(f"UPLOADED_FILE. PATH: {path}, file_name: {file_name}")
+        return send_from_directory(REPORT_PATH, file_name)
+    return redirect(url_for('view_running_reports'))
 
 
-@app.route('/remove-reports/<path:filename>')
-def remove_report(filename):
-    log.info(f'REMOVE REPORT. FILENAME: {filename}')
-    remove_by_file_name(f'{REPORT_PATH}/{filename}')
+@app.route('/remove-reports/<string:date_report>/<int:num_report>')
+def view_remove_report(date_report,num_report):
+    log.info(f'REMOVE REPORT. DATE_REPORT: {date_report}, NUM_REPORT: {num_report}')
+    remove_report(date_report, num_report)
     return redirect(url_for('view_running_reports'))
