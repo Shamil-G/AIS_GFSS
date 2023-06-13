@@ -60,17 +60,17 @@ create index XN_LOAD_REPORT_STATUS_DATE_EXECUTE on LOAD_REPORT_STATUS (DATE_EXEC
 
 def check_report(file_path: str):
     stmt = f"""
-      select date_execute, num, status, 
+      select st.date_execute, st.num, st.status, 
             case when st.status = 2 then
                     date_execute + 
-                    (case when live_time>0 then live_time/24 else 1 end) -
-                    (case when live_time>0 then sysdate else date_execute end) 
+                    (case when st.live_time>0 then st.live_time/24 else 1 end) -
+                    (case when st.live_time>0 then st.sysdate else st.date_execute end) 
                 when trunc(st.date_execute) != trunc(sysdate) and st.status = 1 then
                      0
-                else live_time 
+                else st.live_time 
             end           
-      from LOAD_REPORT_STATUS lr 
-      where lr.file_path = :file_path
+      from LOAD_REPORT_STATUS st 
+      where st.file_path = :file_path
     """
     mistake, result, err_msg = select_one(stmt, [file_path])
     log.info(f"CHECK_REPORT. MISTAKE: {mistake},  err_msg: {err_msg}, file_path: {file_path}")
