@@ -70,8 +70,6 @@ def list_reports_by_day(request_day):
                     if remain_time <= 0:
                         log.info(f"CHECK_REPORT. REMOVE. REMAIN TIME: {remain_time} <= 0, date_report: {request_day}, inum_report: {row[1]}")
                         remove_report(row[0], row[1])
-                        if file_exist:
-                            os.remove(row[9])
                     elif not file_exist and status == 2:
                         remove_report(row[0], row[1])
                         log.info(f"CHECK_REPORT. REMOVE. FILE NOT EXISTS. date_report: {request_day}, num_report: {row[1]}, file: {row[9]}")
