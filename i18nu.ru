@@ -1,4 +1,4 @@
-APP_NAME = АИС ГФСС 2023
+APP_NAME = Отчётность ГФСС, 2023
 ABOUT = О программе
 GROUP_REPORT = Группа отчетов
 RETURN = Назад
