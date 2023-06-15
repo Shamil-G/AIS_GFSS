@@ -95,11 +95,15 @@ def check_report(file_path: str):
 
 
 def init_report(name_report: str, date_first: str, date_second: str, rfpm_id: str, rfbn_id: str, live_time: str, file_path: str):
-    plsql_proc_s('INIT REPORT', 'reports.reps.add_report', [name_report, date_first, date_second, rfpm_id, rfbn_id, live_time, file_path])
+    status = 0
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            status =cursor.callfunc('reports.reps.add_report', int, [name_report, date_first, date_second, rfpm_id, rfbn_id, live_time, file_path])
     # 0 - файл отсутствует
     # 1 - Файл готовится
     # 2 - Файл готов
     # 10 - Журнал не содержит информаци об отчете
+    return status
 
 
 def set_status_report(file_path: str, status: int):
@@ -157,7 +161,7 @@ def call_report(dep: str, group: str, code: str, params: dict):
 
                     #log.info(f'CALL REPORT. GET FILE NAME. file_name: {file_name}')
                     status = int(check_report(file_name))
-
+ 
                     ##log.info(f'CALL REPORT. CHECK REPORT. status: {status}')
                     if status < 0:
                         log.info(f'CALL REPORT. Ошибка статуса. {status}. {file_name}')
@@ -185,8 +189,14 @@ def call_report(dep: str, group: str, code: str, params: dict):
                         if 'srfbn_id' in params:
                             rfbn_id = params['srfbn_id']
 
-                        init_report(f'{group}.{code}', date_first, date_second, rfpm_id, rfbn_id, live_time, file_name)
-
+                        status = init_report(f'{group}.{code}', date_first, date_second, rfpm_id, rfbn_id, live_time, file_name)
+                        log.info(f'CALL REPORT. Status: {status}')
+                        if status == 1:
+                            log.info(f'CALL REPORT. REPORT PREPARING. Status: {status}, file_name: {file_name}')
+                            return {"status": status, "file_path": file_name}
+                        if status == 2:
+                            log.info(f'CALL REPORT. RESULT EXIST. Status: {status}, file_name: {file_name}')
+                            return {"status": status, "file_path": file_name}
                         log.info(f'MAKE_REPORT. Start DO REPORT: {file_name}')
 
                         params['file_name']=file_name

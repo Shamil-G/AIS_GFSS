@@ -111,7 +111,10 @@ def view_set_params():
                         log.info(f"EDIT_PARAMS. RESULT: {result}, PARAMS: {new_params}, report: {report}")
                     if 'status' in result:
                         status = result['status']
-                        #Если отчет готов, то выслать его получателю
+                        # 0 - отчет начал готовится
+                        # 1 - отчет уже готовится
+                        # 2 - отчет уже готов
+                        # Если отчет готов(status==2), то выслать его получателю
                         if status == 2:
                             if 'file_path' in result:
                                 row_path = os.path.normpath(result['file_path'])

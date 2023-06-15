@@ -1,3 +1,5 @@
+from concurrent.futures.thread import BrokenThreadPool
+from gc import enable
 import db_config as cfg
 from util.logger import log
 #from ais_gfss_parameter import using
@@ -113,7 +115,7 @@ def plsql_proc(cursor, f_name, proc_name, args):
 def plsql_func(cursor, f_name, func_name, args):
     ret = ''
     try:
-        ret = cursor.callfunc(func_name, str, args)
+        ret = cursor.callfunc(func_name, args)
     except oracledb.DatabaseError as e:
         error, = e.args
         log.error(f"-----plsql-func-----> ERROR. {f_name}. args: {args}")
