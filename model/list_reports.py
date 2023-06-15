@@ -8,7 +8,7 @@ dict_reports = {
     "ДИА": {
         "1500": {
             "module_dir": f"{REPORT_MODULE_PATH}.DIA",
-            "live_time": "1",
+            "live_time": "240000",
             "01": {
                 "name": "Количество иждивенцев и сумма 0701 за период",
                 "proc": "rep_dia_0701_01",
