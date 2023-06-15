@@ -1,3 +1,5 @@
+from concurrent.futures.thread import BrokenThreadPool
+from gc import enable
 import db_config as cfg
 from util.logger import log
 #from ais_gfss_parameter import using
@@ -22,6 +24,7 @@ _pool = oracledb.create_pool(user=cfg.username, password=cfg.password, dsn=cfg.d
                                 encoding=cfg.encoding, 
                                 min=cfg.pool_min, max=cfg.pool_max, 
                                 increment=cfg.pool_inc,
+                                expire_time=15,
                                 threaded=True, sessionCallback=init_session)
 log.info(f'Пул соединенй БД Oracle создан. Timeout: {_pool.timeout}, wait_timeout: {_pool.wait_timeout}, '
             f'max_lifetime_session: {_pool.max_lifetime_session}, min: {cfg.pool_min}, max: {cfg.pool_max}')
@@ -112,7 +115,7 @@ def plsql_proc(cursor, f_name, proc_name, args):
 def plsql_func(cursor, f_name, func_name, args):
     ret = ''
     try:
-        ret = cursor.callfunc(func_name, str, args)
+        ret = cursor.callfunc(func_name, args)
     except oracledb.DatabaseError as e:
         error, = e.args
         log.error(f"-----plsql-func-----> ERROR. {f_name}. args: {args}")
