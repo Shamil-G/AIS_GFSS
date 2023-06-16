@@ -8,11 +8,11 @@ else:
 if using.startswith('DEV_WIN'):
     platform = '!unix'
     host = '192.168.5.17'
-    debug_level = 3
+    debug_level = 2
     port = 8080
 else:
     platform = 'unix'
-    debug_level = 2
+    debug_level = 1
     host = 'localhost'
     port = 80
 
