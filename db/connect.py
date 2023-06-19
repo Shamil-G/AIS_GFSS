@@ -77,8 +77,7 @@ def select_one(stmt, args):
         mistake = 1
         rec = ''
         err_mess = f"Oracle error: {error.code} : {error.message}"
-        log.error(f"------select------> ERROR with: {stmt}.")
-        log.error(err_mess)
+        log.error(f"ERROR with ------select------>\n{stmt}\nARGS: {args}\nmess: {err_mess}")
     finally:
         return mistake, rec, err_mess
 
