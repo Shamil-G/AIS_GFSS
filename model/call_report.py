@@ -60,7 +60,7 @@ create unique index XN_LOAD_REPORT_STATUS_DATE_EXECUTE_NUM on LOAD_REPORT_STATUS
 
 def check_report(file_path: str):
     stmt = f"""
-      select st.date_execute, st.num, st.status, 
+      select to_char(st.date_execute,'YYYY-MM-DD'), st.num, st.status, 
             case when st.status = 2 then
                     date_execute + 
                     (case when st.live_time>0 then st.live_time/24 else 1 end) -
@@ -86,8 +86,6 @@ def check_report(file_path: str):
             if remain_time <= 0:
                 log.info(f"CHECK_REPORT. REMOVE. REMAIN TIME: {remain_time}, idate_report: {date_report}, inum_report: {num_report}")
                 remove_report(date_report, num_report)
-                if os.path.exists(file_path):
-                    os.remove(file_path)
                 status = 0
             return status
         return 10
