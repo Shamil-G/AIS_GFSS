@@ -156,6 +156,8 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                             #Определим путь для импорта необходимого Python модуля-отчета
                             module_dir = cur_group['module_dir']
                             module_path = f"{module_dir}.{proc}"
+                            if debug_level > 2:
+                                log.info(f'CALL REPORT. MODULE DIR: {module_dir}, MODULE PATH: {module_path}')
                             #loaded_module = __import__(module_path, globals(), locals(), ['make_report'], 0)
                             loaded_module = importlib.import_module(module_path)
                             # Получаем полный путь к файлу - результату
