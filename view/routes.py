@@ -50,11 +50,10 @@ def view_set_dep(dep_name):
     log.info(f'SET_DEP: {dep_name}')
     #if request.method == 'POST':
     session['dep_name'] = dep_name
-    if debug_level > 3:
-        log.info(f"DEP_NAME: {session['dep_name']}")
-    cursor = get_list_groups()
-    print(cursor)
-    return render_template("list_grps.html", cursor=cursor)
+    list_groups = get_list_groups()
+    if debug_level > 2:
+        log.info(f"DEP_NAME: {session['dep_name']}, LIST_GROUPS: {list_groups}")
+    return render_template("list_grps.html", cursor=list_groups)
 
 
 @app.route('/list-reports/<int:grp>', methods=['POST', 'GET'])

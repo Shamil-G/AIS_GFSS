@@ -1,7 +1,7 @@
 from app_config import debug_level
 from main_app import log
 from db.connect import plsql_proc_s, get_connection, plsql_proc, select_one
-#import cx_Oracle
+from datetime import datetime
 import oracledb
 import os
 
@@ -31,32 +31,33 @@ stmt_file_path = f"""
 
 def remove_file(date_report: str, num_report: int):
     mistake, result, err_msg = select_one(stmt_file_path, [date_report, num_report])
-    log.info(f"CHECK_REPORT. MISTAKE: {mistake},  err_msg: {err_msg}, result: {result}")
-    if mistake == 0:
-        if result:
-            file_path = result[0]
-            if os.path.exists(file_path):
-                os.remove(file_path)
-                if debug_level > 2:
-                    log.info(f"CHECK_REPORT. REMOVE_FILE. date_report: {date_report}, num_report: {num_report}, file_path: {file_path}")
-                return True
+    if debug_level > 2:
+        log.info(f"REMOVE_FILE. MISTAKE: {mistake},  err_msg: {err_msg}, result: {result}")
+    if mistake == 0 and result:
+        file_path = result[0]
+        if debug_level > 2:
+            log.info(f"REMOVE_FILE. CHECK EXIST FILE. file_path: {file_path}")
+        if os.path.exists(file_path):
+            log.info(f"REMOVE_FILE. FILE_PATH: {file_path}")
+            os.remove(file_path)
+        return True
     return False
 
 
 def remove_report(date_report: str, num_report: int):
     if remove_file(date_report, num_report):
-        plsql_proc_s('REMOVE BY FILE NAME', 'reports.reps.remove_report', [date_report, num_report])
-    if debug_level > 2:
-        log.info(f'REMOVE BY FILE NAME')
+        log.info(f'REMOVE REPORT. NUM_REPORT: {num_report}')
+        plsql_proc_s('REMOVE REPORT. FILE NAME', 'reports.reps.remove_report', [date_report, num_report])
 
 
 def list_reports_by_day(request_day):
+    current_day = datetime.today().strftime('%Y-%m-%d')
     results = []
     if debug_level > 2:
-        log.info(f'LIST REPORTS BY DAY. request_day: {request_day}')
+        log.info(f'LIST REPORTS BY DAY. request_day: {request_day}, current_day: {current_day}')
     with get_connection() as connection:
         with connection.cursor() as cursor:
-            if debug_level > 3:
+            if debug_level > 2:
                 log.info(f'LIST REPORTS BY DAY. CURSOR CREATED')
             cursor.execute(stmt_list_reports, i_date=request_day)
             if debug_level > 2:
@@ -71,8 +72,11 @@ def list_reports_by_day(request_day):
                         log.info(f"CHECK_REPORT. REMOVE. REMAIN TIME: {remain_time} <= 0, date_report: {request_day}, inum_report: {row[1]}")
                         remove_report(row[0], row[1])
                     elif not file_exist and status == 2:
+                        log.info(f"CHECK_REPORT. REMOVE. FILE NOT EXISTS. num_report: {row[1]}, file: {row[9]}")
                         remove_report(row[0], row[1])
-                        log.info(f"CHECK_REPORT. REMOVE. FILE NOT EXISTS. date_report: {request_day}, num_report: {row[1]}, file: {row[9]}")
+                    elif status == 1 and current_day != request_day:
+                        log.info(f"CHECK_REPORT. REMOVE. STATUS: {status}, request_day: {request_day}, current_day: {current_day}, file: {row[9]}")
+                        remove_report(row[0], row[1])
                     else:
                         info = { "date_event": row[0], "num": row[1], "date_first": row[2], "date_second": row[3], 
                                  "rfpm_id": row[4], "rfbn_id": row[5], 
