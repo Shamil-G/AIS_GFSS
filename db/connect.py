@@ -58,8 +58,7 @@ def select(stmt):
         error, = e.args
         mistake = 1
         err_mess = f"Oracle error: {error.code} : {error.message}"
-        log.error(f"------select------> ERROR with: {stmt}.")
-        log.error(err_mess)
+        log.error(f"ERROR with ------select------>\nmess: {err_mess}")
     finally:
         return mistake, results, err_mess
 
@@ -77,7 +76,7 @@ def select_one(stmt, args):
         mistake = 1
         rec = ''
         err_mess = f"Oracle error: {error.code} : {error.message}"
-        log.error(f"ERROR with ------select------>\n{stmt}\nARGS: {args}\nmess: {err_mess}")
+        log.error(f"ERROR ------select------>\n{stmt}\nARGS: {args}\n{err_mess}")
     finally:
         return mistake, rec, err_mess
 
@@ -87,8 +86,7 @@ def plsql_execute(cursor, f_name, cmd, args):
         cursor.execute(cmd, args)
     except oracledb.DatabaseError as e:
         error, = e.args
-        log.error(f"------execute------> ERROR. {f_name}. IP_Addr: {ip_addr()}, args: {args}")
-        log.error(f"Oracle error: {error.code} : {error.message}")
+        log.error(f"ERROR ------execute------> FNAME:{f_name}\nIP_Addr: {ip_addr()}, args: {args}\nerror: {error.code} : {error.message}")
 
 
 def plsql_proc_s(f_name, proc_name, args):
@@ -106,9 +104,7 @@ def plsql_proc(cursor, f_name, proc_name, args):
         cursor.callproc(proc_name, args)
     except oracledb.DatabaseError as e:
         error, = e.args
-        # log.error(f"-----plsql-proc-----> ERROR. {f_name}. IP_Addr: {ip_addr()}, args: {args}")
-        log.error(f"-----plsql-proc-----> ERROR. {f_name}. ARGS: {args}")
-        log.error(f"Oracle error: {error.code} : {error.message}")
+        log.error(f"ERROR -----plsql-proc-----> FNAME: {f_name}\nARGS: {args}\nerror: {error.code} : {error.message}")
 
 
 def plsql_func(cursor, f_name, func_name, args):
@@ -117,8 +113,7 @@ def plsql_func(cursor, f_name, func_name, args):
         ret = cursor.callfunc(func_name, args)
     except oracledb.DatabaseError as e:
         error, = e.args
-        log.error(f"-----plsql-func-----> ERROR. {f_name}. args: {args}")
-        log.error(f"Oracle error: {error.code} : {error.message}")
+        log.error(f"ERROR -----plsql-func-----> FNAME: {f_name}\nargs: {args}\nerror: {error.code} : {error.message}")
     return ret
 
 
