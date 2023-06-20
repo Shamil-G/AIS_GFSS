@@ -19,6 +19,7 @@ stmt_list_reports = """
             end           
     from load_report_status st
     where trunc(st.date_execute,'DD') = to_date(:i_date,'YYYY-MM-DD')
+    order by st.num
 """
 
 stmt_file_path = f"""
