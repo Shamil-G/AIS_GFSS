@@ -7,7 +7,7 @@ from   model.call_report import set_status_report
 import os.path
 
 report_name = 'Сведения о поступивших возвратах излишне зачисленных (выплаченных) сумм социальных выплат'
-report_code = 'DIA_300_09'
+report_code = '300.09'
 
 #document.ridt_id: 6 - Выплаты из ГФСС, 7 - 10% удержания, 8 - удержания из соц.выплат
 #document.status:  0 - Документ сформирован на выплату, 1 - Сформирован платеж, 2 - Платеж на выплате
@@ -239,11 +239,6 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			workbook.close()
 			set_status_report(file_name, 2)
 			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {now}')
-
-
-def get_file_path(file_name: str, date_first: str, date_second: str):
-	full_file_name = f'{file_name}.300.{date_first}_{date_second}.xlsx'
-	return full_file_name
 
 
 def thread_report(file_name: str, date_first: str, date_second: str):

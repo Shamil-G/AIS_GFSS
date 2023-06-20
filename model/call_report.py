@@ -148,7 +148,19 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                             live_time = 0
                             if 'live_time' in cur_group:
                                 live_time = cur_group['live_time']
-                            init_report_path = f'{REPORT_PATH}/{dep_name}.{group_name}'
+                            #  Параметры дат отчетов надо заложить в имя файла
+                            date_first = ''
+                            date_second = ''
+                            if 'date_first' in params:
+                                date_first = params['date_first']
+                            if 'date_second' in params:
+                                date_second = params['date_second']
+                            if date_first and date_second:
+                                init_report_path = f'{REPORT_PATH}/{dep_name}.{group_name}.{code}.{date_first}_{date_second}.xlsx'
+                            elif date_first:
+                                init_report_path = f'{REPORT_PATH}/{dep_name}.{group_name}.{code}.{date_first}.xlsx'
+                            else:
+                                init_report_path = f'{REPORT_PATH}/{dep_name}.{group_name}.{code}.xlsx'
                             # Дополним параметром начального пути для отчета
                             params['file_name']=init_report_path
                             if debug_level > 2:
@@ -161,7 +173,8 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                             #loaded_module = __import__(module_path, globals(), locals(), ['make_report'], 0)
                             loaded_module = importlib.import_module(module_path)
                             # Получаем полный путь к файлу - результату
-                            file_name = loaded_module.get_file_path(**params)
+                            # file_name = loaded_module.get_file_path(**params)
+                            file_name = init_report_path
 
                             #log.info(f'CALL REPORT. GET FILE NAME. file_name: {file_name}')
                             status = int(check_report(file_name))
@@ -180,14 +193,9 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
 
                             # Если запись об отчете в БД отсутствует, то ее надо сделать
                             if status in (0,10):
-                                date_first = ''
-                                date_second = ''
                                 rfpm_id = ''
                                 rfbn_id = ''
-                                if 'date_first' in params:
-                                    date_first = params['date_first']
-                                if 'date_second' in params:
-                                    date_second = params['date_second']
+
                                 if 'srfpm_id' in params:
                                     rfpm_id = params['srfpm_id']
                                 if 'srfbn_id' in params:
