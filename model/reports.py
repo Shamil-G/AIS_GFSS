@@ -41,7 +41,7 @@ def remove_file(date_report: str, num_report: int):
         if os.path.exists(file_path):
             log.info(f"REMOVE_FILE. FILE_PATH: {file_path}")
             os.remove(file_path)
-        return True
+            return True
     return False
 
 
