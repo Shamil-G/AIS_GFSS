@@ -5,16 +5,16 @@ if using.startswith('DEV_WIN'):
 else:
     BASE = f'/home/ais_gfss/{app_name}'
 
-if using.startswith('DEV_WIN'):
-    platform = '!unix'
-    host = '192.168.5.17'
-    debug_level = 2
-    port = 8080
-else:
+if using.startswith('PROD'):
     platform = 'unix'
-    debug_level = 1
+    debug_level = 2
     host = 'localhost'
     port = 80
+else:
+    platform = '!unix'
+    host = '192.168.5.17'
+    debug_level = 3
+    port = 8080
 
 src_lang = 'file'
 language = 'ru'
