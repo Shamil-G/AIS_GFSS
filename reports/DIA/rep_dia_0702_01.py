@@ -146,7 +146,7 @@ with sum_calc  as(
            sum(case when num_month = 12 then sum_pay else 0 end) sum_m_12
     from (
         select /*+ full(si)*/
-        sicid, trunc(months_between(to_date(:dt_from,'YYYY-MM-DD'), trunc(si.pay_date,'MM'))) num_month, si.sum_pay
+        sicid, trunc(months_between(to_date(:dt_from,'YYYY-MM-DD'), trunc(si.pay_month,'MM'))) num_month, si.sum_pay
         from si_member_2 si
         where trunc(months_between(to_date(:dt_from,'YYYY-MM-DD'), trunc(si.pay_date,'MM'))) between 1 and 12
         and   si.pay_date >= add_months( trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM') , -12)
