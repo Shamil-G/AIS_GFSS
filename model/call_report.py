@@ -96,7 +96,7 @@ def init_report(name_report: str, date_first: str, date_second: str, rfpm_id: st
     status = 0
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            status =cursor.callfunc('reports.reps.add_report', int, [name_report, date_first, date_second, rfpm_id, rfbn_id, live_time, file_path])
+            status =cursor.callfunc('reps.add_report', int, [name_report, date_first, date_second, rfpm_id, rfbn_id, live_time, file_path])
     # 0 - файл отсутствует
     # 1 - Файл готовится
     # 2 - Файл готов

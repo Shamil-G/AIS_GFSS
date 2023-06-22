@@ -14,17 +14,18 @@ if using == 'PROD':
     pool_max = 40
     pool_inc = 20
     Debug = True
+    username = 'reports'
 else:
     pool_min = 4
     pool_max = 10
     pool_inc = 4
     Debug = True
+    username = 'reports_test'
 
 report_db_dsn = '172.16.17.12:1521/gfss'
 report_db_user = 'sswh'
 report_db_password = 'sswh'
 dsn = '192.168.20.60:1521/gfssdb.gfss.kz'
-username = 'reports'
 password = 'reports'
 encoding = 'UTF-8'
 timeout = 15       # В секундах. Время простоя, после которого курсор освобождается
