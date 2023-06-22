@@ -55,7 +55,7 @@ select /*+ Parallel(8) */
 from  payment_history ph, sipr_maket_first_approve_2 sfa, sum_calc sc
       ,person p
 where trunc(ph.act_month,'MM') = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
-and   trunc(sfa.date_stop) = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
+and   trunc(sfa.date_stop, 'MM') = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
 and   substr(ph.rfpm_id,1,4)='0703'
 and   ph.pnpt_id = sfa.pnpt_id(+)
 and   ph.pncd_id = sc.sicid(+)
