@@ -55,7 +55,7 @@ select /*+ Parallel(8) */
 from  payment_history ph, sipr_maket_first_approve_2 sfa, sum_calc sc
       ,person p
 where trunc(ph.act_month,'MM') = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
-and   trunc(sfa.date_stop) = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
+and   trunc(sfa.date_stop, 'MM') = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
 and   substr(ph.rfpm_id,1,4)='0703'
 and   ph.pnpt_id = sfa.pnpt_id(+)
 and   ph.pncd_id = sc.sicid(+)
@@ -76,9 +76,9 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(5, 5, 12)
 	worksheet.set_column(6, 6, 12)
 	worksheet.set_column(7, 7, 12)
-	worksheet.set_column(8, 8, 18)
+	worksheet.set_column(8, 8, 14)
 	worksheet.set_column(9, 9, 8)
-	worksheet.set_column(10, 10, 8)
+	worksheet.set_column(10, 10, 14)
 	worksheet.set_column(11, 11, 14)
 	worksheet.set_column(12, 12, 14)
 	worksheet.set_column(13, 13, 14)
@@ -146,9 +146,14 @@ def do_report(file_name: str, date_first: str):
 
 			sum_pay_format = workbook.add_format({'num_format': '#,###,##0.00', 'font_color': 'black', 'align': 'vcenter'})
 			sum_pay_format.set_border(1)
+
 			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
+
+			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format_it.set_align('vcenter')
+			date_format_it.set_italic()
 
 			digital_format = workbook.add_format({'num_format': '# ### ##0', 'align': 'center'})
 			digital_format.set_border(1)
@@ -176,7 +181,7 @@ def do_report(file_name: str, date_first: str):
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'За период: {date_first}', title_name_report)
+			worksheet.write(1, 0, f'C даты: {date_first}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 3
@@ -216,9 +221,7 @@ def do_report(file_name: str, date_first: str):
 			worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			date_format.set_border(0)
-			date_format.set_italic()
-			worksheet.write(1, 17, f'Дата формирования: {now}', date_format)
+			worksheet.write(1, 17, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
