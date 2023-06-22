@@ -10,7 +10,7 @@ dict_reports = {
         {
             "grp_name": "1501", 
             "module_dir": f"{REPORT_MODULE_PATH}.DIA.1501",
-            "live_time": "240000",
+            "live_time": "0",
             "list": 
             [
                 {
@@ -50,7 +50,7 @@ dict_reports = {
         {
             "grp_name": "1502", 
             "module_dir": f"{REPORT_MODULE_PATH}.DIA.1502",
-            "live_time": "1",
+            "live_time": "0",
             "list": 
             [
                 {
@@ -66,7 +66,7 @@ dict_reports = {
         {
             "grp_name": "1503", 
             "module_dir": f"{REPORT_MODULE_PATH}.DIA.1503",
-            "live_time": "1",
+            "live_time": "0",
             "list": 
             [
                 {
