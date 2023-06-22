@@ -263,9 +263,14 @@ def do_report(file_name: str, date_first: str):
 
 			sum_pay_format = workbook.add_format({'num_format': '#,###,##0.00', 'font_color': 'black', 'align': 'vcenter'})
 			sum_pay_format.set_border(1)
+
 			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
+
+			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format_it.set_align('vcenter')
+			date_format_it.set_italic()
 
 			digital_format = workbook.add_format({'num_format': '# ### ##0', 'align': 'center'})
 			digital_format.set_border(1)
@@ -331,6 +336,10 @@ def do_report(file_name: str, date_first: str):
 			#worksheet.write(row_cnt+shift_row, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
 
 			worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
+
+			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(1, 12, f'Дата формирования: {now}', date_format_it)
+
 			workbook.close()
 			now = datetime.datetime.now()
 			log.info(f'Формирование отчета {file_name} завершено: {now.strftime("%d-%m-%Y %H:%M:%S")}')

@@ -9,7 +9,9 @@ import os
 stmt_list_reports = """
     select  to_char(st.date_execute,'YYYY-MM-DD'), st.num, st.date_first, st.date_second, st.rfpm_id, 
             st.rfbn_id, st.name, st.live_time, st.status, st.file_path,
-            case when st.status = 2 then
+            case 
+                when live_time = 0 then 1
+                when st.status = 2 then
                     date_execute + 
                     (case when live_time>0 then live_time/24 else 1 end) -
                     (case when live_time>0 then sysdate else date_execute end) 
