@@ -61,8 +61,9 @@ create unique index XN_LOAD_REPORT_STATUS_DATE_EXECUTE_NUM on LOAD_REPORT_STATUS
 def check_report(file_path: str):
     stmt = f"""
       select to_char(st.date_execute,'YYYY-MM-DD'), st.num, st.status, 
-            case when st.live_time = 0 then 1
-            case when st.status = 2 then
+            case 
+                when st.live_time = 0 then 1
+                when st.status = 2 then
                     date_execute + 
                     (case when st.live_time>0 then st.live_time/24 else 1 end) -
                     (case when st.live_time>0 then sysdate else st.date_execute end) 
