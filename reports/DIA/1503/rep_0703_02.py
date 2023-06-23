@@ -12,18 +12,15 @@ report_code = '1503.02'
 
 stmt_1 = """
 		with list_stop as(
-			select /*+ Parallel(4) */
-				   sfa.rfpm_id, 
-				   sfa.iin,
-				   sfa.risk_date, 
-				   sfa.date_approve,
-				   sfa.date_stop, 
-				   sfa.sum_all,
-				   sfa.ksu,
-				   sfa.sum_avg
-			from  sipr_maket_first_approve_2 sfa
-			where trunc(sfa.date_stop, 'MM') = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
-			and   substr(sfa.rfpm_id,1,4)='0703'
+			select ph.stopdate as date_stop, 
+				   ph.sum_pay,
+				   ph.date_open,
+				   p.rn as iin
+			from payment_history ph, person p 
+			where trunc(ph.stopdate, 'MM') = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
+			and trunc(ph.act_month, 'MM') = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
+			and substr(ph.rfpm_id,1,4)='0703'
+			and ph.pncd_id = p.sicid
 		),
 		list_start as(
 			select /*+ Parallel(4) */
@@ -49,13 +46,13 @@ stmt_1 = """
 			   s.date_approve,
 			   f.date_stop date_stop_prev,
 			   s.date_stop date_stop_cur,
-			   f.sum_all prev_sum_all,
+			   f.sum_pay prev_sum_all,
 			   s.sum_all, 
 			   s.ksu,
 			   s.sum_avg
 		from list_start s, list_stop f, person p
 		where s.iin=f.iin
-		and   f.date_approve!=s.date_approve
+		and   f.date_open!=s.date_approve
 and   s.iin=p.rn(+)
 """
 
