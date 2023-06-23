@@ -50,7 +50,7 @@ def remove_file(date_report: str, num_report: int):
 def remove_report(date_report: str, num_report: int):
     if remove_file(date_report, num_report):
         log.info(f'REMOVE REPORT. NUM_REPORT: {num_report}')
-        plsql_proc_s('REMOVE REPORT. FILE NAME', 'reports.reps.remove_report', [date_report, num_report])
+        plsql_proc_s('REMOVE REPORT. FILE NAME', 'reps.remove_report', [date_report, num_report])
 
 
 def list_reports_by_day(request_day):
