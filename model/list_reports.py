@@ -90,7 +90,7 @@ dict_reports = {
         { 
             "grp_name": "300", 
             "module_dir": f"{REPORT_MODULE_PATH}.DIA.300",
-            "live_time": "1",
+            "live_time": "0",
             "list": 
             [
                 {
