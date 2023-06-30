@@ -87,6 +87,22 @@ dict_reports = {
                 }
             ]
         },
+        {
+            "grp_name": "1504", 
+            "module_dir": f"{REPORT_MODULE_PATH}.DIA.1504",
+            "live_time": "0",
+            "list": 
+            [
+                {
+                    "name": "Получатели СВбр и СВур, у которых между датами назначения есть СВпр",
+                    "num_rep": "01",
+                    "proc": "rep_0704_01",
+                    "data_approve": "30.06.2023",
+                    "author": "Гусейнов Ш.",
+                    "params": {"date_first": "На"},
+                }
+            ]
+        },
         { 
             "grp_name": "300", 
             "module_dir": f"{REPORT_MODULE_PATH}.DIA.300",
