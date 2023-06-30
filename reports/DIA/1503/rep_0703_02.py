@@ -53,7 +53,8 @@ stmt_1 = """
 		from list_start s, list_stop f, person p
 		where s.iin=f.iin
 		and   f.date_open!=s.date_approve
-and   s.iin=p.rn(+)
+		and   s.iin=p.rn(+)
+		and   s.risk_date <= f.date_stop
 """
 
 active_stmt = stmt_1
