@@ -56,7 +56,7 @@ def view_set_dep(dep_name):
     return render_template("list_grps.html", cursor=list_groups)
 
 
-@app.route('/list-reports/<int:grp>', methods=['POST', 'GET'])
+@app.route('/list-reports/<grp>', methods=['POST', 'GET'])
 @login_required
 def view_set_grp_name(grp):
     session['grp_name'] = str(grp)
