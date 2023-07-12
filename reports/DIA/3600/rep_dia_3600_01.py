@@ -22,7 +22,7 @@ stmt_1 = """
 		floor(months_between(sysdate, p.birthdate)/12) age
 	from si_member_2 pd, person p
 	where trunc(pd.pay_date_gfss,'DD') between to_date(:dt_from, 'YYYY-MM-DD') and to_date(:dt_to, 'YYYY-MM-DD')
-	and   pd.pay_date >= '01.03.2023'
+	and   pd.pay_date >= to_date('01.03.2023','dd.mm.yyyy')
 	and   pd.pay_date > (to_date(:dt_from, 'YYYY-MM-DD') - 14 )
 	and   pd.type_payment = 'О'
 	and   pd.sicid = p.sicid
