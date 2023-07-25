@@ -143,7 +143,9 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                             log.info(f'\n-------> CALL REPORT. CODE. DEP: {dep_name}, CODE: {code}, CUR_GROUP: {cur_group}, params: {params}')
                         #Определим по коду отчета имя Python модуля для последующей загрузке
                         if 'proc' in curr_report:
+                            report_part_path = f'{REPORT_PATH}/{dep_name}.{group_name}.{code}'
                             proc = curr_report['proc']
+
                             if debug_level > 2:
                                 log.info(f'\n-------> CALL REPORT. PROC: {proc}')
                             #Определим время жизни отчета
@@ -157,26 +159,37 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                                 date_first = params['date_first']
                             if 'date_last' in params:
                                 date_last = params['date_last']
-                            if date_first and date_last:
-                                init_report_path = f'{REPORT_PATH}/{dep_name}.{group_name}.{code}.{date_first}_{date_last}.xlsx'
-                            elif date_first:
-                                init_report_path = f'{REPORT_PATH}/{dep_name}.{group_name}.{code}.{date_first}.xlsx'
-                            else:
-                                init_report_path = f'{REPORT_PATH}/{dep_name}.{group_name}.{code}.xlsx'
-                            # Дополним параметром начального пути для отчета
-                            params['file_name']=init_report_path
-                            if debug_level > 2:
-                                log.info(f'CALL_REPORT. PARAMS: {params}')
-                            #Определим путь для импорта необходимого Python модуля-отчета
+
+                            # Загрузим модуль отчетности
+                            # 1. Определим путь для импорта необходимого Python модуля-отчета
                             module_dir = cur_group['module_dir']
                             module_path = f"{module_dir}.{proc}"
                             if debug_level > 2:
                                 log.info(f'CALL REPORT. MODULE DIR: {module_dir}, MODULE PATH: {module_path}')
-                            #loaded_module = __import__(module_path, globals(), locals(), ['make_report'], 0)
+                            # 2. Загрузим модуль по найденнгму пути
                             loaded_module = importlib.import_module(module_path)
-                            # Получаем полный путь к файлу - результату
-                            # file_name = loaded_module.get_file_path(**params)
-                            file_name = init_report_path
+                            
+                            # Найдем в модуле функцию формирования имени файла, если она есть
+                            # 1. Проверяем модуль на наличе функции 'get_file_full_name'
+                            # 2. Извлекаем имя с полным путем
+                            if hasattr(loaded_module,'get_file_full_name'):
+                                # file_name = loaded_module.get_file_path(**params)
+                                get_file_name = getattr(loaded_module,'get_file_full_name')
+                                file_name = get_file_name(report_part_path, params)
+                                log.info(f'\nCALL REPORT. GET FILE FULL NAME. FILE_NAME {file_name}\nparams:{params}\n')
+                            else:
+                                if date_first and date_last:
+                                    file_name = f'{report_part_path}.{date_first}_{date_last}.xlsx'
+                                elif date_first:
+                                    file_name = f'{report_part_path}.{date_first}.xlsx'
+                                else:
+                                    file_name = f'{report_part_path}.xlsx'
+
+                            if debug_level > 2:
+                                log.info(f'CALL_REPORT. PARAMS: {params}')
+
+                            # Дополним параметром начального пути для отчета
+                            params['file_name']=file_name
 
                             #log.info(f'CALL REPORT. GET FILE NAME. file_name: {file_name}')
                             status = int(check_report(file_name))
@@ -214,7 +227,7 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                                 if status == 2:
                                     log.info(f'CALL REPORT. RESULT EXIST. Status: {status}, file_name: {file_name}')
                                     return {"status": status, "file_path": file_name}
-                                log.info(f'MAKE_REPORT. Start DO REPORT: {file_name}')
+                                log.info(f'MAKE_REPORT. Start {module_path} -> {file_name}')
 
                                 params['file_name']=file_name
 
