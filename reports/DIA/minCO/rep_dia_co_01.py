@@ -16,8 +16,7 @@ stmt_load = "begin sswh.ctrl_min_so.load_so; end;"
 stmt_report = """
 			select
 				  nvl(rb.RFBN_ID, 'нет') rfbn_area, --Код района
-				  rb1.NAME name_reg,				--Район
-				--	rb.NAME name_area,	--Район
+				  rb.NAME name_area,	--Район
 				  m.p_rnn,				--БИН/ИИН предприятия
 				  nvl(n.name_ip, n.fio) name_org,	--Наименование предприятия
 				  m.cnt_worker,			-- Общее количество сотрудников
@@ -30,14 +29,12 @@ stmt_report = """
 				 , rfrr_id_region r
 				 , nk_minfin_iin n
 				 , rfbn_branch_site rb
-				 , rfbn_branch_site rb1
 			where trunc(m.ctrl_date,'MM')=trunc(to_date(:control_month,'YYYY-MM-DD'),'MM')
 			and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -12)
 			and   m.p_rnn = r.id(+)
 			and   m.p_rnn = n.iin(+)
 			and   m.sicid = p.sicid
 			and   r.rfbn_id = rb.RFBN_ID(+)
-			and   r.rfrg_id || '00' = rb1.RFBN_ID(+)
 			AND   coalesce(r.typ, 'I') = 'I'
 			order by 1,2,3
 	"""
@@ -51,7 +48,7 @@ def format_worksheet(worksheet, common_format):
 
 	worksheet.set_column(0, 0, 9)
 	worksheet.set_column(1, 1, 12)
-	worksheet.set_column(2, 2, 32)
+	worksheet.set_column(2, 2, 48)
 	worksheet.set_column(3, 3, 14)
 	worksheet.set_column(4, 4, 120)
 	worksheet.set_column(5, 5, 18)

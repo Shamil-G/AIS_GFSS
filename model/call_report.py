@@ -94,11 +94,11 @@ def check_report(file_path: str):
     return -100
 
 
-def init_report(name_report: str, date_first: str, date_last: str, rfpm_id: str, rfbn_id: str, live_time: str, file_path: str):
+def init_report(name_report: str, date_first: str, date_second: str, rfpm_id: str, rfbn_id: str, live_time: str, file_path: str):
     status = 0
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            status =cursor.callfunc('reps.add_report', int, [name_report, date_first, date_last, rfpm_id, rfbn_id, live_time, file_path])
+            status =cursor.callfunc('reps.add_report', int, [name_report, date_first, date_second, rfpm_id, rfbn_id, live_time, file_path])
     # 0 - файл отсутствует
     # 1 - Файл готовится
     # 2 - Файл готов
@@ -154,11 +154,11 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                                 live_time = cur_group['live_time']
                             #  Параметры дат отчетов надо заложить в имя файла
                             date_first = ''
-                            date_last = ''
+                            date_second = ''
                             if 'date_first' in params:
                                 date_first = params['date_first']
-                            if 'date_last' in params:
-                                date_last = params['date_last']
+                            if 'date_second' in params:
+                                date_second = params['date_second']
 
                             # Загрузим модуль отчетности
                             # 1. Определим путь для импорта необходимого Python модуля-отчета
@@ -178,8 +178,8 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                                 file_name = get_file_name(report_part_path, params)
                                 log.info(f'\nCALL REPORT. GET FILE FULL NAME. FILE_NAME {file_name}\nparams:{params}\n')
                             else:
-                                if date_first and date_last:
-                                    file_name = f'{report_part_path}.{date_first}_{date_last}.xlsx'
+                                if date_first and date_second:
+                                    file_name = f'{report_part_path}.{date_first}_{date_second}.xlsx'
                                 elif date_first:
                                     file_name = f'{report_part_path}.{date_first}.xlsx'
                                 else:
@@ -217,9 +217,9 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                                     rfbn_id = params['srfbn_id']
 
                                 if debug_level > 2:
-                                    log.info(f"\nCALL REPORT. name:\t{f'{group_name}.{code}'}\nlive_time:\t{live_time}\ndate_first:\t{date_first}\ndate_last:\t{date_last}\nrfpm_id:\t{rfpm_id}\nrfbn_id:\t{rfbn_id}")
+                                    log.info(f"\nCALL REPORT. name:\t{f'{group_name}.{code}'}\nlive_time:\t{live_time}\ndate_first:\t{date_first}\ndate_second:\t{date_second}\nrfpm_id:\t{rfpm_id}\nrfbn_id:\t{rfbn_id}")
 
-                                status = init_report(f'{group_name}.{code}', date_first, date_last, rfpm_id, rfbn_id, live_time, file_name)
+                                status = init_report(f'{group_name}.{code}', date_first, date_second, rfpm_id, rfbn_id, live_time, file_name)
                                 log.info(f'CALL REPORT. Status: {status}')
                                 if status == 1:
                                     log.info(f'CALL REPORT. REPORT PREPARING. Status: {status}, file_name: {file_name}')
