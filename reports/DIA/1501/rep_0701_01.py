@@ -242,23 +242,6 @@ def thread_report(file_name: str, date_first: str, date_second: str):
 	return {"status": 1, "file_path": file_name}
 
 	
-	#if platform == 'linux':
-	#	from os import fork
-	#	pid = fork()
-	#	if pid:
-	#		return {"status": 1, "file_path": file_name}
-	#	else:
-	#		log.info(f'MAKE_REPORT. CHILD FORK PROCESS. {file_name}')
-	#		do_report(file_name, rfpm_id, date_from, date_to)
-	#else:
-	#	import threading
-	#	log.info(f'MAKE_REPORT. THREAD PROCESS. {file_name}')
-	#	threading.Thread(target=do_report, args=(file_name, rfpm_id, date_from, date_to), daemon=True).start()
-	#	return {"status": 1, "file_path": file_name}
-
-
-
-
 if __name__ == "__main__":
     log.info(f'MAIN. Отчет запускается.')
     do_report('0701_01.xlsx', '01.01.2022','31.12.2022')

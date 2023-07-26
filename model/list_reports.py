@@ -1,4 +1,5 @@
 from app_config import REPORT_MODULE_PATH
+from app_config import REPORT_MODULE_PATH
 
 # live_time - время жизни отчета в часах, может указываться с 2 занками после запятой
 # в этом случае время минимальное жизни отчета составляет 36 секунд
@@ -120,35 +121,58 @@ dict_reports = {
             ]
         },
         {
-            "grp_name": "320", 
-            "module_dir": f"{REPORT_MODULE_PATH}.DIA.320",
-            "live_time": "1",
+            "grp_name": "ЕдПлатеж", 
+            "module_dir": f"{REPORT_MODULE_PATH}.DIA.cp",
+            "live_time": "0",
             "list": 
             [
                 {
-                    "name": "Сведения о численности получателей и сумм их выплат - в разработке Адильхановой!!!",
+                    "name": "Сведения о численности получателей и сумм их выплат (made by Адильханова)",
                     "num_rep": "01",
-                    "proc": "rep_dia_320_01",
-                    "data_approve": "13.06.2023",
+                    "proc": "rep_dia_cp_01",
+                    "data_approve": "12.07.2023",
                     "author": "Адильханова А.К.",
-                    "params": {"date_first": "На"},
+                    "params": {"date_first": "С", "date_second": "по"},
                 }
             ]
         },
-
         {
-            "grp_name": "3600", 
-            "module_dir": f"{REPORT_MODULE_PATH}.DIA.3600",
-            "live_time": "1",
+            "grp_name": "ЕСП", 
+            "module_dir": f"{REPORT_MODULE_PATH}.DIA.esp",
+            "live_time": "0",
             "list": 
             [
                 {
-                    "name": "Сведения о численности получателей и сумм их выплат - made by Адильханова !!!",
+                    "name": "Списочная часть чистых ЕСП-шников",
                     "num_rep": "01",
-                    "proc": "rep_dia_3600_01",
-                    "data_approve": "10.06.2023",
-                    "author": "Адильханова А.К.",
-                    "params": {"date_first": "С", "date_last": "по"},
+                    "proc": "rep_dia_esp_01",
+                    "data_approve": "25.07.2023",
+                    "author": "Алиманов Д.Д.",
+                    "params": {"date_first": "С", "date_second": "по"},
+                },
+                {
+                    "name": "Списочная часть смешанных ЕСП-шников",
+                    "num_rep": "02",
+                    "proc": "rep_dia_esp_02",
+                    "data_approve": "25.07.2023",
+                    "author": "Алиманов Д.Д.",
+                    "params": {"date_first": "С", "date_second": "по"},
+                },
+            ]
+        },
+        {
+            "grp_name": "минСО", 
+            "module_dir": f"{REPORT_MODULE_PATH}.DIA.minCO",
+            "live_time": "0",
+            "list": 
+            [
+                {
+                    "name": "Списочная часть по социальным отчислениям, меньшим установленного минимального уровня",
+                    "num_rep": "01",
+                    "proc": "rep_dia_co_01",
+                    "data_approve": "14.07.2023",
+                    "author": "Гусейнов Ш.А.",
+                    "params": {"date_first": "Период:"}
                 }
             ]
         }
