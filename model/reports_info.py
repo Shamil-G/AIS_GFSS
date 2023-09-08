@@ -45,7 +45,7 @@ def get_list_reports():
             if grp_name == grp['grp_name']:
                 if debug_level > 2:
                     log.info(f"---> GET_LIST_REPORTS. grp: {grp}")
-                # Âûáåðåì âñå îò÷åòû èç ñïèñêà ãðóïïû îò÷åòîâ
+                # Ð’Ñ‹Ð±ÐµÑ€ÐµÐ¼ Ð²ÑÐµ Ð¾Ñ‚Ñ‡ÐµÑ‚Ñ‹ Ð¸Ð· ÑÐ¿Ð¸ÑÐºÐ° Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹ Ð¾Ñ‚Ñ‡ÐµÑ‚Ð¾Ð²
                 for rep in grp['list']:
                     if debug_level > 1:
                         log.info(f"\n---> GET_LIST_REPORTS. REP: {rep}")

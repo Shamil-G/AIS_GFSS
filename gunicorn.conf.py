@@ -4,6 +4,7 @@ from   ais_gfss_parameter import app_name, using
 bind = "localhost:5000"
 workers = int(multiprocessing.cpu_count()*2) + 1
 worker_class = "gevent"
+print(f'GUNICORN. change DIRECTORY: {app_name}')
 if using.startswith('PROD'):
     chdir = f"/home/ais_gfss/{app_name}"
 else:

@@ -1,3 +1,4 @@
 systemctl stop ais
 systemctl start ais
+sleep 3
 systemctl status -l ais

@@ -178,7 +178,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					col += 1
 				row_cnt += 1
 				cnt_part += 1
-				if cnt_part > 999:
+				if cnt_part > 9999:
 					log.info(f'{file_name}. LOADED {row_cnt} records.')
 					cnt_part = 0
 

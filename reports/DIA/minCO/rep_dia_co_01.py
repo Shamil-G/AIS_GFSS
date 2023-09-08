@@ -30,7 +30,7 @@ stmt_report = """
 				 , nk_minfin_iin n
 				 , rfbn_branch_site rb
 			where trunc(m.ctrl_date,'MM')=trunc(to_date(:control_month,'YYYY-MM-DD'),'MM')
-			and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -12)
+			and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -13)
 			and   m.p_rnn = r.id(+)
 			and   m.p_rnn = n.iin(+)
 			and   m.sicid = p.sicid

@@ -10,9 +10,9 @@ else:
     LIB_DIR = r'C:\instantclient_21_3'
 
 if using == 'PROD':
-    pool_min = 20
+    pool_min = 10
     pool_max = 40
-    pool_inc = 20
+    pool_inc = 10
     Debug = True
     username = 'reports'
 else:

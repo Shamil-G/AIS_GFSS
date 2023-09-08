@@ -9,12 +9,12 @@ if using.startswith('PROD'):
     platform = 'unix'
     debug_level = 2
     host = 'localhost'
-    port = 80
+    port = 5000
 else:
     platform = '!unix'
     host = '192.168.5.17'
     debug_level = 3
-    port = 8080
+    port = 5000
 
 src_lang = 'file'
 language = 'ru'
