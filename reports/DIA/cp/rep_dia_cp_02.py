@@ -29,7 +29,8 @@ stmt_1 = """
             and si.knp = '012'
             and si.pay_date_gfss  >= to_date('01.02.2023','dd.mm.yyyy')
             and si.pay_date		  >= to_date('01.02.2023','dd.mm.yyyy')
-            and si.pay_date		  <= to_date(:dt_to, 'yyyy-mm-dd')
+            and si.pay_date >= (to_date(:dt_from, 'yyyy-mm-dd') -  10)
+            and si.pay_date  < (to_date(:dt_to, 'yyyy-mm-dd') + 1)
 			and substr(p.branchid,1,2) = rg.rfrg_id
 			and rg.rfrg_id = case when :id_region is null then rg.rfrg_id else :id_region end
       ) g
@@ -61,7 +62,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('E3:E4', 'кол-во мужчин', common_format)
 	worksheet.merge_range('F3:F4', 'Сумма', common_format)
 
-def do_report(file_name: str, date_first: str, date_last: str, srfbn_id: str):
+def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
@@ -122,15 +123,15 @@ def do_report(file_name: str, date_first: str, date_last: str, srfbn_id: str):
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'Период расчёта: с {date_first} по {date_last}', title_name_report)
+			worksheet.write(1, 0, f'Период расчёта: с {date_first} по {date_second}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 3
 			cnt_part = 0
 			m_val = [0]
 
-			log.info(f'{file_name}. Загружаем данные с {date_first} по {date_last}')
-			cursor.execute(active_stmt, dt_from=date_first,dt_to=date_last, id_region=srfbn_id)
+			log.info(f'{file_name}. Загружаем данные с {date_first} по {date_second}')
+			cursor.execute(active_stmt, dt_from=date_first,dt_to=date_second, id_region=srfbn_id)
 
 			records = cursor.fetchall()
 			
@@ -163,10 +164,10 @@ def do_report(file_name: str, date_first: str, date_last: str, srfbn_id: str):
 			return file_name
 
 
-def thread_report(file_name: str, date_first: str, date_last: str, srfbn_id: str):
+def thread_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 	import threading
-	log.info(f'THREAD REPORT. DATE BETWEEN REPORT: {date_first} - {date_last}, FILE_NAME: {file_name}, srfbn_id: {srfbn_id}')
-	threading.Thread(target=do_report, args=(file_name, date_first, date_last, srfbn_id), daemon=True).start()
+	log.info(f'THREAD REPORT. DATE BETWEEN REPORT: {date_first} - {date_second}, FILE_NAME: {file_name}, srfbn_id: {srfbn_id}')
+	threading.Thread(target=do_report, args=(file_name, date_first, date_second, srfbn_id), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
 
 

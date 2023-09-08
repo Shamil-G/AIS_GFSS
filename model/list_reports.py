@@ -148,7 +148,7 @@ dict_reports = {
                 "proc": "rep_dia_cp_02",
                 "data_approve": "10.06.2023",
                 "author": "Адильханова А.К.",
-                "params": {"date_first": "C", "date_last": "по", "srfbn_id": "Код региона:2"},
+                "params": {"date_first": "C", "date_second": "по", "srfbn_id": "Код региона:2"},
                 }
             ]
         },
