@@ -25,7 +25,7 @@ stmt_1 = """
 	and   pd.pay_date >= to_date('01.03.2023','dd.mm.yyyy')
 	and   pd.pay_date > (to_date(:dt_from, 'YYYY-MM-DD') - 14 )
 	and   pd.type_payment = 'О'
-	and	  pd.knp = '12'
+	and	  pd.knp = '012'
 	and   pd.sicid = p.sicid
 """
 
