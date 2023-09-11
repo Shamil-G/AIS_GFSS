@@ -6,7 +6,7 @@
 
 {% block main_title %}
 <form method="POST">
-    <input class="input_s" type="date" id="request_date" name="request_date">
+    <input class="input_s" type="date" id="request_date" name="request_date" value="{{ request_date }}">
     <button class="bt_s" type="submit" name="submit">{{ res_value('SELECT_BY_DATE') }}</button>
 </form>
 {% endblock %}

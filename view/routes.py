@@ -1,6 +1,6 @@
 from app_config import debug_level, REPORT_PATH
 from main_app import app, log
-from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory
+from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory, g
 from flask_login import  login_required
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
 from model.call_report import call_report
@@ -156,18 +156,20 @@ def view_change_password():
 
 
 @app.route('/running-reports', methods=['POST', 'GET'])
+@login_required
 def view_running_reports():
     if '_flashes' in session:
         session['_flashes'].clear()
-    request_date = date.today().strftime('%Y-%m-%d')
+    if 'request_date' not in session:
+        session['request_date'] = date.today().strftime('%Y-%m-%d')
     if request.method == "POST":
-        request_date = request.form['request_date']
+        session['request_date'] = request.form['request_date']
     if debug_level > 2:
-        log.info(f'RUNNING REPORTS. REQUEST DATE: {request_date}')
-    list_reports = list_reports_by_day(request_date)
+        log.info(f"RUNNING REPORTS. REQUEST DATE: {session['request_date']}")
+    list_reports = list_reports_by_day(session['request_date'])
     if debug_level > 2:
         log.info(f'RUNNING REPORTS. LIST REPORTS: {list_reports}')
-    return render_template("running_reports.html", list = list_reports)
+    return render_template("running_reports.html", list = list_reports, request_date=session['request_date'])
 
 
 @app.route('/uploads/<path:full_path>')
@@ -183,8 +185,9 @@ def uploaded_file(full_path):
 
 
 @app.route('/remove-reports/<string:date_report>/<int:num_report>')
+@login_required
 def view_remove_report(date_report,num_report):
-    if debug_level > 2:
-        log.info(f'REMOVE REPORT. DATE_REPORT: {date_report}, NUM_REPORT: {num_report}')
-    remove_report(date_report, num_report)
+    if 'admin' in g.user.roles or 'Руководитель' in g.user.roles:
+        log.info(f"REMOVE REPORT. {session['username']}. DATE_REPORT: {date_report}, NUM_REPORT: {num_report}, ROLES: {g.user.roles}")
+        remove_report(date_report, num_report)
     return redirect(url_for('view_running_reports'))
