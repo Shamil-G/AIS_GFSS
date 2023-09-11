@@ -24,6 +24,7 @@ stmt_1 = """
 	where trunc(pd.pay_date_gfss,'DD') between to_date(:dt_from, 'YYYY-MM-DD') and to_date(:dt_to, 'YYYY-MM-DD')
 	and   pd.pay_date >= to_date('01.03.2023','dd.mm.yyyy')
 	and   pd.pay_date > (to_date(:dt_from, 'YYYY-MM-DD') - 14 )
+	and   pd.pay_date < to_date(:dt_to, 'YYYY-MM-DD')
 	and   pd.type_payment = 'О'
 	and	  pd.knp = '012'
 	and   pd.sicid = p.sicid
