@@ -4,8 +4,8 @@ import redis
 
 if using.startswith('PROD'):
     LIB_DIR = r'/home/ais_gfss/instantclient_21_8'
-elif using == 'DEV_WIN_HOME':
-    LIB_DIR = r'd:/install/oracle/instantclient_19_13'
+#elif using == 'DEV_WIN_HOME':
+#    LIB_DIR = r'd:/install/oracle/instantclient_19_13'
 else:
     LIB_DIR = r'C:\instantclient_21_3'
 

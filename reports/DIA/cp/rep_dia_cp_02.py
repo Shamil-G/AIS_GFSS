@@ -24,15 +24,15 @@ stmt_1 = """
                 p.sex, si.sum_pay, p.sicid
             from  si_member_2 si, person p, rfrg_region rg
             where si.sicid = p.sicid
-            and trunc(si.pay_date_gfss,'DD') between to_date(:dt_from, 'yyyy-mm-dd') and to_date(:dt_to, 'yyyy-mm-dd')
             and si.type_payment = 'О'
             and si.knp = '012'
+            and trunc(si.pay_date_gfss,'DD') between to_date(:dt_from, 'yyyy-mm-dd') and to_date(:dt_to, 'yyyy-mm-dd')
             and si.pay_date_gfss  >= to_date('01.02.2023','dd.mm.yyyy')
             and si.pay_date		  >= to_date('01.02.2023','dd.mm.yyyy')
-            and si.pay_date >= (to_date(:dt_from, 'yyyy-mm-dd') -  10)
-            and si.pay_date  < (to_date(:dt_to, 'yyyy-mm-dd') + 1)
-			and substr(p.branchid,1,2) = rg.rfrg_id
-			and rg.rfrg_id = case when :id_region is null then rg.rfrg_id else :id_region end
+            and si.pay_date >= (to_date(:dt_from, 'yyyy-mm-dd') -  14)
+            and si.pay_date <= to_date(:dt_to, 'yyyy-mm-dd')
+			and substr(p.branchid,1,2) = rg.rfrg_id(+)
+			and substr(p.branchid,1,2) = case when :id_region is null then substr(p.branchid,1,2) else :id_region end
       ) g
       group by 	to_char(20 + 5 * (width_bucket(g.let, 20, 65, 9) - 1 ) ) || 
 			' - ' || 

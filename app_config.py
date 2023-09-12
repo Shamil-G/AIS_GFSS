@@ -1,9 +1,9 @@
 from ais_gfss_parameter import using, app_name
 
-if using.startswith('DEV_WIN'):
-    BASE = f'C:/Projects/{app_name}'
-else:
+if using.startswith('PROD'):
     BASE = f'/home/ais_gfss/{app_name}'
+else:
+    BASE = f'C:/Projects/{app_name}'
 
 if using.startswith('PROD'):
     platform = 'unix'
