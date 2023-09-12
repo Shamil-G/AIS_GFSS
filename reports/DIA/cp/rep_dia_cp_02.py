@@ -20,7 +20,7 @@ stmt_1 = """
             count(unique  case when sex = 1 then sicid else null end ) cnt_1m,
             sum( case when sex = 1 then g.sum_pay else 0 end ) sum1m
       from (select
-                trunc(months_between(si.pay_date_gfss, p.birthdate)/12) let,
+                trunc(months_between(to_date(:dt_to, 'yyyy-mm-dd'), p.birthdate)/12) let,
                 p.sex, si.sum_pay, p.sicid
             from  si_member_2 si, person p, rfrg_region rg
             where si.sicid = p.sicid
