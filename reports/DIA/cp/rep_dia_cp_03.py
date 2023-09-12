@@ -11,7 +11,7 @@ report_name = 'Участники ЕП в разрезе областей'
 report_code = 'CP.03'
 
 stmt_1 = """
-      select rg.name, count(unique p.sicid) cnt_all, sum(si.sum_pay) sum_pay
+      select rg.name, count(unique p.sicid) cnt_all, sum(si.sum_pay) sum_pay, rg.rfrg_id
             from  si_member_2 si, person p, rfrg_region rg
             where si.sicid = p.sicid
             and si.type_payment = 'О'
@@ -22,8 +22,8 @@ stmt_1 = """
             and si.pay_date >= (to_date(:dt_from, 'yyyy-mm-dd') -  14)
             and si.pay_date <= to_date(:dt_to, 'yyyy-mm-dd')
 			and substr(p.branchid,1,2) = rg.rfrg_id(+)
-      group by 	name
-      order by 1
+      group by rg.name, rg.rfrg_id
+      order by 4
 """
 
 active_stmt = stmt_1
