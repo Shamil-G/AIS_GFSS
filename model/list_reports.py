@@ -149,6 +149,14 @@ dict_reports = {
                 "data_approve": "10.06.2023",
                 "author": "Адильханова А.К.",
                 "params": {"date_first": "C", "date_second": "по", "srfbn_id": "Код региона:2"},
+                },
+                {
+                "name": "Участники ЕП, в разрезе регионов",
+                "num_rep": "03",
+                "proc": "rep_dia_cp_03",
+                "data_approve": "12.09.2023",
+                "author": "Гусейнов Ш.А.",
+                "params": {"date_first": "C", "date_second": "по"},
                 }
             ]
         },
