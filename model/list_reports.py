@@ -128,6 +128,55 @@ dict_reports = {
                 }
             ]
         },
+        { 
+            "grp_name": "6020", 
+            "module_dir": f"{REPORT_MODULE_PATH}.DIA.6020",
+            "live_time": "0",
+            "list": 
+            [
+                {
+                "name": "Список лиц, которым назначена социальная выплата на случай потери кормильца",
+                "num_rep": "01",
+                "proc": "rep_dia_6021",
+                "data_approve": "14.09.2023",
+                "author": "Алиманов Д.Д.",
+                "params": {"date_first": "C", "date_second": "по "},
+                },
+                {
+                "name": "Список лиц, которым назначена социальная выплата на случай утраты трудоспособности",
+                "num_rep": "02",
+                "proc": "rep_dia_6022",
+                "data_approve": "14.09.2023",
+                "author": "Алиманов Д.Д.",
+                "params": {"date_first": "C", "date_second": "по "},
+                },
+                 {
+                "name": "Список лиц, которым назначена социальная выплата на случай потери работы",
+                "num_rep": "03",
+                "proc": "rep_dia_6023",
+                "data_approve": "14.09.2023",
+                "author": "Алиманов Д.Д.",
+                "params": {"date_first": "C", "date_second": "по "},
+                },
+                 {
+                "name": "Список лиц, которым назначена социальная выплата на случай потери дохода в связи с беременностью и родами, усыновлением/удочерением ребенка",
+                "num_rep": "04",
+                "proc": "rep_dia_6024",
+                "data_approve": "14.09.2023",
+                "author": "Алиманов Д.Д.",
+                "params": {"date_first": "C", "date_second": "по "},
+                },
+                 {
+                "name": "Список лиц, которым назначена социальная выплата на случай потери дохода в связи с уходом за ребенком по достижении им возраста 1 года",
+                "num_rep": "05",
+                "proc": "rep_dia_6025",
+                "data_approve": "14.09.2023",
+                "author": "Алиманов Д.Д.",
+                "params": {"date_first": "C", "date_second": "по "},
+                }
+
+            ]
+        },
         {
             "grp_name": "ЕдПлатеж", 
             "module_dir": f"{REPORT_MODULE_PATH}.DIA.cp",
@@ -182,6 +231,22 @@ dict_reports = {
                     "author": "Алиманов Д.Д.",
                     "params": {"date_first": "С", "date_second": "по"},
                 },
+                {
+                    "name": "Списочная часть смешанных ЕСП-шников(СВ)",
+                    "num_rep": "03",
+                    "proc": "rep_dia_esp_03_sv",
+                    "data_approve": "14.09.2023",
+                    "author": "Алиманов Д.Д.",
+                    "params": {"date_first": "С", "date_second": "по"},
+                },
+                {
+                    "name": "Списочная часть чистых ЕСП-шников(СВ)",
+                    "num_rep": "04",
+                    "proc": "rep_dia_esp_04_sv",
+                    "data_approve": "14.09.2023",
+                    "author": "Алиманов Д.Д.",
+                    "params": {"date_first": "С", "date_second": "по"},
+                }
             ]
         },
         {
