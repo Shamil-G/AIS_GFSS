@@ -55,12 +55,20 @@ dict_reports = {
             "list": 
             [
                 {
-                    "name": "Получатели СВут 0702 за период (месяц)",
+                    "name": "Получатели СВут 0702 за месяц",
                     "num_rep": "01",
                     "proc": "rep_0702_01",
                     "data_approve": "14.02.2023",
                     "author": "Гусейнов Ш.",
                     "params": {"date_first": "На"},
+                },
+                {
+                    "name": "Получатели СВут 0702 за период",
+                    "num_rep": "02",
+                    "proc": "rep_0702_02",
+                    "data_approve": "21.09.2023",
+                    "author": "Гусейнов Ш.",
+                    "params": {"date_first": "C", "date_second": "по"},
                 }
             ]
         },
