@@ -9,15 +9,15 @@ from   model.call_report import set_status_report
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
-report_name = 'Получатели СВут (0702)'
-report_code = '1502.02'
+report_name = 'Получатели СВпр (0703)'
+report_code = '1503.03'
 
 stmt_create = """
-select unique rfbn_id, rfpm_id, iin, 
+select 	unique rfbn_id, rfpm_id, iin, 
 	case when sex=0 then 'Ж' else 'M' end as sex, 
 	appointdate, date_approve, stopdate, 
 	last_pay_sum,  
-	ksu, kut, sum_avg, sum_all,
+	ksu, sum_avg, sum_all,
 	knp
 from (              
 	SELECT 
@@ -29,7 +29,7 @@ from (
 			 FIRST_VALUE(sipr.date_approve) OVER(PARTITION BY sipr.iin ORDER BY sipr.date_approve DESC) date_approve,
 			 FIRST_VALUE(pp.stopdate) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) stopdate,
 			 FIRST_VALUE(case when D.pay_sum>0 then D.pay_sum else d.sum_debt end) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) last_pay_sum,
-			 sipr.kut, sipr.ksu, sipr.sum_avg, sipr.sum_all,
+			 sipr.ksu, sipr.sum_avg, sipr.sum_all,
 			 FIRST_VALUE(D.knp) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) KNP
 	FROM  PNPD_DOCUMENT D, 
 		sipr_maket_first_approve_2 sipr,
@@ -39,7 +39,7 @@ from (
 	and   d.pncd_id = p.sicid
 	AND   coalesce(D.KNP,'000')!='010'
 	AND   D.PNCP_DATE BETWEEN to_date(:date_first,'YYYY-MM-DD') AND to_date(:date_second,'YYYY-MM-DD')
-	AND   substr(D.RFPM_ID,1,4) = '0702'
+	AND   substr(D.RFPM_ID,1,4) = '0703'
 	AND   D.RIDT_ID IN (4, 6, 7, 8)
 	AND   D.STATUS IN (0, 1, 2, 3, 5, 7)
 	AND   D.PNSP_ID > 0
@@ -65,10 +65,9 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(7, 7, 12)
 	worksheet.set_column(8, 8, 18)
 	worksheet.set_column(9, 9, 8)
-	worksheet.set_column(10, 10, 8)
-	worksheet.set_column(11, 11, 12)
-	worksheet.set_column(12, 12, 21)
-	worksheet.set_column(13, 13, 7)
+	worksheet.set_column(10, 10, 12)
+	worksheet.set_column(11, 11, 21)
+	worksheet.set_column(12, 12, 7)
 
 	worksheet.merge_range('A3:A4', '№', common_format)
 	worksheet.merge_range('B3:B4', 'Код региона', common_format)
@@ -80,10 +79,9 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('H3:H4', 'Дата окончания', common_format)
 	worksheet.merge_range('I3:I4', 'Размер СВ', common_format)
 	worksheet.merge_range('J3:J4', 'КСУ', common_format)
-	worksheet.merge_range('K3:K4', 'КУТ', common_format)
-	worksheet.merge_range('L3:L4', 'СМД', common_format)
-	worksheet.merge_range('M3:M4', 'Сумма первой назначенной выплаты', common_format)
-	worksheet.merge_range('N3:N4', 'КНП', common_format)
+	worksheet.merge_range('K3:K4', 'СМД', common_format)
+	worksheet.merge_range('L3:L4', 'Сумма первой назначенной выплаты', common_format)
+	worksheet.merge_range('M3:M4', 'КНП', common_format)
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
@@ -163,13 +161,13 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (1,2,3,13):
+					if col in (1,2,3,12):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
 					if col in(4,):
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
 					if col in (5,6,7):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
-					if col in (8,9,10,11,12):
+					if col in (8,9,10,11):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
 					col += 1
 				cnt_part += 1
@@ -177,8 +175,6 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					log.info(f'{file_name}. LOADED {row_cnt} records.')
 					cnt_part = 0
 				row_cnt += 1
-
-			worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 			worksheet.write(1, 11, f'Дата формирования: {now}', date_format_it)

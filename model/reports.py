@@ -79,7 +79,7 @@ def list_reports_by_day(request_day):
         log.info(f'LIST REPORTS BY DAY. request_day: {request_day}, current_day: {current_day}')
     with get_connection() as connection:
         with connection.cursor() as cursor:
-            if debug_level > 2:
+            if debug_level > 1:
                 log.info(f'LIST REPORTS BY DAY. CURSOR CREATED')
             if first_day(request_day) == request_day or last_day(request_day) == request_day:
                 stmt = stmt_list_reports_month

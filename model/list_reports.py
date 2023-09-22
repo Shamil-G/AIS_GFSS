@@ -93,6 +93,14 @@ dict_reports = {
                     "data_approve": "23.06.2023",
                     "author": "Гусейнов Ш.",
                     "params": {"date_first": "Выберите месяц: "},
+                },
+                {
+                    "name": "Получатели СВпр за период",
+                    "num_rep": "03",
+                    "proc": "rep_0703_03",
+                    "data_approve": "22.09.2023",
+                    "author": "Гусейнов Ш.",
+                    "params": {"date_first": "C", "date_second": "по"},
                 }
             ]
         },
