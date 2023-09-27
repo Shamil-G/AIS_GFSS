@@ -45,6 +45,14 @@ dict_reports = {
                     "data_approve": "14.02.2023",
                     "author": "Гусейнов Ш.",
                     "params": {"date_first": "C", "date_second": "по "},
+                },
+                {
+                    "name": "Списки умерших кормильцев по действующим СВ",
+                    "num_rep": "05",
+                    "proc": "rep_0701_05",
+                    "data_approve": "27.09.2023",
+                    "author": "Гусейнов Ш.",
+                    "params": {"date_first": "C", "date_second": "по "},
                 }
             ]
         },
