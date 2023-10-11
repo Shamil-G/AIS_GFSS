@@ -6,81 +6,69 @@ from   util.logger import log
 from   db_config import report_db_user, report_db_password, report_db_dsn
 from   model.call_report import set_status_report
 
+# from cx_Oracle import SessionPool
+# con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
-report_name = 'Получатели СВбр и СВур, у которых мкжду датами назначения есть СВпр'
-report_code = '1504.01'
+report_name = 'Контроль сроков выплаты '
+report_code = 'dsr.01'
 
-stmt_1 = """
-		select sfa.rfbn_id, sfa.rfpm_id, sfa.iin,
-			   t05.risk_date_0704, sfa.risk_date, t05.risk_date_0705,
-			   t05.sum_all_0704, sfa.sum_all, t05.sum_all_0705,
-			   t05.sum_avg_0705, t05.ksu_0704 
-		from sipr_maket_first_approve_2 sfa,
-			 (
-				select t04.*, sfa.risk_date as risk_date_0705, 
-					   sfa.sum_avg as sum_avg_0705, 
-					   sfa.sum_all as sum_all_0705
-				from sipr_maket_first_approve_2 sfa,
-				(
-				select rfbn_id, 
-					   rfpm_id, 
-					   iin, 
-					   risk_date risk_date_0704, 
-					   sum_avg as sum_avg_0704, 
-					   sum_all as sum_all_0704,
-					   ksu as ksu_0704
-				from sipr_maket_first_approve_2 sfa
-				where substr(sfa.rfpm_id,1,4) = '0704'
-				and   trunc(sfa.risk_date) = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
-				--and   trunc(sfa.risk_date) = trunc(to_date('2021-03-01','YYYY-MM-DD'), 'MM')
-				) t04
-				where sfa.iin=t04.iin
-				and   substr(sfa.rfpm_id,1,4) = '0705'
-				and   sfa.risk_date > t04.risk_date_0704
-				and   sfa.risk_date < add_months(t04.risk_date_0704, 20)
-			  ) t05
-		where sfa.iin=t05.iin
-		and   substr(sfa.rfpm_id,1,4) = '0703'
-		and   sfa.risk_date => t05.risk_date_0704
-		and   sfa.risk_date <= add_months(t05.risk_date_0705,6)
+stmt_create = """
+select /*+parallel(4)*/ 
+       UNIQUE 
+       doc.rfbn_id, 
+       sipr.iin, 
+       sipr.date_approve, 
+       ( select unique first_value(st.dat) over(partition by sipr_id order by st.dat asc) 
+         from ss_m_sol_st st 
+         where st.sid=sipr.sipr_id
+         and   st.st2=20
+       ) date_20,
+       sipr.sum_all, 
+       first_value(pd.pay_date) over(partition by sipr.iin, sipr.sipr_id order by pd.pay_date asc) pncd_date,
+       ( first_value(pd.pay_date) over(partition by sipr.iin, sipr.sipr_id order by pd.pay_date asc) - 
+       sipr.date_approve ) as cnt_days,
+       first_value(doc.pay_sum) over(partition by sipr.iin, sipr.sipr_id order by doc.pncp_date) sum_doc,
+       first_value(doc.sum_debt) over(partition by sipr.iin, sipr.sipr_id order by doc.pncp_date) sum_debt
+from sipr_maket_first_approve_2 sipr, pnpd_document doc, pmpd_pay_doc pd 
+where sipr.date_approve>=to_date(:date_first,'YYYY-MM-DD')
+and   sipr.date_approve<=to_date(:date_second,'YYYY-MM-DD')
+and   doc.knp = :knp
+and   substr(sipr.rfpm_id, 1, 4) = :rfpm_id
+and sipr.pnpt_id = doc.source_id
+and doc.mhmh_id = pd.mhmh_id(+)
 """
 
-active_stmt = stmt_1
+active_stmt = stmt_create
 
 def format_worksheet(worksheet, common_format):
-	worksheet.set_row(0, 24)
+	worksheet.set_row(0, 28)
 	worksheet.set_row(1, 24)
-	worksheet.set_row(2, 22)
-	worksheet.set_row(3, 22)
+	worksheet.set_row(2, 24)
+	worksheet.set_row(3, 24)
 
-	worksheet.set_column(0, 0, 8)
-	worksheet.set_column(1, 1, 14)
+	worksheet.set_column(0, 0, 9)
+	worksheet.set_column(1, 1, 10)
 	worksheet.set_column(2, 2, 14)
-	worksheet.set_column(3, 3, 14)
+	worksheet.set_column(3, 3, 12)
 	worksheet.set_column(4, 4, 12)
 	worksheet.set_column(5, 5, 12)
 	worksheet.set_column(6, 6, 12)
-	worksheet.set_column(7, 7, 14)
-	worksheet.set_column(8, 8, 14)
-	worksheet.set_column(9, 9, 14)
-	worksheet.set_column(10, 10, 14)
-	worksheet.set_column(11, 11, 8)
-
+	worksheet.set_column(7, 7, 12)
+	worksheet.set_column(8, 8, 12)
+	worksheet.set_column(9, 9, 16)
 
 	worksheet.merge_range('A3:A4', '№', common_format)
 	worksheet.merge_range('B3:B4', 'Код региона', common_format)
-	worksheet.merge_range('C3:C4', 'Код выплаты', common_format)
-	worksheet.merge_range('D3:D4', 'ИИН получателя', common_format)
-	worksheet.merge_range('E3:E4', 'Дата риска СВбр', common_format)
-	worksheet.merge_range('F3:F4', 'Дата риска СВпр', common_format)
-	worksheet.merge_range('G3:G4', 'Дата риска СВур', common_format)
-	worksheet.merge_range('H3:H4', 'Размер СВбр', common_format)
-	worksheet.merge_range('I3:I4', 'Размер СВпр', common_format)
-	worksheet.merge_range('J3:J4', 'Размер СВур', common_format)
-	worksheet.merge_range('K3:K4', 'СМД при СВбр', common_format)
-	worksheet.merge_range('L3:L4', 'КСУ', common_format)
+	worksheet.merge_range('C3:C4', 'ИИН получателя', common_format)
+	worksheet.merge_range('D3:D4', 'Дата назначения', common_format)
+	worksheet.merge_range('E3:E4', 'Дата 20', common_format)
+	worksheet.merge_range('F3:F4', 'Размер СВ', common_format)
+	worksheet.merge_range('G3:G4', 'Первая дата выплаты', common_format)
+	worksheet.merge_range('H3:H4', 'Кол-во дней', common_format)
+	worksheet.merge_range('I3:I4', 'Сумма выплаты', common_format)
+	worksheet.merge_range('J3:J4', 'Сумма задолженности', common_format)
 
-def do_report(file_name: str, date_first: str):
+def do_report(file_name: str, date_first: str, date_second: str, srfpm_id: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
@@ -140,29 +128,40 @@ def do_report(file_name: str, date_first: str):
 			worksheet.activate()
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
-			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'Месяц расчёта: {date_first}', title_name_report)
+			worksheet.write(0, 0, f'{report_name} : {srfpm_id}', title_name_report)
+			worksheet.write(1, 0, f'За период: {date_first} - {date_second}, ', title_name_report)
 
 			row_cnt = 1
 			shift_row = 3
 			cnt_part = 0
 			m_val = [0]
+			v_knp='000'
+			
+			match srfpm_id:
+				case '0703':
+					v_knp='048'
+				case '0705':
+					v_knp='091'
+				case _:
+					v_knp='000'
 
-			log.info(f'{file_name}. Загружаем данные за период {date_first}')
-			cursor.execute(active_stmt, dt_from=date_first)
+			log.info(f'{file_name}. Загружаем данные за период {date_first} - {date_second}, КНП: {v_knp}, RFPM: {srfpm_id}')
+			cursor.execute(active_stmt, date_first=date_first, date_second=date_second, rfpm_id=srfpm_id, knp=v_knp)
 
 			records = cursor.fetchall()
-			
+
 			#for record in records:
 			for record in records:
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (1,2,3):
+					if col in (1,2,7):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col in (4,5,6):
+					if col in (3,4,6):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
-					if col in (7,8,9,10,11):
+					# if col in(4,):
+					# 	worksheet.write(row_cnt+shift_row, col, list_val, common_format)
+					if col in (5,8,9):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
 					col += 1
 				cnt_part += 1
@@ -171,11 +170,10 @@ def do_report(file_name: str, date_first: str):
 					cnt_part = 0
 				row_cnt += 1
 
-			#worksheet.write(row_cnt+shift_row, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
-			#worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
+			worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 9, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 8, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
@@ -184,10 +182,16 @@ def do_report(file_name: str, date_first: str):
 			return file_name
 
 
-def thread_report(file_name: str, date_first: str):
+def get_file_path(file_name: str, date_first: str, date_second: str, srfpm_id: str):
+	full_file_name = f'{file_name}.{report_code}.{srfpm_id}.{date_first}-{date_second}.xlsx'
+	return full_file_name
+
+
+def thread_report(file_name: str, date_first: str, date_second: str, srfpm_id: str):
 	import threading
-	log.info(f'THREAD REPORT. DATE FOR REPORT: {date_first}, FILE_NAME: {file_name}')
-	threading.Thread(target=do_report, args=(file_name, date_first), daemon=True).start()
+	log.info(f'THREAD REPORT. {datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} -> {file_name}')
+	log.info(f'THREAD REPORT. PARAMS: rfpm_id: {srfpm_id}, date_first: {date_first}, date_second: {date_second}')
+	threading.Thread(target=do_report, args=(file_name, date_first, date_second, srfpm_id), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
 
 

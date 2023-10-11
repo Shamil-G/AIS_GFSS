@@ -125,6 +125,14 @@ dict_reports = {
                     "data_approve": "30.06.2023",
                     "author": "Гусейнов Ш.",
                     "params": {"date_first": "На"},
+                },
+                {
+                    "name": "Получатели СВбр за период",
+                    "num_rep": "02",
+                    "proc": "rep_0704_02",
+                    "data_approve": "28.09.2023",
+                    "author": "Гусейнов Ш.",
+                    "params": {"date_first": "C", "date_second": "по"},
                 }
             ]
         },
@@ -290,6 +298,25 @@ dict_reports = {
             ]
         }
 
+    ]
+    ,
+    "Стратеги":
+    [
+        {
+            "grp_name": "Выплаты",
+            "live_time": "100",
+            "module_dir": f"{REPORT_MODULE_PATH}.DSR",
+            "list": [
+                {
+                    "name": "Контроль сроков по выплатам",
+                    "num_rep": "01",
+                    "proc": "dsr_01",
+                    "data_approve": "11.10.2023",
+                    "author": "Гусейнов Ш.",
+                    "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                },
+            ]
+        }
     ]
     ,
     "Актуар":
