@@ -300,7 +300,7 @@ dict_reports = {
 
     ]
     ,
-    "Стратеги":
+    "ДСР":
     [
         {
             "grp_name": "Выплаты",
@@ -319,30 +319,4 @@ dict_reports = {
         }
     ]
     ,
-    "Актуар":
-    [
-        {
-            "grp_name": "1500",
-            "live_time": "1",
-            "module_dir": f"{REPORT_MODULE_PATH}.AKTUAR",
-            "list": [
-                {
-                    "name": "Получатели СВут 0702 за период",
-                    "num_rep": "01",
-                    "proc": "rep_dia_0702_01",
-                    "data_approve": "24.02.2023",
-                    "author": "Гусейнов Ш.",
-                    "params": {"srfpm_id": "Код выплаты:4", "date_first": "Месяц расчета"},
-                },
-                {
-                    "name": "Получатели СВпт 0703 за период",
-                    "num_rep": "02",
-                    "proc": "rep_dia_0702_01",
-                    "data_approve": "24.02.2023",
-                    "author": "Гусейнов Ш.",
-                    "params": {"srfpm_id": "Код выплаты:4", "date_first": "Месяц расчета"},
-                }
-            ]
-        }
-    ]
 }
