@@ -9,7 +9,7 @@ from   model.call_report import set_status_report
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
-report_name = 'Получатели СВбр с СО между датой риска и датой окончания'
+report_name = 'РџРѕР»СѓС‡Р°С‚РµР»Рё РЎР’Р±СЂ СЃ РЎРћ РјРµР¶РґСѓ РґР°С‚РѕР№ СЂРёСЃРєР° Рё РґР°С‚РѕР№ РѕРєРѕРЅС‡Р°РЅРёСЏ'
 report_code = '1504.03'
 
 stmt_create = """
@@ -70,21 +70,21 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(9, 9, 16)
 	worksheet.set_column(10, 10, 16)
 
-	worksheet.merge_range('A3:A4', '№', common_format)
-	worksheet.merge_range('B3:B4', 'Код региона', common_format)
-	worksheet.merge_range('C3:C4', 'ИИН получателя', common_format)
-	worksheet.merge_range('D3:D4', 'Возраст', common_format)
-	worksheet.merge_range('E3:E4', 'Дата риска', common_format)
-	worksheet.merge_range('F3:F4', 'Дата назначения', common_format)
-	worksheet.merge_range('G3:G4', 'Дата окончания', common_format)
-	worksheet.merge_range('H3:H4', 'КСУ', common_format)
-	worksheet.merge_range('I3:I4', 'Кол-во СО', common_format)
-	worksheet.merge_range('J3:J4', 'СМД', common_format)
-	worksheet.merge_range('K3:K4', 'Сумма первой назначенной выплаты', common_format)
+	worksheet.merge_range('A3:A4', 'в„–', common_format)
+	worksheet.merge_range('B3:B4', 'РљРѕРґ СЂРµРіРёРѕРЅР°', common_format)
+	worksheet.merge_range('C3:C4', 'РРРќ РїРѕР»СѓС‡Р°С‚РµР»СЏ', common_format)
+	worksheet.merge_range('D3:D4', 'Р’РѕР·СЂР°СЃС‚', common_format)
+	worksheet.merge_range('E3:E4', 'Р”Р°С‚Р° СЂРёСЃРєР°', common_format)
+	worksheet.merge_range('F3:F4', 'Р”Р°С‚Р° РЅР°Р·РЅР°С‡РµРЅРёСЏ', common_format)
+	worksheet.merge_range('G3:G4', 'Р”Р°С‚Р° РѕРєРѕРЅС‡Р°РЅРёСЏ', common_format)
+	worksheet.merge_range('H3:H4', 'РљРЎРЈ', common_format)
+	worksheet.merge_range('I3:I4', 'РљРѕР»-РІРѕ РЎРћ', common_format)
+	worksheet.merge_range('J3:J4', 'РЎРњР”', common_format)
+	worksheet.merge_range('K3:K4', 'РЎСѓРјРјР° РїРµСЂРІРѕР№ РЅР°Р·РЅР°С‡РµРЅРЅРѕР№ РІС‹РїР»Р°С‚С‹', common_format)
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
-		log.info(f'Отчет уже существует {file_name}')
+		log.info(f'РћС‚С‡РµС‚ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ {file_name}')
 		return file_name
 	#cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
 	#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
@@ -130,8 +130,8 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			money_format.set_align('vcenter')
 
 			now = datetime.datetime.now()
-			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
-			worksheet = workbook.add_worksheet('Список')
+			log.info(f'РќР°С‡Р°Р»Рѕ С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
+			worksheet = workbook.add_worksheet('РЎРїРёСЃРѕРє')
 			sql_sheet = workbook.add_worksheet('SQL')
 			merge_format = workbook.add_format({
 				'bold':     False,
@@ -147,14 +147,14 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, f'{report_name} : 0704', title_name_report)
-			worksheet.write(1, 0, f'За период: {date_first} - {date_second}', title_name_report)
+			worksheet.write(1, 0, f'Р—Р° РїРµСЂРёРѕРґ: {date_first} - {date_second}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 3
 			cnt_part = 0
 			m_val = [0]
 
-			log.info(f'{file_name}. Загружаем данные за период {date_first} - {date_second}')
+			log.info(f'{file_name}. Р—Р°РіСЂСѓР¶Р°РµРј РґР°РЅРЅС‹Рµ Р·Р° РїРµСЂРёРѕРґ {date_first} - {date_second}')
 			cursor.execute(active_stmt, date_first=date_first, date_second=date_second)
 
 			records = cursor.fetchall()
@@ -184,11 +184,11 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				row_cnt += 1
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 9, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 9, f'Р”Р°С‚Р° С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
-			log.info(f'Формирование отчета {file_name} завершено: {now.strftime("%d-%m-%Y %H:%M:%S")}')
+			log.info(f'Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РѕС‚С‡РµС‚Р° {file_name} Р·Р°РІРµСЂС€РµРЅРѕ: {now.strftime("%d-%m-%Y %H:%M:%S")}')
 			set_status_report(file_name, 2)
 			return file_name
 
@@ -207,6 +207,6 @@ def thread_report(file_name: str, date_first: str, date_second: str):
 
 
 if __name__ == "__main__":
-    log.info(f'Отчет {report_code} запускается.')
+    log.info(f'РћС‚С‡РµС‚ {report_code} Р·Р°РїСѓСЃРєР°РµС‚СЃСЏ.')
     #make_report('0701', '01.10.2022','31.10.2022')
     do_report('01.01.2023')
