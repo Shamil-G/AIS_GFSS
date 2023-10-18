@@ -14,13 +14,16 @@ report_code = '1505.01'
 
 stmt_create = """
 select 	unique rfbn_id, rfpm_id, iin, 
-	case when sex=0 then 'Ж' else 'M' end as sex, 
+	case when sex=0 then 'Ж' else 'M' end as sex,
+	age,
+	floor( months_between(sipr.risk_date, p.birthdate) / 12 ) age,
 	appointdate, date_approve, 
 	sum_avg, sum_all
 from (              
 	SELECT /*+parallel(4)*/
 			 p.rn as "IIN",
 			 p.sex,
+			 floor( months_between(sipr.risk_date, p.birthdate) / 12 ) age,
 			 FIRST_VALUE(D.rfbn_id) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) rfbn_id,
 			 FIRST_VALUE(D.rfpm_id) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) rfpm_id,
 			 FIRST_VALUE(pp.appointdate) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) appointdate,
@@ -57,18 +60,20 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(4, 4, 8)
 	worksheet.set_column(5, 5, 12)
 	worksheet.set_column(6, 6, 12)
-	worksheet.set_column(7, 7, 14)
-	worksheet.set_column(8, 8, 12)
+	worksheet.set_column(7, 7, 12)
+	worksheet.set_column(8, 8, 14)
+	worksheet.set_column(9, 9, 12)
 
 	worksheet.merge_range('A3:A4', '№', common_format)
 	worksheet.merge_range('B3:B4', 'Код региона', common_format)
 	worksheet.merge_range('C3:C4', 'Код выплаты', common_format)
 	worksheet.merge_range('D3:D4', 'ИИН получателя', common_format)
 	worksheet.merge_range('E3:E4', 'Пол', common_format)
-	worksheet.merge_range('F3:F4', 'Дата риска', common_format)
-	worksheet.merge_range('G3:G4', 'Дата назначения', common_format)
-	worksheet.merge_range('H3:H4', 'СМД', common_format)
-	worksheet.merge_range('I3:I4', 'Размер СВ', common_format)
+	worksheet.merge_range('F3:F4', 'Возраст на дату риска', common_format)
+	worksheet.merge_range('G3:G4', 'Дата риска', common_format)
+	worksheet.merge_range('H3:H4', 'Дата назначения', common_format)
+	worksheet.merge_range('I3:I4', 'СМД', common_format)
+	worksheet.merge_range('J3:J4', 'Размер СВ', common_format)
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
@@ -150,11 +155,11 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				for list_val in record:
 					if col in (1,2,3):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col in(4,):
+					if col in(4,5):
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
-					if col in (5,6):
+					if col in (6,7):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
-					if col in (7,8):
+					if col in (8,9):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
 					col += 1
 				cnt_part += 1
