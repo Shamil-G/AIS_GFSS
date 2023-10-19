@@ -20,7 +20,7 @@ select 	unique rfbn_id, rfpm_id, iin,
 	appointdate, date_approve, 
 	sum_avg, sum_all
 from (              
-	SELECT /*+parallel(4)*/
+	SELECT /*+parallel(2)*/
 			 p.rn as "IIN",
 			 p.sex,
 			 floor( months_between(sipr.risk_date, p.birthdate) / 12 ) age,

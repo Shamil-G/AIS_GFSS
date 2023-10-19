@@ -18,7 +18,7 @@ select  unique rfbn_id, iin,
   risk_date, date_approve, stopdate, 
   ksu, count_so, sum_avg, sum_all
 from (              
-  SELECT 
+  SELECT /*+parallel(2)*/
         p.rn as "IIN",
 		floor( months_between(sipr.risk_date, p.birthdate) / 12 ) age,
 		FIRST_VALUE(pp.rfbn_id) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) rfbn_id,
@@ -80,7 +80,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('H3:H4', 'КСУ', common_format)
 	worksheet.merge_range('I3:I4', 'Кол-во СО', common_format)
 	worksheet.merge_range('J3:J4', 'СМД', common_format)
-	worksheet.merge_range('K3:K4', 'Сумма первой назначенной выплаты', common_format)
+	worksheet.merge_range('K3:K4', 'Сумма назначенной выплаты', common_format)
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
