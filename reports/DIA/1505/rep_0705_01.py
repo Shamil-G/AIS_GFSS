@@ -16,7 +16,6 @@ stmt_create = """
 select 	unique rfbn_id, rfpm_id, iin, 
 	case when sex=0 then 'Ж' else 'M' end as sex,
 	age,
-	floor( months_between(sipr.risk_date, p.birthdate) / 12 ) age,
 	appointdate, date_approve, 
 	sum_avg, sum_all
 from (              
