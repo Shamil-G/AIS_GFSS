@@ -7,7 +7,7 @@ from   db_config import report_db_user, report_db_password, report_db_dsn
 from   model.call_report import set_status_report
 
 
-report_name = 'Получатели СВбр и СВур, у которых мкжду датами назначения есть СВпр'
+report_name = 'Получатели СВбр и СВур, у которых между датами назначения есть СВпр'
 report_code = '1504.01'
 
 stmt_1 = """
@@ -41,7 +41,7 @@ stmt_1 = """
 			  ) t05
 		where sfa.iin=t05.iin
 		and   substr(sfa.rfpm_id,1,4) = '0703'
-		and   sfa.risk_date => t05.risk_date_0704
+		and   sfa.risk_date >= t05.risk_date_0704
 		and   sfa.risk_date <= add_months(t05.risk_date_0705,6)
 """
 
