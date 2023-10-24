@@ -83,7 +83,8 @@ select  s_brid,
         sum(case when cnt.cnt_days = 3 then cnt.cnt_days else null end) "3 дня",
         sum(case when cnt.cnt_days = 4 then cnt.cnt_days else null end) "4 дня"
 from cntdays487 cnt
-group by s_brid, p_pc
+group by s_brid
+order by 1
 """
 
 active_stmt = stmt_2
