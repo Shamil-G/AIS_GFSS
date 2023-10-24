@@ -1,4 +1,4 @@
-from app_config import debug_level, REPORT_PATH
+from app_config import REPORT_PATH, debug_level, platform
 from main_app import app, log
 from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory, g
 from flask_login import  login_required
@@ -10,6 +10,7 @@ from model.reports import list_reports_by_day, remove_report
 from datetime import date
 from util.get_i18n import get_i18n_value
 from model.call_report import check_report
+
 
 list_params = []
 
@@ -174,6 +175,8 @@ def view_running_reports():
 
 @app.route('/uploads/<path:full_path>')
 def uploaded_file(full_path):
+    if platform == 'unix' and not full_path.startswith('/'):
+        full_path = f'/{full_path}'
     path, file_name = os.path.split(full_path)
     if full_path.startswith(REPORT_PATH):
         status = check_report(full_path)
