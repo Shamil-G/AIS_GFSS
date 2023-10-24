@@ -30,7 +30,7 @@ from (
          SELECT COUNT(UNIQUE SI.PAY_MONTH) 
          FROM SI_MEMBER_2 SI 
          WHERE SI.SICID=D.PNCD_ID
-         AND   SI.PAY_MONTH>=SIPR.RISK_DATE
+         AND   SI.PAY_MONTH>SIPR.RISK_DATE
          AND   SI.PAY_MONTH<=sipr.date_stop
 	     and   si.pay_date>add_months(SIPR.RISK_DATE, -1) 
        ) as COUNT_SO
