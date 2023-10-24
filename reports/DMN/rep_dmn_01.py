@@ -23,7 +23,7 @@ with st7with_dat as (
                         p_pc
                 from ss_m_sol_st st
                 where st2 in (7, 12)
-                and st.dat Between to_date(:d1, 'YYYY-MM-DD') And to_date(:d2, 'YYYY-MM-DD')
+                and trunc(st.dat,'DD') Between to_date(:d1, 'YYYY-MM-DD') And to_date(:d2, 'YYYY-MM-DD')
                 and substr(p_pc, 1, 4) = :rfpm_id
 ),
 
@@ -164,7 +164,7 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'За период: {date_first} - {date_first}, {srfpm_id}', title_name_report)
+			worksheet.write(1, 0, f'За период: {date_first} - {date_second}, {srfpm_id}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 2
@@ -202,6 +202,9 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			set_status_report(file_name, 2)
 			return file_name
 
+def get_file_path(file_name: str, srfpm_id: str, date_first: str, date_second: str):
+	full_file_name = f'{file_name}.{report_code}.{srfpm_id}.{date_first}-{date_second}.xlsx'
+	return full_file_name
 
 def thread_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 	import threading
