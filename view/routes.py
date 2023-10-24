@@ -182,6 +182,8 @@ def uploaded_file(full_path):
         if status == 2:
             log.info(f"UPLOADED_FILE. PATH: {path}, FILE_NAME: {file_name}")
             return send_from_directory(path, file_name)
+    else:
+        log.info(f"UPLOADED_FILE. FULL_PATH: {full_path}\nsplit_path: {path}\nreprt_path: {REPORT_PATH}")
     return redirect(url_for('view_running_reports'))
 
 
