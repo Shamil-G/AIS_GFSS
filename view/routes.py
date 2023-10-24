@@ -175,12 +175,13 @@ def view_running_reports():
 @app.route('/uploads/<path:full_path>')
 def uploaded_file(full_path):
     path, file_name = os.path.split(full_path)
-    status = check_report(f'{REPORT_PATH}/{file_name}')
-    if debug_level > 2:
-        log.info(f"UPLOADED_FILE. STATUS: {status} : {type(status)}, PATH: {path}, file_name: {file_name}, REPORT_PATH: {REPORT_PATH}")
-    if status == 2:
-        log.info(f"UPLOADED_FILE. PATH: {path}, FILE_NAME: {file_name}")
-        return send_from_directory(REPORT_PATH, file_name)
+    if full_path.startswith(REPORT_PATH):
+        status = check_report(full_path)
+        if debug_level > 2:
+            log.info(f"UPLOADED_FILE. STATUS: {status} : {type(status)}, PATH: {path}, file_name: {file_name}, REPORT_PATH: {REPORT_PATH}")
+        if status == 2:
+            log.info(f"UPLOADED_FILE. PATH: {path}, FILE_NAME: {file_name}")
+            return send_from_directory(path, file_name)
     return redirect(url_for('view_running_reports'))
 
 

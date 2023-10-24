@@ -343,4 +343,23 @@ dict_reports = {
         }
     ]
     ,
+    "ДМЭН":
+    [
+        {
+            "grp_name": "Макеты",
+            "live_time": "0",
+            "module_dir": f"{REPORT_MODULE_PATH}.DMN",
+            "list": [
+                {
+                    "name": "Количество дел по дням и регионам",
+                    "num_rep": "01",
+                    "proc": "rep_dmn_01",
+                    "data_approve": "11.10.2023",
+                    "author": "Адильханова А.",
+                    "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                },
+            ]
+        }
+    ]
+    ,    
 }
