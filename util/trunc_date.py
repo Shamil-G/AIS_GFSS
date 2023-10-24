@@ -24,3 +24,10 @@ def trunc_year(input_date: str):
 	except ValueError:
 		trunc_date = datetime.datetime.strptime(input_date, '%d.%m.%Y').replace(day=1, month=1)
 	return datetime.datetime.strftime(trunc_date, '%Y-%m-%d')
+
+def get_year(input_date: str):
+	try:
+		trunc_date = datetime.datetime.strptime(input_date, '%Y-%m-%d').replace(day=1, month=1)
+	except ValueError:
+		trunc_date = datetime.datetime.strptime(input_date, '%d.%m.%Y').replace(day=1, month=1)
+	return datetime.datetime.strftime(trunc_date, '%Y')

@@ -1,9 +1,11 @@
+from distutils.command import check
 from  db.connect import select_one, plsql_proc_s, get_connection, plsql_execute, plsql_proc_s
 from  main_app import log
 import importlib
 from   app_config import REPORT_PATH, debug_level, platform
 from   model.list_reports import dict_reports
 from   model.reports import remove_report
+from   util.trunc_date import get_year
 import os
 
 
@@ -57,6 +59,11 @@ create unique index XN_LOAD_REPORT_STATUS_DATE_EXECUTE_NUM on LOAD_REPORT_STATUS
     maxextents unlimited
   );
 """
+
+def check_dir(dir_path: str):
+    if not os.path.isdir(dir_path):
+        os.mkdir(dir_path)
+        
 
 def check_report(file_path: str):
     stmt = f"""
@@ -143,7 +150,16 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                             log.info(f'\n-------> CALL REPORT. CODE. DEP: {dep_name}, CODE: {code}, CUR_GROUP: {cur_group}, params: {params}')
                         #Определим по коду отчета имя Python модуля для последующей загрузке
                         if 'proc' in curr_report:
-                            report_part_path = f'{REPORT_PATH}/{dep_name}.{group_name}.{code}'
+                            #  Параметры дат отчетов надо заложить в имя файла
+                            date_first = ''
+                            date_second = ''
+                            if 'date_first' in params:
+                                date_first = params['date_first']
+                            if 'date_second' in params:
+                                date_second = params['date_second']
+
+                            check_dir(f'{REPORT_PATH}/{get_year(date_first)}')
+                            report_part_path = f'{REPORT_PATH}/{get_year(date_first)}/{dep_name}.{group_name}.{code}'
                             proc = curr_report['proc']
 
                             if debug_level > 2:
@@ -152,13 +168,6 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                             live_time = 0
                             if 'live_time' in cur_group:
                                 live_time = cur_group['live_time']
-                            #  Параметры дат отчетов надо заложить в имя файла
-                            date_first = ''
-                            date_second = ''
-                            if 'date_first' in params:
-                                date_first = params['date_first']
-                            if 'date_second' in params:
-                                date_second = params['date_second']
 
                             # Загрузим модуль отчетности
                             # 1. Определим путь для импорта необходимого Python модуля-отчета
