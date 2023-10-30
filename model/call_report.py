@@ -127,7 +127,6 @@ def set_status_report(file_path: str, status: int):
         plsql_execute(cursor, 'SET STATUS REPORT', stmt_upd, [status])
 
 
-
 def call_report(dep_name: str, group_name: str, code: str, params: dict):
     if debug_level > 1:
         log.info(f'\nCALL REPORT. DEP: {dep_name}, group: {group_name}, code: {code}, params: {params}')

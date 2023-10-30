@@ -31,7 +31,7 @@ stmt_1 = """
 					   ksu as ksu_0704
 				from sipr_maket_first_approve_2 sfa
 				where substr(sfa.rfpm_id,1,4) = '0704'
-				and   trunc(sfa.risk_date) = trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM')
+				and   trunc(sfa.risk_date) between trunc(to_date(:date_first,'YYYY-MM-DD'), 'MM') and trunc(to_date(:date_second,'YYYY-MM-DD'), 'MM')
 				--and   trunc(sfa.risk_date) = trunc(to_date('2021-03-01','YYYY-MM-DD'), 'MM')
 				) t04
 				where sfa.iin=t04.iin
@@ -80,7 +80,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('K3:K4', 'СМД при СВбр', common_format)
 	worksheet.merge_range('L3:L4', 'КСУ', common_format)
 
-def do_report(file_name: str, date_first: str):
+def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
@@ -141,15 +141,15 @@ def do_report(file_name: str, date_first: str):
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'Месяц расчёта: {date_first}', title_name_report)
+			worksheet.write(1, 0, f'Период расчёта: {date_first} - {date_second}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 3
 			cnt_part = 0
 			m_val = [0]
 
-			log.info(f'{file_name}. Загружаем данные за период {date_first}')
-			cursor.execute(active_stmt, dt_from=date_first)
+			log.info(f'{file_name}. Загружаем данные за период {date_first} - {date_second}')
+			cursor.execute(active_stmt, date_first=date_first, date_second=date_second)
 
 			records = cursor.fetchall()
 			
@@ -184,14 +184,13 @@ def do_report(file_name: str, date_first: str):
 			return file_name
 
 
-def thread_report(file_name: str, date_first: str):
+def thread_report(file_name: str, date_first: str, date_second: str):
 	import threading
-	log.info(f'THREAD REPORT. DATE FOR REPORT: {date_first}, FILE_NAME: {file_name}')
-	threading.Thread(target=do_report, args=(file_name, date_first), daemon=True).start()
+	log.info(f'THREAD REPORT. DATE FOR REPORT: {date_first} - {date_second}, FILE_NAME: {file_name}')
+	threading.Thread(target=do_report, args=(file_name, date_first, date_second), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
 
 
 if __name__ == "__main__":
     log.info(f'Отчет {report_code} запускается.')
-    #make_report('0701', '01.10.2022','31.10.2022')
     do_report('01.01.2023')

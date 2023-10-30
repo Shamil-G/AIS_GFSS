@@ -1,8 +1,8 @@
 from app_config import REPORT_MODULE_PATH
 from app_config import REPORT_MODULE_PATH
 
-# live_time - время жизни отчета в часах, может указываться с 2 занками после запятой
-# в этом случае время минимальное жизни отчета составляет 36 секунд
+# live_time - время жизни отчета в часах, может указываться с 2 знаками после запятой
+# в этом случае минимальное время жизни отчета составляет 36 секунд
 
 
 dict_reports = {
@@ -124,7 +124,7 @@ dict_reports = {
                     "proc": "rep_0704_01",
                     "data_approve": "30.06.2023",
                     "author": "Гусейнов Ш.",
-                    "params": {"date_first": "На"},
+                    "params": {"date_first": "C", "date_second": "по"},
                 },
                 {
                     "name": "Получатели СВбр за период",
@@ -262,6 +262,14 @@ dict_reports = {
                 "data_approve": "12.09.2023",
                 "author": "Гусейнов Ш.А.",
                 "params": {"date_first": "C", "date_second": "по"},
+                },
+                {
+                "name": "Списочная часть чистых ЕП-шников(СВ)",
+                "num_rep": "04",
+                "proc": "rep_dia_cp_04",
+                "data_approve": "27.10.2023",
+                "author": "Адильханова А.К.",
+                "params": {"date_first": "С", "date_second": "по"},
                 }
             ]
         },
