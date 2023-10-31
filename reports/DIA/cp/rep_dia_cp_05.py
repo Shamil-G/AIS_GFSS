@@ -9,7 +9,7 @@ import oracledb
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
-report_name = 'Списочная часть чистых ЕП-шников(СВ)'
+report_name = 'Списочная часть смешанных ЕП-шников(СВ)'
 report_code = 'CP.04'
 
 stmt_2 = """
@@ -21,8 +21,8 @@ with all_data as (
                and    si.pay_month between add_months(sfa.risk_date,-24) and sfa.risk_date
                and    si.pay_date > add_months(sfa.risk_date,-24)
          ),
-e as (
-               select sicid, rfbn_id, iin, rfpm_id, risk_date, sum_avg, kzd,mrzp, count_donation, sum_all, date_approve
+ep as (
+               select unique sicid
                from   all_data a
                where  nvl(a.type_payment,'U')='О'
          )
@@ -32,14 +32,14 @@ non_ep as (
                from   all_data a
                where  nvl(a.type_payment,'U')!='О' --or type_payer is null
          )
-select ep.sicid, ep.rfbn_id, ep.iin, ep.rfpm_id, ep.risk_date, ep.sum_avg, ep.kzd, ep.mrzp, ep.count_donation, ep.sum_all, ep.date_approve
+select a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd,esp.mrzp, a.count_donation, a.sum_all, a.date_approve
 from (
-      select unique sicid from e
-      minus
-      select unique sicid from non_ep
-     )b, ep
-where b.sicid=esp.sicid
-group by ep.sicid, ep.rfbn_id, ep.iin, ep.rfpm_id, ep.risk_date, ep.sum_avg, ep.kzd, ep.mrzp, ep.count_donation, ep.sum_all, ep.date_approve
+      select sicid from ep
+      intersect
+      select sicid from non_ep
+     )b, all_data a
+where b.sicid=a.sicid
+group by a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd, a.mrzp, a.count_donation, a.sum_all, a.date_approve
 """
 
 active_stmt = stmt_2
