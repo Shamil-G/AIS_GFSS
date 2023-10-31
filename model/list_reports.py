@@ -270,6 +270,14 @@ dict_reports = {
                 "data_approve": "27.10.2023",
                 "author": "Адильханова А.К.",
                 "params": {"date_first": "С", "date_second": "по"},
+                },
+                {
+                "name": "Списочная часть смешанных ЕП-шников(СВ)",
+                "num_rep": "05",
+                "proc": "rep_dia_cp_05",
+                "data_approve": "31.10.2023",
+                "author": "Адильханова А.К.",
+                "params": {"date_first": "С", "date_second": "по"},
                 }
             ]
         },
