@@ -17,7 +17,7 @@ with all_data as (
                select /*+parallel(2)*/ si.sicid, sfa.rfbn_id, sfa.iin, sfa.rfpm_id,  sfa.risk_date, sfa.sum_avg, sfa.kzd,mrzp, sfa.count_donation, sfa.sum_all, sfa.date_approve, si.type_payment
                from   si_member_2 si, sipr_maket_first_approve_2 sfa
                where  si.sicid=sfa.sicid
-               and    trunc(sfa.date_approve) Between to_date(:d1,'dd.mm.yyyy') And to_date(:d2,'dd.mm.yyyy')
+               and    trunc(sfa.date_approve) Between to_date(:d1,'YYYY-MM-DD') And to_date(:d2,'YYYY-MM-DD')
                and    si.pay_month between add_months(sfa.risk_date,-24) and sfa.risk_date
                and    si.pay_date > add_months(sfa.risk_date,-24)
          ),
@@ -32,7 +32,7 @@ non_ep as (
                from   all_data a
                where  nvl(a.type_payment,'U')!='О' --or type_payer is null
          )
-select a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd,esp.mrzp, a.count_donation, a.sum_all, a.date_approve
+select a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd, a.mrzp, a.count_donation, a.sum_all, a.date_approve
 from (
       select sicid from ep
       intersect

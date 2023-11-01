@@ -17,11 +17,11 @@ with all_data as (
                select /*+parallel(2)*/ si.sicid, sfa.rfbn_id, sfa.iin, sfa.rfpm_id,  sfa.risk_date, sfa.sum_avg, sfa.kzd,mrzp, sfa.count_donation, sfa.sum_all, sfa.date_approve, si.type_payment
                from   si_member_2 si, sipr_maket_first_approve_2 sfa
                where  si.sicid=sfa.sicid
-               and    trunc(sfa.date_approve) Between to_date(:d1,'dd.mm.yyyy') And to_date(:d2,'dd.mm.yyyy')
+               and    trunc(sfa.date_approve) Between to_date(:d1,'YYYY-MM-DD') And to_date(:d2,'YYYY-MM-DD')
                and    si.pay_month between add_months(sfa.risk_date,-24) and sfa.risk_date
                and    si.pay_date > add_months(sfa.risk_date,-24)
          ),
-e as (
+ep as (
                select sicid, rfbn_id, iin, rfpm_id, risk_date, sum_avg, kzd,mrzp, count_donation, sum_all, date_approve
                from   all_data a
                where  nvl(a.type_payment,'U')='О'
@@ -34,11 +34,11 @@ non_ep as (
          )
 select ep.sicid, ep.rfbn_id, ep.iin, ep.rfpm_id, ep.risk_date, ep.sum_avg, ep.kzd, ep.mrzp, ep.count_donation, ep.sum_all, ep.date_approve
 from (
-      select unique sicid from e
+      select unique sicid from ep
       minus
       select unique sicid from non_ep
      )b, ep
-where b.sicid=esp.sicid
+where b.sicid=ep.sicid
 group by ep.sicid, ep.rfbn_id, ep.iin, ep.rfpm_id, ep.risk_date, ep.sum_avg, ep.kzd, ep.mrzp, ep.count_donation, ep.sum_all, ep.date_approve
 """
 
