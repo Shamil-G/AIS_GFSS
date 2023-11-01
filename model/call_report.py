@@ -76,6 +76,7 @@ def set_status_report(file_path: str, status: int):
           commit;
       end;
     """
+    log.info(f'SET STATUS REPORT. STATUS: {status}, FILE_PATH: {file_path}')
     with get_connection().cursor() as cursor:
         plsql_execute(cursor, 'SET STATUS REPORT', stmt_upd, [status])
         

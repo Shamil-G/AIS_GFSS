@@ -30,6 +30,7 @@ def remove_report(date_report: str, num_report: int):
         log.info(f'REMOVE REPORT. NUM_REPORT: {num_report}, DATE_REPORT: {date_report}')
         plsql_proc_s('REMOVE REPORT. FILE NAME', 'reps.remove_report', [date_report, num_report])
 
+
 def set_status_report(file_path: str, status: int):
     stmt_upd = f"""
       begin
@@ -40,5 +41,6 @@ def set_status_report(file_path: str, status: int):
           commit;
       end;
     """
+    log.info(f'SET STATUS REPORT. STATUS: {status}, FILE_PATH: {file_path}')
     with get_connection().cursor() as cursor:
         plsql_execute(cursor, 'SET STATUS REPORT', stmt_upd, [status])

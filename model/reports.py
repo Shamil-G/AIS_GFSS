@@ -80,9 +80,9 @@ def list_reports_by_day(request_day):
                     else:
                         info = { "date_event": row[0], "num": row[1], "date_first": row[2], "date_second": row[3], 
                                  "rfpm_id": row[4], "rfbn_id": row[5], 
-                                 "name": row[6], "live_time": row[7], "status": int(row[8]), "path": row[9]}
+                                 "name": row[6], "live_time": row[7], "status": status, "path": row[9]}
                         results.append(info)
-                        if debug_level > 2:
+                        if debug_level > 1:
                             log.info(f"LIST REPORTS BY DAY. status: {info['status']}, exist: {file_exist}, path: {info['path']}")
                 rows.clear()
     return results
