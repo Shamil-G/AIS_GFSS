@@ -367,13 +367,37 @@ dict_reports = {
             "module_dir": f"{REPORT_MODULE_PATH}.DMN",
             "list": [
                 {
-                    "name": "Количество дел по дням и регионам",
-                    "num_rep": "01",
-                    "proc": "rep_dmn_01",
-                    "data_approve": "11.10.2023",
-                    "author": "Адильханова А.",
-                    "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                "name": "Количество дел по дням и регионам без доработки",
+                "num_rep": "01",
+                "proc": "rep_dmn_01",
+                "data_approve": "11.10.2023",
+                "author": "Адильханова А.",
+                "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
                 },
+                {
+                "name": "Количество дел по дням и регионам без доработки с ИИН-ами",
+                "num_rep": "02",
+                "proc": "rep_dmn_01_iin",
+                "data_approve": "11.10.2023",
+                "author": "Адильханова А.",
+                "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                },
+                {
+                "name": "Количество дел по дням и регионам с доработкой",
+                "num_rep": "03",
+                "proc": "rep_dmn_02",
+                "data_approve": "01.11.2023",
+                "author": "Адильханова А.",
+                "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                },
+                {
+                "name": "Количество дел по дням и регионам с доработкой с ИИН-ами",
+                "num_rep": "04",
+                "proc": "rep_dmn_02_iin",
+                "data_approve": "01.11.2023",
+                "author": "Адильханова А.",
+                "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                }              
             ]
         }
     ]

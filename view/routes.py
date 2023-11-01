@@ -6,7 +6,8 @@ from model.reports_info import get_owner_reports, get_list_groups, get_list_repo
 from model.call_report import call_report
 import os
 from model.manage_user import change_passwd
-from model.reports import list_reports_by_day, remove_report
+from model.reports import list_reports_by_day
+from model.check_reports import remove_report
 from datetime import date
 from util.get_i18n import get_i18n_value
 from model.call_report import check_report

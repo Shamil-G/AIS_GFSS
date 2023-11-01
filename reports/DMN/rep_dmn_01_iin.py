@@ -10,7 +10,7 @@ from   model.call_report import set_status_report
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
 report_name = 'Кол-во дел по дням и регионам без доработки'
-report_code = 'DMN.01'
+report_code = 'DMN.02'
 
 
 stmt_2 = """
@@ -36,11 +36,13 @@ select
         st7.s_brid,
         st7.p_pc,
         z.sicid,
-        z.num
-from ss_m_sol_st st, ss_z_doc z, st7with_dat st7
+        z.num, rn
+from ss_m_sol_st st, ss_z_doc z, st7with_dat st7, person p
 where z.id = st.sid
 and st.sid = st7.sid
+and p.sicid = z.sicid
 and st.st2 in (4, 145, 8, 43)
+--and rn = '950510400442'
 )
 ,
 st_with_8_43 as (
@@ -52,7 +54,7 @@ st_with_8_43 as (
 ,
 WITHOUT_8_43 as (
         select  p.sid, p.p_pc, p.sicid, p.num, 
-                dat
+                dat, rn
         from 
                 (
                 select sid, p_pc, sicid, num
@@ -71,20 +73,18 @@ cntdays487 as (
                         st7.s_brid,
                         st8.p_pc,
                         st8.sicid,
-                        st8.num
+                        st8.num, rn
                 from WITHOUT_8_43 st8, st7with_dat st7
                 where st8.sid = st7.sid
                 )
-				
+
 select  substr(s_brid, 1, 2),
-        count(num),
-        count(case when cnt.cnt_days = 1 then num else null end) "1 день",
-        count(case when cnt.cnt_days = 2 then num else null end) "2 дня",
-        count(case when cnt.cnt_days = 3 then num else null end) "3 дня",
-        count(case when cnt.cnt_days = 4 then num else null end) "4 дня",
-        count(case when cnt.cnt_days > 4 then num else null end) "more than 4"
-from cntdays487 cnt
-group by substr(s_brid, 1, 2)
+        case when cnt.cnt_days = 1 then rn else null end "1 день",
+        case when cnt.cnt_days = 2 then rn else null end "2 дня",
+        case when cnt.cnt_days = 3 then rn else null end "3 дня",
+        case when cnt.cnt_days = 4 then rn else null end "4 дня",
+		case when cnt.cnt_days > 4 then rn else null end "больше 4"
+from cntdays487 cnt 
 """
 
 active_stmt = stmt_2
@@ -109,7 +109,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2, 4, '2 дня', common_format)
 	worksheet.write(2, 5, '3 дня', common_format)
 	worksheet.write(2, 6, '4 дня', common_format)
-	worksheet.write(2, 7, 'больше 4', common_format)
+	worksheet.write(2, 7, 'больше 4 дней', common_format)
 
 
 def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):

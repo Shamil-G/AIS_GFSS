@@ -9,8 +9,8 @@ from   model.call_report import set_status_report
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
-report_name = 'Кол-во дел по дням и регионам без доработки'
-report_code = 'DMN.01'
+report_name = 'Кол-во дел по дням и регионам с доработкой'
+report_code = 'DMN.03'
 
 
 stmt_2 = """
@@ -27,64 +27,77 @@ with st7with_dat as (
                 and substr(p_pc, 1, 4) = :rfpm_id
 )
 ,
-
 comm_st as(
-select 
-        st.sid,
-        st.st2,
-        trunc(st.dat, 'DD') dat,
-        st7.s_brid,
-        st7.p_pc,
-        z.sicid,
-        z.num
-from ss_m_sol_st st, ss_z_doc z, st7with_dat st7
-where z.id = st.sid
-and st.sid = st7.sid
-and st.st2 in (4, 145, 8, 43)
-)
-,
-st_with_8_43 as (
-                select 
-						sid, p_pc, sicid, num
-                from comm_st
-                where st2 in (8, 43)
-                )
-,
-WITHOUT_8_43 as (
-        select  p.sid, p.p_pc, p.sicid, p.num, 
-                dat
-        from 
-                (
-                select sid, p_pc, sicid, num
-                from comm_st st
-                minus
-                select sid, p_pc, sicid, num
-                from st_with_8_43
-                ) p, comm_st c
-        where p.sid=c.sid
-        and p.num=c.num
-        and st2 in (4, 145)
-            ),
-cntdays487 as (
-                select  count_work_date(trunc(st8.dat,'DD'), trunc(st7.dat, 'DD'))+1 cnt_days,
-                        st8.sid, 
+                select  st.sid,
+                        st.st2,
+                        st.dat,
                         st7.s_brid,
-                        st8.p_pc,
-                        st8.sicid,
-                        st8.num
-                from WITHOUT_8_43 st8, st7with_dat st7
-                where st8.sid = st7.sid
+                        st7.p_pc,
+                        z.sicid,
+                        z.num,
+                        rn
+                        
+                from ss_m_sol_st st, ss_z_doc z, person p, st7with_dat st7
+                where z.id = st.sid
+                and p.sicid = z.sicid
+                and st.sid = st7.sid
+                and st.st2 in (4, 145, 16, 8, 43)
+                ),
+st4_145 as
+            (
+            select * from
+                            (
+                            select
+                                    st.sid,
+                                    st.st2,
+                                    first_value(st.dat) over(partition by st.sid, st.num order by st.dat) dat,
+                                    row_number() over(partition by st.sid, st.num order by st.dat) row_num,
+                                    s_brid,
+                                    p_pc,
+                                    sicid,
+                                    st.num
+                            from comm_st st
+                            where st2 in (4, 145, 16)
+                            )
+            where row_num=1
+            )
+,
+st8_43 as (
+            select * from
+                        (
+                        select  st.sid,
+                                st.st2,
+                                first_value(st.dat) over(partition by st.sid, st.num order by st.dat) dat,
+                                row_number() over(partition by st.sid, st.num order by st.dat) row_num,
+                                s_brid,
+                                p_pc
+                        from comm_st st
+                        where st2 in (8, 43)
+                        )
+            where row_num=1
+            )
+,
+cntdays487 as (
+                select  count_work_date(trunc(st4.dat,'DD'), trunc(st7.dat, 'DD'))+1 cnt_days,
+                        st4.sid,
+                        st4.s_brid,
+                        st4.p_pc,
+                        st4.sicid,
+                        st4.num
+                from st8_43 st8, st4_145 st4, st7with_dat st7
+                where st8.sid = st4.sid
+                and st8.sid = st7.sid
                 )
-				
-select  substr(s_brid, 1, 2),
-        count(num),
-        count(case when cnt.cnt_days = 1 then num else null end) "1 день",
-        count(case when cnt.cnt_days = 2 then num else null end) "2 дня",
-        count(case when cnt.cnt_days = 3 then num else null end) "3 дня",
-        count(case when cnt.cnt_days = 4 then num else null end) "4 дня",
-        count(case when cnt.cnt_days > 4 then num else null end) "more than 4"
-from cntdays487 cnt
-group by substr(s_brid, 1, 2)
+
+        select  substr(s_brid, 1, 2),
+                count(case when cnt.cnt_days < 5 then num else null end) before_5,
+                count(case when cnt.cnt_days between 5 and 9 then num else null end) in5_9,
+                count(case when cnt.cnt_days between 10 and 14 then num else null end) in10_14,
+                count(case when cnt.cnt_days between 15 and 19 then num else null end) in15_19,
+                count(case when cnt.cnt_days between 20 and 24 then num else null end) in20_24,
+                count(case when cnt.cnt_days >= 25 then num else null end) more25
+        from cntdays487 cnt
+        group by substr(s_brid, 1, 2)
 """
 
 active_stmt = stmt_2
@@ -103,13 +116,13 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(7, 7, 12)
 
 	worksheet.write(2, 0, '№', common_format)
-	worksheet.write(2, 1, 'Код региона', common_format)
-	worksheet.write(2, 2, 'общее кол-во дел', common_format)
-	worksheet.write(2, 3, '1 день', common_format)
-	worksheet.write(2, 4, '2 дня', common_format)
-	worksheet.write(2, 5, '3 дня', common_format)
-	worksheet.write(2, 6, '4 дня', common_format)
-	worksheet.write(2, 7, 'больше 4', common_format)
+	worksheet.write(2, 1, 'Регион', common_format)
+	worksheet.write(2, 2, 'до 5 дней', common_format)
+	worksheet.write(2, 3, 'от 5 до 9 дней', common_format)
+	worksheet.write(2, 4, 'от 10 до 14 дней', common_format)
+	worksheet.write(2, 5, 'от 15 до 19 дней', common_format)
+	worksheet.write(2, 6, 'от 20 до 24 дней', common_format)
+	worksheet.write(2, 7, 'больше 25', common_format)
 
 
 def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
