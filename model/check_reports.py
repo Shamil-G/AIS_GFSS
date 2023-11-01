@@ -29,7 +29,6 @@ def remove_report(date_report: str, num_report: int):
     if remove_file(date_report, num_report):
         log.info(f'REMOVE REPORT. NUM_REPORT: {num_report}, DATE_REPORT: {date_report}')
         plsql_proc_s('REMOVE REPORT. FILE NAME', 'reps.remove_report', [date_report, num_report])
-        
 
 def set_status_report(file_path: str, status: int):
     stmt_upd = f"""

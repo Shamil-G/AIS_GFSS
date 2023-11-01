@@ -66,7 +66,7 @@ def list_reports_by_day(request_day):
                     date_execute = row[0]
                     file_exist = os.path.exists(row[9])
                     status = int(row[8])
-                    if status!=2 and not file_exist:
+                    if status!=2 and file_exist != True:
                         set_status_report(row[9],2)
                     if remain_time <= 0:
                         log.info(f"CHECK_REPORT. REMOVE. REMAIN TIME: {remain_time} <= 0, date_report: {request_day}, inum_report: {row[1]}")

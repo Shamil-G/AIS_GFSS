@@ -25,7 +25,6 @@ with st7with_dat as (
                 where st2 in (7, 12)
                 and trunc(st.dat, 'DD') Between to_date(:d1, 'YYYY-MM-DD') And to_date(:d2, 'YYYY-MM-DD')
                 and substr(p_pc, 1, 4) = :rfpm_id
---                and sid = '194144860'
 )
 ,
 comm_st as(
@@ -63,7 +62,6 @@ st4_145 as
             where row_num=1
             )
 ,
--- select * from st4_145
 st8_43 as (
             select * from
                         (
@@ -79,7 +77,6 @@ st8_43 as (
             where row_num=1
             )
 ,
--- select * from st8_43
 cntdays487 as (
                 select  count_work_date(trunc(st4.dat,'DD'), trunc(st7.dat, 'DD'))+1 cnt_days,
                         st4.sid,
@@ -91,16 +88,14 @@ cntdays487 as (
                 where st8.sid = st4.sid
                 and st8.sid = st7.sid
                 )
--- select * from cntdays487
-
-        select  substr(s_brid, 1, 2),
-                case when cnt.cnt_days < 5 then rn else null end before_5,
-                case when cnt.cnt_days between 5 and 9 then rn else null end in5_9,
-                case when cnt.cnt_days between 10 and 14 then rn else null end in10_14,
-                case when cnt.cnt_days between 15 and 19 then rn else null end in15_19,
-                case when cnt.cnt_days between 20 and 24 then rn else null end in20_24,
-                case when cnt.cnt_days >= 25 then rn else null end more25
-        from cntdays487 cnt;
+select  substr(s_brid, 1, 2),
+        case when cnt.cnt_days < 5 then rn else null end before_5,
+        case when cnt.cnt_days between 5 and 9 then rn else null end in5_9,
+        case when cnt.cnt_days between 10 and 14 then rn else null end in10_14,
+        case when cnt.cnt_days between 15 and 19 then rn else null end in15_19,
+        case when cnt.cnt_days between 20 and 24 then rn else null end in20_24,
+        case when cnt.cnt_days >= 25 then rn else null end more25
+from cntdays487 cnt
 """
 
 active_stmt = stmt_2
