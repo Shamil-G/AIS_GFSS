@@ -4,7 +4,7 @@ import os.path
 from   util.logger import log
 import oracledb
 from   db_config import report_db_user, report_db_password, report_db_dsn
-from   model.call_report import set_status_report
+from   model.check_reports import set_status_report
 
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
@@ -114,12 +114,12 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(7, 7, 12)
 
 	worksheet.write(2, 0, '№', common_format)
-	worksheet.write(2, 6, 'Регион', common_format)
-	worksheet.write(2, 1, 'до 5 дней', common_format)
-	worksheet.write(2, 2, 'от 5 до 9 дней', common_format)
-	worksheet.write(2, 3, 'от 10 до 14 дней', common_format)
-	worksheet.write(2, 4, 'от 15 до 19 дней', common_format)
-	worksheet.write(2, 5, 'от 20 до 24 дней', common_format)
+	worksheet.write(2, 1, 'Регион', common_format)
+	worksheet.write(2, 2, 'до 5 дней', common_format)
+	worksheet.write(2, 3, 'от 5 до 9 дней', common_format)
+	worksheet.write(2, 4, 'от 10 до 14 дней', common_format)
+	worksheet.write(2, 5, 'от 15 до 19 дней', common_format)
+	worksheet.write(2, 6, 'от 20 до 24 дней', common_format)
 	worksheet.write(2, 7, 'больше 25', common_format)
 
 
