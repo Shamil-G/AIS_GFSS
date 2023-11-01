@@ -33,6 +33,7 @@ with sum_calc  as(
         sicid, trunc( months_between(trunc(si.pay_month,'MM'), to_date(:dt_from,'YYYY-MM-DD') )) num_month, si.sum_pay
         from si_member_2 si
         where si.pay_date > to_date(:dt_from,'YYYY-MM-DD')
+	    and   si.knp='012'
         and   si.pay_date <= add_months( trunc(to_date(:dt_from,'YYYY-MM-DD'), 'MM'), 12 ) 
     )
     group by sicid

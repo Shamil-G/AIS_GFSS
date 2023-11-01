@@ -1,11 +1,10 @@
 from app_config import debug_level
 from main_app import log
-from db.connect import plsql_proc_s, get_connection, plsql_proc, select_one
+from db.connect import get_connection
 from datetime import datetime
-import oracledb
-import os
+from model.check_reports import set_status_report, remove_report
 from util.trunc_date import first_day, last_day
-
+import os
 
 stmt_list_reports_month = """
     select  to_char(st.date_execute,'YYYY-MM-DD'), st.num, st.date_first, st.date_second, st.rfpm_id, 
@@ -43,34 +42,6 @@ stmt_list_reports = """
     order by st.num
 """
 
-stmt_file_path = f"""
-    select st.file_path
-    from LOAD_REPORT_STATUS st 
-    where to_char(st.date_execute, 'YYYY-MM-DD') = :i_date_report
-    and   st.num = :i_num
-"""
-
-
-def remove_file(date_report: str, num_report: int):
-    mistake, result, err_msg = select_one(stmt_file_path, [date_report, num_report])
-    if mistake == 0 and result:
-        file_path = result[0]
-        if os.path.exists(file_path):
-            log.info(f"REMOVE_FILE. NUM_REPORT: {num_report}, DATE_REPORT: {date_report}, FILE_PATH: {file_path}")
-            os.remove(file_path)
-        else:
-            log.info(f"REMOVE_FILE. FILE NOT EXISTS: NUM_REPORT: {num_report}, DATE_REPORT: {date_report}, FILE_PATH: {file_path}")
-        return True
-    log.info(f"REMOVE_FILE. MISTAKE: {mistake},  err_msg: {err_msg}, result: {result}")
-    return False
-
-
-def remove_report(date_report: str, num_report: int):
-    if remove_file(date_report, num_report):
-        log.info(f'REMOVE REPORT. NUM_REPORT: {num_report}, DATE_REPORT: {date_report}')
-        plsql_proc_s('REMOVE REPORT. FILE NAME', 'reps.remove_report', [date_report, num_report])
-
-
 def list_reports_by_day(request_day):
     current_day = datetime.today().strftime('%Y-%m-%d')
     results = []
@@ -95,6 +66,8 @@ def list_reports_by_day(request_day):
                     date_execute = row[0]
                     file_exist = os.path.exists(row[9])
                     status = int(row[8])
+                    if status!=2 and not file_exist:
+                        set_status_report(row[9],2)
                     if remain_time <= 0:
                         log.info(f"CHECK_REPORT. REMOVE. REMAIN TIME: {remain_time} <= 0, date_report: {request_day}, inum_report: {row[1]}")
                         remove_report(row[0], row[1])
