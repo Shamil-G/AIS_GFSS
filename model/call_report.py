@@ -1,10 +1,9 @@
-from  distutils.command import check
-from  db.connect import select_one, plsql_proc_s, get_connection, plsql_execute, plsql_proc_s
+from  db.connect import select_one, get_connection, plsql_execute
 from  main_app import log
 import importlib
 from   app_config import REPORT_PATH, debug_level, platform
 from   model.list_reports import dict_reports
-from   model.check_reports import remove_report, set_status_report
+from   model.check_reports import remove_report
 from   util.trunc_date import get_year
 import os
 
@@ -64,6 +63,21 @@ create unique index XN_LOAD_REPORT_STATUS_DATE_EXECUTE_NUM on LOAD_REPORT_STATUS
 def check_dir(dir_path: str):
     if not os.path.isdir(dir_path):
         os.mkdir(dir_path)
+        
+        
+
+def set_status_report(file_path: str, status: int):
+    stmt_upd = f"""
+      begin
+          update LOAD_REPORT_STATUS st
+          set st.status = :status,
+              st.date_execute = sysdate
+          where st.file_path = '{file_path}';
+          commit;
+      end;
+    """
+    with get_connection().cursor() as cursor:
+        plsql_execute(cursor, 'SET STATUS REPORT', stmt_upd, [status])
         
 
 def check_report(file_path: str):
