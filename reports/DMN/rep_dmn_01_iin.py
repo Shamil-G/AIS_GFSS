@@ -4,10 +4,8 @@ import os.path
 from   util.logger import log
 import oracledb
 from   db_config import report_db_user, report_db_password, report_db_dsn
-from   model.call_report import set_status_report
+from   model.manage_reports import set_status_report
 
-# from cx_Oracle import SessionPool
-# con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
 report_name = 'Кол-во дел по дням и регионам без доработки'
 report_code = 'DMN.02'
@@ -100,16 +98,14 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(4, 4, 14)
 	worksheet.set_column(5, 5, 12)
 	worksheet.set_column(6, 6, 12)
-	worksheet.set_column(7, 7, 12)
 
 	worksheet.write(2, 0, '№', common_format)
 	worksheet.write(2, 1, 'Код региона', common_format)
-	worksheet.write(2, 2, 'общее кол-во дел', common_format)
-	worksheet.write(2, 3, '1 день', common_format)
-	worksheet.write(2, 4, '2 дня', common_format)
-	worksheet.write(2, 5, '3 дня', common_format)
-	worksheet.write(2, 6, '4 дня', common_format)
-	worksheet.write(2, 7, 'больше 4 дней', common_format)
+	worksheet.write(2, 2, '1 день', common_format)
+	worksheet.write(2, 3, '2 дня', common_format)
+	worksheet.write(2, 4, '3 дня', common_format)
+	worksheet.write(2, 5, '4 дня', common_format)
+	worksheet.write(2, 6, 'больше 4 дней', common_format)
 
 
 def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
@@ -183,17 +179,9 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (1, 2):
+					if col == 1:
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
-					if col == 3:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 4:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 5:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 6:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 7:
+					if col in (2, 3,4,5,6):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
 					col += 1
 				row_cnt += 1

@@ -2,7 +2,7 @@ from app_config import debug_level
 from main_app import log
 from db.connect import get_connection
 from datetime import datetime
-from model.check_reports import set_status_report, remove_report
+from model.manage_reports import set_status_report, remove_report
 from util.trunc_date import first_day, last_day
 import os
 

@@ -2,10 +2,10 @@ from   db_config import report_db_user, report_db_password, report_db_dsn
 import xlsxwriter
 import datetime
 from   os import path
-from   util.logger import log
 import oracledb
-from   model.call_report import set_status_report
+from   util.logger import log
 import os.path
+from   model.manage_reports import set_status_report
 
 # Принят ДИА 13.02.2023
 

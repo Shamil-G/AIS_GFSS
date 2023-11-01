@@ -4,7 +4,7 @@ import os.path
 import oracledb
 from   util.logger import log
 from   db_config import report_db_user, report_db_password, report_db_dsn
-from   model.call_report import set_status_report
+from   model.manage_reports import set_status_report
 
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)

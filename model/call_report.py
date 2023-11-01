@@ -3,7 +3,7 @@ from  main_app import log
 import importlib
 from   app_config import REPORT_PATH, debug_level, platform
 from   model.list_reports import dict_reports
-from   model.check_reports import remove_report
+from   model.manage_reports import remove_report
 from   util.trunc_date import get_year
 import os
 

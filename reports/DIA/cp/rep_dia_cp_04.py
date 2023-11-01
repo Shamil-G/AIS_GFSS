@@ -2,12 +2,10 @@ from   db_config import report_db_user, report_db_password, report_db_dsn
 import xlsxwriter
 import datetime
 import os.path
-from   util.logger import log
-from   model.call_report import set_status_report
 import oracledb
+from   util.logger import log
+from   model.manage_reports import set_status_report
 
-# from cx_Oracle import SessionPool
-# con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
 report_name = 'Списочная часть чистых ЕП-шников(СВ)'
 report_code = 'CP.04'

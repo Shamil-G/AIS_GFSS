@@ -3,8 +3,8 @@ import xlsxwriter
 import datetime
 from   util.logger import log
 import oracledb
-from   model.call_report import set_status_report
 import os.path
+from   model.manage_reports import set_status_report
 
 report_name = 'Списочная часть по платежам, рассчитанным от дохода менее 1 МЗП'
 report_code = 'minCO.01'

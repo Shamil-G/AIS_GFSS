@@ -1,10 +1,11 @@
 from   db_config import report_db_user, report_db_password, report_db_dsn
 import xlsxwriter
 import datetime
-from   util.logger import log
 import oracledb
-from   model.call_report import set_status_report
+from   util.logger import log
 import os.path
+from   model.manage_reports import set_status_report
+
 
 report_name = 'Сведения о поступивших возвратах излишне зачисленных (выплаченных) сумм социальных выплат'
 report_code = '300.09'
