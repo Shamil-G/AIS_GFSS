@@ -34,15 +34,14 @@ comm_st as(
                         st7.s_brid,
                         st7.p_pc,
                         z.sicid,
-                        z.num,
-                        rn
-                        
-                from ss_m_sol_st st, ss_z_doc z, person p, st7with_dat st7
+                        z.num
+                from ss_m_sol_st st, ss_z_doc z, st7with_dat st7
                 where z.id = st.sid
-                and p.sicid = z.sicid
                 and st.sid = st7.sid
-                and st.st2 in (4, 145, 16, 8, 43)
-                ),
+                and st.st2 in (4, 145, 16, 8, 43, 44, 45)
+                and z.id_tip = 'NEW'
+                )
+                ,
 st4_145 as
             (
             select * from
@@ -72,7 +71,7 @@ st8_43 as (
                                 s_brid,
                                 p_pc
                         from comm_st st
-                        where st2 in (8, 43)
+                        where st2 in (8, 43, 44, 45)
                         )
             where row_num=1
             )
@@ -90,6 +89,7 @@ cntdays487 as (
                 )
 
         select  substr(s_brid, 1, 2),
+				count(num),
                 count(case when cnt.cnt_days < 5 then num else null end) before_5,
                 count(case when cnt.cnt_days between 5 and 9 then num else null end) in5_9,
                 count(case when cnt.cnt_days between 10 and 14 then num else null end) in10_14,
@@ -108,21 +108,23 @@ def format_worksheet(worksheet, common_format):
 
 	worksheet.set_column(0, 0, 7)
 	worksheet.set_column(1, 1, 10)
-	worksheet.set_column(2, 2, 12)
-	worksheet.set_column(3, 3, 14)
-	worksheet.set_column(4, 4, 14)
-	worksheet.set_column(5, 5, 12)
-	worksheet.set_column(6, 6, 12)
-	worksheet.set_column(7, 7, 12)
+	worksheet.set_column(2, 2, 16)
+	worksheet.set_column(3, 3, 16)
+	worksheet.set_column(4, 4, 16)
+	worksheet.set_column(5, 5, 16)
+	worksheet.set_column(6, 6, 16)
+	worksheet.set_column(7, 7, 16)
+	worksheet.set_column(8, 8, 16)
 
 	worksheet.write(2, 0, '№', common_format)
 	worksheet.write(2, 1, 'Регион', common_format)
-	worksheet.write(2, 2, 'до 5 дней', common_format)
-	worksheet.write(2, 3, 'от 5 до 9 дней', common_format)
-	worksheet.write(2, 4, 'от 10 до 14 дней', common_format)
-	worksheet.write(2, 5, 'от 15 до 19 дней', common_format)
-	worksheet.write(2, 6, 'от 20 до 24 дней', common_format)
-	worksheet.write(2, 7, 'больше 25', common_format)
+	worksheet.write(2, 2, 'Общее количество', common_format)
+	worksheet.write(2, 3, 'до 5 дней', common_format)
+	worksheet.write(2, 4, 'от 5 до 9 дней', common_format)
+	worksheet.write(2, 5, 'от 10 до 14 дней', common_format)
+	worksheet.write(2, 6, 'от 15 до 19 дней', common_format)
+	worksheet.write(2, 7, 'от 20 до 24 дней', common_format)
+	worksheet.write(2, 8, 'больше 25', common_format)
 
 
 def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
@@ -148,12 +150,6 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			common_format.set_align('vcenter')
 			common_format.set_border(1)
 
-			sum_pay_format = workbook.add_format({'num_format': '#,###,##0.00', 'font_color': 'black', 'align': 'vcenter'})
-			sum_pay_format.set_border(1)
-			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
-			date_format.set_border(1)
-			date_format.set_align('vcenter')
-
 			digital_format = workbook.add_format({'num_format': '#0', 'align': 'center'})
 			digital_format.set_border(1)
 			digital_format.set_align('vcenter')
@@ -161,6 +157,14 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			money_format = workbook.add_format({'num_format': '# ### ##0', 'align': 'right'})
 			money_format.set_border(1)
 			money_format.set_align('vcenter')
+			
+			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format.set_border(1)
+			date_format.set_align('vcenter')
+
+			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format_it.set_align('vcenter')
+			date_format_it.set_italic()
 
 			now = datetime.datetime.now()
 			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
@@ -196,23 +200,24 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (1, 2):
+					if col == 1:
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
-					if col == 3:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 4:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 5:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 6:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 7:
+					if col in (2,3,4,5,6,7,8):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
 					col += 1
 				row_cnt += 1
 				cnt_part += 1
 
-			#worksheet.write(row_cnt+1, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
+			worksheet.write(row_cnt+2, 2, "=SUM(C4:C"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 3, "=SUM(D4:D"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 4, "=SUM(E4:E"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 5, "=SUM(F4:F"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 6, "=SUM(G4:G"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 7, "=SUM(H4:H"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 8, "=SUM(I4:I"+str(row_cnt+2)+")", digital_format)
+
+			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(1, 6, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()

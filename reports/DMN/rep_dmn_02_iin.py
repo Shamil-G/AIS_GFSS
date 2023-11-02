@@ -15,79 +15,81 @@ report_code = 'DMN.04'
 
 stmt_2 = """
 with st7with_dat as (
-                select 
-                        st.sid,
-                        st.st2,
-                        first_value(st.dat) over(partition by sid order by dat) dat,
-                        s_brid,
-                        p_pc
-                from ss_m_sol_st st
-                where st2 in (7, 12)
-                and trunc(st.dat, 'DD') Between to_date(:d1, 'YYYY-MM-DD') And to_date(:d2, 'YYYY-MM-DD')
-                and substr(p_pc, 1, 4) = :rfpm_id
+    select 
+            st.sid,
+            st.st2,
+            first_value(st.dat) over(partition by sid order by dat) dat,
+            s_brid,
+            p_pc
+    from ss_m_sol_st st
+    where st2 in (7, 12)
+    and trunc(st.dat, 'DD') Between to_date(:d1, 'YYYY-MM-DD') And to_date(:d2, 'YYYY-MM-DD')
+    and substr(p_pc, 1, 4) = :rfpm_id
 )
 ,
 comm_st as(
-                select  st.sid,
-                        st.st2,
-                        st.dat,
-                        st7.s_brid,
-                        st7.p_pc,
-                        z.sicid,
-                        z.num,
-                        rn
-                        
-                from ss_m_sol_st st, ss_z_doc z, person p, st7with_dat st7
-                where z.id = st.sid
-                and p.sicid = z.sicid
-                and st.sid = st7.sid
-                and st.st2 in (4, 145, 16, 8, 43)
-                ),
+	select  st.sid,
+			st.st2,
+			st.dat,
+			st7.s_brid,
+			st7.p_pc,
+			z.sicid,
+			z.num,
+			rn
+	from ss_m_sol_st st, ss_z_doc z, person p, st7with_dat st7
+	where z.id = st.sid
+	and p.sicid = z.sicid
+	and st.sid = st7.sid
+	and st.st2 in (4, 145, 16, 8, 43, 44, 45)
+	and z.id_tip = 'NEW'
+)
+,
 st4_145 as
-            (
-            select * from
-                            (
-                            select
-                                    st.sid,
-                                    st.st2,
-                                    first_value(st.dat) over(partition by st.sid, st.num order by st.dat) dat,
-                                    row_number() over(partition by st.sid, st.num order by st.dat) row_num,
-                                    s_brid,
-                                    p_pc,
-                                    sicid,
-                                    st.num, rn
-                            from comm_st st
-                            where st2 in (4, 145, 16)
-                            )
-            where row_num=1
-            )
+(
+select * from
+        (
+        select
+                st.sid,
+                st.st2,
+                first_value(st.dat) over(partition by st.sid, st.num order by st.dat) dat,
+                row_number() over(partition by st.sid, st.num order by st.dat) row_num,
+                s_brid,
+                p_pc,
+                sicid,
+                st.num, rn
+        from comm_st st
+        where st2 in (4, 145, 16)
+        )
+where row_num=1
+)
 ,
 st8_43 as (
-            select * from
-                        (
-                        select  st.sid,
-                                st.st2,
-                                first_value(st.dat) over(partition by st.sid, st.num order by st.dat) dat,
-                                row_number() over(partition by st.sid, st.num order by st.dat) row_num,
-                                s_brid,
-                                p_pc
-                        from comm_st st
-                        where st2 in (8, 43)
-                        )
-            where row_num=1
-            )
+	select * from
+		(
+		select  st.sid,
+				st.st2,
+				first_value(st.dat) over(partition by st.sid, st.num order by st.dat) dat,
+				row_number() over(partition by st.sid, st.num order by st.dat) row_num,
+				s_brid,
+				p_pc
+		from comm_st st
+		where st2 in (8, 43, 44, 45)
+		)
+	where row_num=1
+)
 ,
 cntdays487 as (
-                select  count_work_date(trunc(st4.dat,'DD'), trunc(st7.dat, 'DD'))+1 cnt_days,
-                        st4.sid,
-                        st4.s_brid,
-                        st4.p_pc,
-                        st4.sicid,
-                        st4.num, rn
-                from st8_43 st8, st4_145 st4, st7with_dat st7
-                where st8.sid = st4.sid
-                and st8.sid = st7.sid
-                )
+    select  count_work_date(trunc(st4.dat,'DD'), trunc(st7.dat, 'DD'))+1 cnt_days,
+            st4.sid,
+            st4.s_brid,
+            st4.p_pc,
+            st4.sicid,
+            st4.num, rn
+    from st8_43 st8, st4_145 st4, st7with_dat st7
+    where st8.sid = st4.sid
+    and st8.sid = st7.sid
+)
+
 select  substr(s_brid, 1, 2),
         case when cnt.cnt_days < 5 then rn else null end before_5,
         case when cnt.cnt_days between 5 and 9 then rn else null end in5_9,
@@ -96,6 +98,7 @@ select  substr(s_brid, 1, 2),
         case when cnt.cnt_days between 20 and 24 then rn else null end in20_24,
         case when cnt.cnt_days >= 25 then rn else null end more25
 from cntdays487 cnt
+ORDER BY s_brid
 """
 
 active_stmt = stmt_2
@@ -148,9 +151,14 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 
 			sum_pay_format = workbook.add_format({'num_format': '#,###,##0.00', 'font_color': 'black', 'align': 'vcenter'})
 			sum_pay_format.set_border(1)
+
 			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
+
+			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format_it.set_align('vcenter')
+			date_format_it.set_italic()
 
 			digital_format = workbook.add_format({'num_format': '#0', 'align': 'center'})
 			digital_format.set_border(1)
@@ -196,21 +204,15 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 				for list_val in record:
 					if col in (1, 2):
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
-					if col == 3:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 4:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 5:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 6:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 7:
+					if col in (3,4,5,6,7):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
 					col += 1
 				row_cnt += 1
 				cnt_part += 1
 
 			#worksheet.write(row_cnt+1, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
+			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(1, 6, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()

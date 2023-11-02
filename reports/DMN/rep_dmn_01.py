@@ -4,13 +4,13 @@ import os.path
 from   util.logger import log
 import oracledb
 from   db_config import report_db_user, report_db_password, report_db_dsn
-from   model.manage_reports import set_status_report
+from   model.call_report import set_status_report
 
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
 report_name = 'Кол-во дел по дням и регионам без доработки'
-report_code = 'DMN.01'
+report_code = 'rep_DMN_01'
 
 
 stmt_2 = """
@@ -18,36 +18,51 @@ with st7with_dat as (
                 select 
                         st.sid,
                         st.st2,
-                        first_value(st.dat) over(partition by sid order by dat) dat,
-                        s_brid,
-                        p_pc
+                        dat
                 from ss_m_sol_st st
                 where st2 in (7, 12)
                 and trunc(st.dat, 'DD') Between to_date(:d1, 'YYYY-MM-DD') And to_date(:d2, 'YYYY-MM-DD')
                 and substr(p_pc, 1, 4) = :rfpm_id
 )
 ,
+seven_date as (
+        select * from 
+              (
+              select st.sid, 
+                     st.st2,
+                     first_value(st.dat) over(partition by st.sid order by st.dat) sdat,
+                     row_number() over(partition by st.sid order by st.dat) row_num,
+                     s_brid,
+                     p_pc
+              from ss_m_sol_st st, st7with_dat st7
+              where st.sid = st7.sid
+              and st.st2 in (7, 12)
+              ) where row_num = 1
+                and trunc(sdat, 'DD') Between to_date(:d1, 'YYYY-MM-DD') And to_date(:d2, 'YYYY-MM-DD')
+    )
+,
 
 comm_st as(
 select 
         st.sid,
         st.st2,
-        trunc(st.dat, 'DD') dat,
+        trunc(st.dat, 'DD') dat, 
         st7.s_brid,
         st7.p_pc,
         z.sicid,
         z.num
-from ss_m_sol_st st, ss_z_doc z, st7with_dat st7
+from ss_m_sol_st st, ss_z_doc z, seven_date st7
 where z.id = st.sid
 and st.sid = st7.sid
-and st.st2 in (4, 145, 8, 43)
+and st.st2 in (4, 145, 8, 43, 44, 45)
+and z.id_tip = 'NEW'
 )
 ,
 st_with_8_43 as (
                 select 
 						sid, p_pc, sicid, num
                 from comm_st
-                where st2 in (8, 43)
+                where st2 in (8, 43, 44, 45)
                 )
 ,
 WITHOUT_8_43 as (
@@ -66,16 +81,16 @@ WITHOUT_8_43 as (
         and st2 in (4, 145)
             ),
 cntdays487 as (
-                select  count_work_date(trunc(st8.dat,'DD'), trunc(st7.dat, 'DD'))+1 cnt_days,
+                select  count_work_date(trunc(st8.dat,'DD'), trunc(st7.sdat, 'DD'))+1 cnt_days,
                         st8.sid, 
                         st7.s_brid,
                         st8.p_pc,
                         st8.sicid,
                         st8.num
-                from WITHOUT_8_43 st8, st7with_dat st7
+                from WITHOUT_8_43 st8, seven_date st7
                 where st8.sid = st7.sid
                 )
-				
+
 select  substr(s_brid, 1, 2),
         count(num),
         count(case when cnt.cnt_days = 1 then num else null end) "1 день",
@@ -135,12 +150,6 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			common_format.set_align('vcenter')
 			common_format.set_border(1)
 
-			sum_pay_format = workbook.add_format({'num_format': '#,###,##0.00', 'font_color': 'black', 'align': 'vcenter'})
-			sum_pay_format.set_border(1)
-			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
-			date_format.set_border(1)
-			date_format.set_align('vcenter')
-
 			digital_format = workbook.add_format({'num_format': '#0', 'align': 'center'})
 			digital_format.set_border(1)
 			digital_format.set_align('vcenter')
@@ -148,6 +157,14 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			money_format = workbook.add_format({'num_format': '# ### ##0', 'align': 'right'})
 			money_format.set_border(1)
 			money_format.set_align('vcenter')
+			
+			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format.set_border(1)
+			date_format.set_align('vcenter')
+
+			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format_it.set_align('vcenter')
+			date_format_it.set_italic()
 
 			now = datetime.datetime.now()
 			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
@@ -183,23 +200,23 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (1, 2):
+					if col == 1:
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
-					if col == 3:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 4:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 5:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 6:
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 7:
+					if col in (2,3,4,5,6,7):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
 					col += 1
 				row_cnt += 1
 				cnt_part += 1
 
-			#worksheet.write(row_cnt+1, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
+			worksheet.write(row_cnt+2, 2, "=SUM(C4:C"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 3, "=SUM(D4:D"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 4, "=SUM(E4:E"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 5, "=SUM(F4:F"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 6, "=SUM(G4:G"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 7, "=SUM(H4:H"+str(row_cnt+2)+")", digital_format)
+
+			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(1, 7, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
