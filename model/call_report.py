@@ -154,6 +154,12 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                             #  Параметры дат отчетов надо заложить в имя файла
                             date_first = ''
                             date_second = ''
+                            rfpm_id = ''
+                            rfbn_id = ''
+                            if 'srfbn_id' in params:
+                                rfbn_id = params['srfbn_id']
+                            if 'srfpm_id' in params:
+                                rfpm_id = params['srfpm_id']
                             if 'date_first' in params:
                                 date_first = params['date_first']
                             if 'date_second' in params:
@@ -188,12 +194,16 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                                 file_name = get_file_name(report_part_path, params)
                                 log.info(f'\nCALL REPORT. GET FILE FULL NAME. FILE_NAME {file_name}\nparams:{params}\n')
                             else:
+                                if rfbn_id:
+                                    report_part_path = f'{report_part_path}.{rfbn_id}'
+                                if rfpm_id:
+                                    report_part_path = f'{report_part_path}.{rfpm_id}'
                                 if date_first and date_second:
-                                    file_name = f'{report_part_path}.{date_first}_{date_second}.xlsx'
+                                    report_part_path = f'{report_part_path}.{date_first}_{date_second}'
                                 elif date_first:
-                                    file_name = f'{report_part_path}.{date_first}.xlsx'
-                                else:
-                                    file_name = f'{report_part_path}.xlsx'
+                                    report_part_path = f'{report_part_path}.{date_first}'
+
+                                file_name = f'{report_part_path}.xlsx'
 
                             if debug_level > 2:
                                 log.info(f'CALL_REPORT. PARAMS: {params}')
@@ -218,13 +228,6 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
 
                             # Если запись об отчете в БД отсутствует, то ее надо сделать
                             if status in (0,10):
-                                rfpm_id = ''
-                                rfbn_id = ''
-
-                                if 'srfpm_id' in params:
-                                    rfpm_id = params['srfpm_id']
-                                if 'srfbn_id' in params:
-                                    rfbn_id = params['srfbn_id']
 
                                 if debug_level > 2:
                                     log.info(f"\nCALL REPORT. name:\t{f'{group_name}.{code}'}\nlive_time:\t{live_time}\ndate_first:\t{date_first}\ndate_second:\t{date_second}\nrfpm_id:\t{rfpm_id}\nrfbn_id:\t{rfbn_id}")
