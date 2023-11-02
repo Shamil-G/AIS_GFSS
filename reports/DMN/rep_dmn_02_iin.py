@@ -178,7 +178,7 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'За период: {date_first} - {date_first}, {srfpm_id}', title_name_report)
+			worksheet.write(1, 0, f'За период: {date_first} - {date_second}, {srfpm_id}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 2
@@ -222,7 +222,7 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 def thread_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 	import threading
 	log.info(f'THREAD REPORT. {datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} -> {file_name}')
-	log.info(f'THREAD REPORT. PARAMS: rfpm_id: 0702, date_first: {date_first}, date_second: {date_second}')
+	log.info(f'THREAD REPORT. PARAMS: rfpm_id: {srfpm_id}, date_first: {date_first}, date_second: {date_second}')
 	threading.Thread(target=do_report, args=(file_name, srfpm_id, date_first, date_second), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
 
