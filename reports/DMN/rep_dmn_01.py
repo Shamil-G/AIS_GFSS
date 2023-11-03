@@ -100,6 +100,7 @@ select  substr(s_brid, 1, 2),
         count(case when cnt.cnt_days > 4 then num else null end) "more than 4"
 from cntdays487 cnt
 group by substr(s_brid, 1, 2)
+order by 1
 """
 
 active_stmt = stmt_2

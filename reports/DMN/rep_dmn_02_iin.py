@@ -18,7 +18,7 @@ with st7with_dat as (
     select 
             st.sid,
             st.st2,
-            first_value(st.dat) over(partition by sid order by dat) dat,
+            first_value(trunc(st.dat,'DD')) over(partition by sid order by dat) dat,
             s_brid,
             p_pc
     from ss_m_sol_st st
@@ -30,7 +30,7 @@ with st7with_dat as (
 comm_st as(
 	select  st.sid,
 			st.st2,
-			st.dat,
+			trunc(st.dat,'DD') dat,
 			st7.s_brid,
 			st7.p_pc,
 			z.sicid,
@@ -79,7 +79,7 @@ st8_43 as (
 )
 ,
 cntdays487 as (
-    select  count_work_date(trunc(st4.dat,'DD'), trunc(st7.dat, 'DD'))+1 cnt_days,
+    select  count_work_date(st4.dat, st7.dat)+1 cnt_days,
             st4.sid,
             st4.s_brid,
             st4.p_pc,
@@ -98,8 +98,10 @@ select  substr(s_brid, 1, 2),
         case when cnt.cnt_days between 20 and 24 then rn else null end in20_24,
         case when cnt.cnt_days >= 25 then rn else null end more25
 from cntdays487 cnt
-ORDER BY s_brid
+ORDER BY 1
 """
+
+
 
 active_stmt = stmt_2
 

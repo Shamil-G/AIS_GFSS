@@ -8,8 +8,6 @@ from   db_config import report_db_user, report_db_password, report_db_dsn
 from   model.manage_reports import set_status_report
 
 
-
-
 report_name = 'Кол-во дел по дням и регионам без доработки'
 report_code = 'DMN.02'
 
@@ -17,9 +15,7 @@ report_code = 'DMN.02'
 stmt_2 = """
 with st7with_dat as (
                 select 
-                        st.sid,
-                        st.st2,
-                        dat
+                        st.sid
                 from ss_m_sol_st st
                 where st2 in (7, 12)
                 and trunc(st.dat, 'DD') Between to_date(:d1, 'YYYY-MM-DD') And to_date(:d2, 'YYYY-MM-DD')
@@ -31,7 +27,7 @@ seven_date as (
               (
               select st.sid, 
                      st.st2,
-                     first_value(st.dat) over(partition by st.sid order by st.dat) sdat,
+                     first_value(trunc(st.dat,'DD')) over(partition by st.sid order by st.dat) sdat,
                      row_number() over(partition by st.sid order by st.dat) row_num,
                      s_brid,
                      p_pc
@@ -39,7 +35,7 @@ seven_date as (
               where st.sid = st7.sid
               and st.st2 in (7, 12)
               ) where row_num = 1
-                and trunc(sdat, 'DD') Between to_date(:d1, 'YYYY-MM-DD') And to_date(:d2, 'YYYY-MM-DD')
+                and sdat Between to_date(:d1, 'YYYY-MM-DD') And to_date(:d2, 'YYYY-MM-DD')
     )
 ,
 
@@ -84,7 +80,7 @@ WITHOUT_8_43 as (
         and st2 in (4, 145)
             ),
 cntdays487 as (
-                select  count_work_date(trunc(st8.dat,'DD'), trunc(st7.sdat, 'DD'))+1 cnt_days,
+                select  count_work_date(trunc(st8.dat,'DD'), st7.sdat) + 1 cnt_days,
                         st8.sid, 
                         st7.s_brid,
                         st8.p_pc,
@@ -101,8 +97,9 @@ select  substr(s_brid, 1, 2),
         case when cnt.cnt_days = 4 then rn else null end "4 дня",
 		case when cnt.cnt_days > 4 then rn else null end "больше 4"
 from cntdays487 cnt
-order by substr(s_brid, 1, 2)
+order by 1
 """
+
 
 active_stmt = stmt_2
 
@@ -196,6 +193,7 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			cursor = connection.cursor()
 			log.info(f'{file_name}. Загружаем данные за период {date_first} : {date_second}, srfpm: {srfpm_id}')
 			cursor.execute(active_stmt, rfpm_id=srfpm_id, d1=date_first, d2=date_second)
+			# cursor.execute(active_stmt, rfpm_id=srfpm_id)
 
 			records = cursor.fetchall()
 			#for record in records:
