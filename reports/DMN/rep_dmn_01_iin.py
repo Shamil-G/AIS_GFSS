@@ -101,7 +101,7 @@ select  substr(s_brid, 1, 2),
         case when cnt.cnt_days = 4 then rn else null end "4 дня",
 		case when cnt.cnt_days > 4 then rn else null end "больше 4"
 from cntdays487 cnt
-order by substr(s_brid, 1, 2)
+order by 1
 """
 
 active_stmt = stmt_2

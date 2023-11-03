@@ -77,27 +77,28 @@ st8_43 as (
             )
 ,
 cntdays487 as (
-                select  count_work_date(trunc(st4.dat,'DD'), trunc(st7.dat, 'DD'))+1 cnt_days,
-                        st4.sid,
-                        st4.s_brid,
-                        st4.p_pc,
-                        st4.sicid,
-                        st4.num
-                from st8_43 st8, st4_145 st4, st7with_dat st7
-                where st8.sid = st4.sid
-                and st8.sid = st7.sid
-                )
+            select  count_work_date(trunc(st4.dat,'DD'), trunc(st7.dat, 'DD'))+1 cnt_days,
+                    st4.sid,
+                    st4.s_brid,
+                    st4.p_pc,
+                    st4.sicid,
+                    st4.num
+            from st8_43 st8, st4_145 st4, st7with_dat st7
+            where st8.sid = st4.sid
+            and st8.sid = st7.sid
+            )
 
-        select  substr(s_brid, 1, 2),
-				count(num),
-                count(case when cnt.cnt_days < 5 then num else null end) before_5,
-                count(case when cnt.cnt_days between 5 and 9 then num else null end) in5_9,
-                count(case when cnt.cnt_days between 10 and 14 then num else null end) in10_14,
-                count(case when cnt.cnt_days between 15 and 19 then num else null end) in15_19,
-                count(case when cnt.cnt_days between 20 and 24 then num else null end) in20_24,
-                count(case when cnt.cnt_days >= 25 then num else null end) more25
-        from cntdays487 cnt
-        group by substr(s_brid, 1, 2)
+    select  substr(s_brid, 1, 2),
+			count(num),
+            count(case when cnt.cnt_days < 5 then num else null end) before_5,
+            count(case when cnt.cnt_days between 5 and 9 then num else null end) in5_9,
+            count(case when cnt.cnt_days between 10 and 14 then num else null end) in10_14,
+            count(case when cnt.cnt_days between 15 and 19 then num else null end) in15_19,
+            count(case when cnt.cnt_days between 20 and 24 then num else null end) in20_24,
+            count(case when cnt.cnt_days >= 25 then num else null end) more25
+    from cntdays487 cnt
+    group by substr(s_brid, 1, 2)
+	order by 1
 """
 
 active_stmt = stmt_2

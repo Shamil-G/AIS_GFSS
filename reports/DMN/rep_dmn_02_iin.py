@@ -98,7 +98,7 @@ select  substr(s_brid, 1, 2),
         case when cnt.cnt_days between 20 and 24 then rn else null end in20_24,
         case when cnt.cnt_days >= 25 then rn else null end more25
 from cntdays487 cnt
-ORDER BY s_brid
+ORDER BY 1
 """
 
 active_stmt = stmt_2
