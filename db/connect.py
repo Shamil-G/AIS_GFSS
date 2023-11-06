@@ -9,8 +9,9 @@ import oracledb
 
 def init_session(connection, requestedTag_ignored):
     cursor = connection.cursor()
+    cursor.execute("ALTER SESSION SET NLS_TERRITORY = 'CIS'")
     cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'DD.MM.YYYY HH24:MI'")
-    log.debug("--------------> Executed: ALTER SESSION SET NLS_DATE_FORMAT = 'DD.MM.YYYY HH24:MI'")
+    log.info("--------------> Executed: ALTER SESSION SET NLS_TERRITORY = 'CIS'")
     cursor.close()
 
 
