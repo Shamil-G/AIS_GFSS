@@ -11,7 +11,8 @@ report_name = 'Участники ЕП в разрезе областей'
 report_code = 'CP.03'
 
 stmt_1 = """
-      select rg.name, count(unique p.sicid) cnt_all, sum(si.sum_pay) sum_pay, rg.rfrg_id
+      select coalesce(rg.name, 'Неопределен'), 
+			count(unique p.sicid) cnt_all, sum(si.sum_pay) sum_pay, rg.rfrg_id
             from  si_member_2 si, person p, rfrg_region rg
             where si.sicid = p.sicid
             and si.type_payment = 'О'
