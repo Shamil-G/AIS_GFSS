@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ res_value('AUXILIARY_TASK') }}
+{% endblock %}
+
+{% block main_title %}
+<a class="title">{{ res_value('AUXILIARY_TASK') }}</a>
+{% endblock %}
+
+{% block navigate %}
+<a href="/">{{ res_value('RETURN') }}</a>
+{% endblock %}
+
+{% block body %}
+<form action="/load_minso_dia" class="form_r" style="padding-left: 1%" method="POST" id="form_input">
+    <script>
+        //document.getElementById("form_input").addEventListener("change",
+        //    function (e) {
+        //        var val = document.getElementById("file").value;
+        //        document.getElementById("select_file").value = val;
+        //    });
+
+        //const form = document.querySelector('#form');
+        //const input = document.querySelector('#file');
+
+        //input.addEventListener('change', function () { // Как только значение поля ввода меняется
+        //    form.submit(); // Отсылаем форму
+        //})
+    </script>
+    <a style="color: #ddd; text-decoration: none; padding-left: 5px">01. {{ res_value('LOAD_LIST_ORG_MINSO') }}</a>
+    <!--<input type="file" name="{{ res_value('SELECT_FILE') }}">-->
+    <a style="color: #ddd; text-decoration: none; padding-left: 5px">01. {{ res_value('LOAD_LIST_ORG_MINSO') }}</a>
+    <!--<input type="file" name="{{ res_value('SELECT_FILE') }}">-->
+    <br>
+    <label class="upload-file__label" for="file">
+
+        <img src="/static/img/upload.png" class="image-2">&emsp;
+        <span class="upload-file__text" name="select_file">{{ res_value('SELECT_FILE') }}</span>
+
+        <input class="upload-file__input"
+               type="file"
+               accept=".xls, .xlsx"
+               name="file"
+               id="file">
+
+    </label>
+    <button class="bt bt_r" type="submit">{{ res_value('LOAD_FILE') }}</button>
+</form>
+{% endblock %}

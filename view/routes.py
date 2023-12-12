@@ -3,6 +3,7 @@ from main_app import app, log
 from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory, g
 from flask_login import  login_required
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
+from model.auxiliary_task import load_minso_dia
 from model.call_report import call_report, check_report
 import os
 from model.manage_user import change_passwd
@@ -197,3 +198,23 @@ def view_remove_report(date_report,num_report):
         log.info(f"REMOVE REPORT. {session['username']}. DATE_REPORT: {date_report}, NUM_REPORT: {num_report}, ROLES: {g.user.roles}")
         remove_report(date_report, num_report)
     return redirect(url_for('view_running_reports'))
+
+
+@app.route('/auxiliary-task-dia')
+@login_required
+def view_auxiliary_task_dia():
+    if 'Администратор ДИА' in g.user.roles:
+        log.info(f"REMOVE REPORT. {session['username']}.")
+    return render_template("auxiliary_task_dia.html")
+
+
+@app.route('/load_minso_dia', methods=['POST', 'GET'])
+@login_required
+def view_load_minso_dia():
+    if 'Администратор ДИА' in g.user.roles:
+        if request.method == "POST":
+            file_name = request.form['file']
+            status = load_minso_dia(file_name)
+            log.info(f"VIEW_LOAD_MINSO. LOAD_FILE: {file_name}, status: {status}")
+    return redirect(url_for('view_auxiliary_task_dia'))
+

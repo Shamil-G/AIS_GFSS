@@ -397,7 +397,23 @@ dict_reports = {
                 "data_approve": "01.11.2023",
                 "author": "Адильханова А.",
                 "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
-                }              
+                },
+                {
+                    "name": "Количество дел по дням и регионам с доработкой 145",
+                    "num_rep": "05",
+                    "proc": "rep_dmen_145_with8",
+                    "data_approve": "07.12.2023",
+                    "author": "Адильханова А.",
+                    "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                },
+                {
+                    "name": "Количество дел по дням и регионам с доработкой 145 ИИН-ы",
+                    "num_rep": "06",
+                    "proc": "rep_dmen_145_with8_iin",
+                    "data_approve": "07.12.2023",
+                    "author": "Адильханова А.",
+                    "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                }                
             ]
         }
     ]

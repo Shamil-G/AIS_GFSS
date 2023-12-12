@@ -30,6 +30,9 @@
             {% block navigate %}{% endblock %}
             {% if g.user.is_active %}
                 <a class="title2" href="/running-reports">{{ res_value('RUNNING_REPORTS') }}</a>
+                {% if 'Администратор ДИА' in g.user.roles %}
+                    <a class="title2" href="/auxiliary-task-dia">{{ res_value('AUXILIARY_TASK') }}</a>
+                {% endif %}
                 <a class="title2" href="/change-passwd">{{ res_value('CHANGE_PASSWORD') }}</a>
                 <a class="title2" href="/logout">{{ res_value('LOGOUT') }}</a>
             {% endif %}

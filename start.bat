@@ -6,5 +6,5 @@ call %VIRTUAL_ENV%/Scripts/activate.bat
 python -m pip install --upgrade pip
 rem pip3.10 uninstall cx_Oracle
 rem pip3.10 install oracledb
-pip freeze > requirements.txt
-rem python main_app.py
+rem pip freeze > requirements.txt
+python main_app.py
