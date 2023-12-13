@@ -14,29 +14,12 @@
 
 {% block body %}
 <form action="/load_minso_dia" class="form_r" style="padding-left: 1%" method="POST" id="form_input">
-    <script>
-        //document.getElementById("form_input").addEventListener("change",
-        //    function (e) {
-        //        var val = document.getElementById("file").value;
-        //        document.getElementById("select_file").value = val;
-        //    });
-
-        //const form = document.querySelector('#form');
-        //const input = document.querySelector('#file');
-
-        //input.addEventListener('change', function () { // Как только значение поля ввода меняется
-        //    form.submit(); // Отсылаем форму
-        //})
-    </script>
-    <a style="color: #ddd; text-decoration: none; padding-left: 5px">01. {{ res_value('LOAD_LIST_ORG_MINSO') }}</a>
-    <!--<input type="file" name="{{ res_value('SELECT_FILE') }}">-->
-    <a style="color: #ddd; text-decoration: none; padding-left: 5px">01. {{ res_value('LOAD_LIST_ORG_MINSO') }}</a>
-    <!--<input type="file" name="{{ res_value('SELECT_FILE') }}">-->
+    <a style="color: #ddd; text-decoration: none; padding: 2px 0px">01. {{ res_value('LOAD_LIST_ORG_MINSO') }}</a>
     <br>
-    <label class="upload-file__label" for="file">
+    <label class="upload-file__label" for="file" id="label_file_input">
 
         <img src="/static/img/upload.png" class="image-2">&emsp;
-        <span class="upload-file__text" name="select_file">{{ res_value('SELECT_FILE') }}</span>
+        <span class="upload-file__text" id="select_file">{{ res_value('SELECT_FILE') }}</span>
 
         <input class="upload-file__input"
                type="file"
@@ -46,5 +29,24 @@
 
     </label>
     <button class="bt bt_r" type="submit">{{ res_value('LOAD_FILE') }}</button>
+    <script>
+        //document.getElementById("form_input").addEventListener("change",
+        //    function (e) {
+        //        var val = document.getElementById("file").value;
+        //        var len_val = (val.split('').length + 6) * 20 * 0.520; // 0.263;
+        //        if (len_val > 960) len_val=960
+        //        //console.log('VAL: ' + val + ', LEN: ' + len_val + "px" );
+        //        document.getElementById("select_file").innerHTML = val;
+        //        document.getElementById("label_file_input").style.width = (len_val-32) + "px"
+        //});
+        document.getElementById("file").addEventListener("change",
+            function (e) {
+                document.getElementById("select_file").innerHTML = this.files[0].name;
+                len_pixel = document.getElementById("select_file").clientWidth;
+
+                //console.log('FILE_NAME: ' + this.files[0].name + "\nWIDTH IN PIXEL: " + len_pixel);
+                document.getElementById("label_file_input").style.width = (len_pixel + 95) + "px"
+            });
+    </script>
 </form>
 {% endblock %}

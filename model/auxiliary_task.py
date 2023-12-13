@@ -5,9 +5,5 @@ def load_minso_dia(file_name:str ):
     table_name = "CTRL_MINSO"
     columns = ["BIN", "CTRL_DATE"]
     log.info(f"LOAD_MINSO. FILE: {file_name}, columns: {columns}, table: {table_name}")
-    st = load_excel(file_name, table_name, columns)
-    match st:
-        case 0: status='FAIL'
-        case _: status='SUCCESS'
-    
-    return status    
+    st = load_excel(f"c:\loads\{file_name}", table_name, columns)
+    return st
