@@ -70,10 +70,12 @@ def load_csv(file_name, table_name: str, columns: list):
 def load_excel(file_name, table_name: str, columns: list):
     global stmt_load
     cnt_rows: int
-    
+    mess = ''
+
     if not file_name.endswith('.xlsx') and not file_name.endswith('.xls'):
-        log.error(f"---- ERROR. FILE {file_name} is not EXCEL FILE")    
-        return 0
+        mess = f"Файл {file_name} не является EXCEL файлом"
+        log.error(mess)    
+        return 0, mess
     count_columns, stmt_load = create_insert_command(table_name, columns)
     log.info(f'COUNT_COLUMNS: {count_columns}, STMT: {stmt_load}')
     
@@ -84,8 +86,9 @@ def load_excel(file_name, table_name: str, columns: list):
     log.info("Загрузка EXCEL стартовала: " + s_now.strftime("%d-%m-%Y %H:%M:%S") + ' : ' + file_name + ' : ' + file_path)
 
     if not os.path.isfile(file_path):
-        log.info(f"EXCEL File not exists: {str(os.path.isfile(file_path))}")
-        return 0
+        mess = f"EXCEL файл не существует. Он должен иметль полный путь: {file_path}"
+        log.info(mess)
+        return 0, mess
 
     wb = load_workbook(path)
     sheet_number = len(wb.worksheets)
@@ -112,7 +115,7 @@ def load_excel(file_name, table_name: str, columns: list):
                 now = datetime.datetime.now()
                 log.info(f'Загрузка sheet {sheet} завершена.\n+++++ Загружено {cnt_rows}/{sheet.max_row} записей. {now.strftime("%d-%m-%Y %H:%M:%S")}')
             cursor.execute('commit')
-    return cnt_rows
+    return cnt_rows, f'Загружено {cnt_rows} строк'
 
 
 if __name__ == "__main__":

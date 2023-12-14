@@ -12,6 +12,13 @@
     border: 1px solid rgba(180, 180, 180, 0.3);
 }
 
+.form_aux {
+    margin: 4px;
+    padding: 12px 10px 12px 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+
 .input_s {
     color: #ddd;
     margin: 4px;

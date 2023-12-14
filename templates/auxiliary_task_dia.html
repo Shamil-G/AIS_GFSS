@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block main_title %}
-<a class="title">{{ res_value('AUXILIARY_TASK') }}</a>
+<div class="title">{{ res_value('AUXILIARY_TASK') }}</div>
 {% endblock %}
 
 {% block navigate %}
@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block body %}
-<form action="/load_minso_dia" class="form_r" style="padding-left: 1%" method="POST" id="form_input">
+<form action="/load_minso_dia" class="form_aux" style="padding-left: 1%" method="POST" id="form_input">
     <a style="color: #ddd; text-decoration: none; padding: 2px 0px">01. {{ res_value('LOAD_LIST_ORG_MINSO') }}</a>
     <br>
     <label class="upload-file__label" for="file" id="label_file_input">
@@ -28,7 +28,10 @@
                id="file">
 
     </label>
-    <button class="bt bt_r" type="submit">{{ res_value('LOAD_FILE') }}</button>
+    <button class="bt bt_r" style="margin: 8px 2px" type="submit">{{ res_value('LOAD_FILE') }}</button>
+    <div>
+        <span id="id_mess" style="color: #ff54dc; text-decoration: none; padding: 2px 0px; margin: 4px 0px 0px 3px ">{{ info }}</span>
+    </div>
     <script>
         //document.getElementById("form_input").addEventListener("change",
         //    function (e) {
@@ -42,10 +45,11 @@
         document.getElementById("file").addEventListener("change",
             function (e) {
                 document.getElementById("select_file").innerHTML = this.files[0].name;
-                len_pixel = document.getElementById("select_file").clientWidth;
+                len_in_pixel = document.getElementById("select_file").clientWidth;
 
-                //console.log('FILE_NAME: ' + this.files[0].name + "\nWIDTH IN PIXEL: " + len_pixel);
-                document.getElementById("label_file_input").style.width = (len_pixel + 95) + "px"
+                //console.log('FILE_NAME: ' + this.files[0].name + "\nWIDTH IN PIXEL: " + len_in_pixel);
+                document.getElementById("label_file_input").style.width = (len_in_pixel + 95) + "px"
+                document.getElementById("id_mess").innerHTML = ''
             });
     </script>
 </form>
