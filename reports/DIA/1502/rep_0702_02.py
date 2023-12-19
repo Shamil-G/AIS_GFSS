@@ -19,9 +19,10 @@ select unique rfbn_id, rfpm_id, iin,
 	appointdate, date_approve, stopdate, 
 	last_pay_sum,  
 	ksu, kut, sum_avg, sum_all,
-	knp
+	knp,
+	cnt_pay_month
 from (              
-	SELECT 
+	SELECT /*+parallel(4)*/
 			 p.rn as "IIN",
 			 p.sex,
 			 floor( months_between(sipr.risk_date, p.birthdate) / 12 ) age,
@@ -32,7 +33,12 @@ from (
 			 FIRST_VALUE(pp.stopdate) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) stopdate,
 			 FIRST_VALUE(case when D.pay_sum>0 then D.pay_sum else d.sum_debt end) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) last_pay_sum,
 			 sipr.kut, sipr.ksu, sipr.sum_avg, sipr.sum_all,
-			 FIRST_VALUE(D.knp) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) KNP
+			 FIRST_VALUE(D.knp) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) KNP,
+			(select count(unique si.pay_month) 
+			 from si_member_2 si
+			 where d.pncd_id = si.sicid 
+			 and si.pay_date BETWEEN to_date(:date_first,'YYYY-MM-DD') AND to_date(:date_second,'YYYY-MM-DD')
+			) cnt_pay_month
 	FROM  PNPD_DOCUMENT D, 
 		sipr_maket_first_approve_2 sipr,
 	PNPT_PAYMENT PP, person p
@@ -72,6 +78,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(12, 12, 12)
 	worksheet.set_column(13, 13, 21)
 	worksheet.set_column(14, 14, 7)
+	worksheet.set_column(15, 15, 12)
 
 	worksheet.merge_range('A3:A4', '№', common_format)
 	worksheet.merge_range('B3:B4', 'Код региона', common_format)
@@ -88,6 +95,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('M3:M4', 'СМД', common_format)
 	worksheet.merge_range('N3:N4', 'Сумма первой назначенной выплаты', common_format)
 	worksheet.merge_range('O3:O4', 'КНП', common_format)
+	worksheet.merge_range('P3:P4', 'Кол-во периодов', common_format)
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
@@ -167,7 +175,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (1,2,3,5,14):
+					if col in (1,2,3,5,14,15):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
 					if col in(4,):
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)

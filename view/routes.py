@@ -204,8 +204,12 @@ def view_remove_report(date_report,num_report):
 @login_required
 def view_auxiliary_task_dia():
     if 'Администратор ДИА' in g.user.roles:
-        log.info(f"REMOVE REPORT. {session['username']}.")
-    return render_template("auxiliary_task_dia.html")
+        log.info(f"VIEW AUXILIARY TASK DIA. {session['username']}.")
+    mess = '' 
+    if 'aux_info' in session:
+        mess = session['aux_info']
+        session.pop('aux_info')
+    return render_template("auxiliary_task_dia.html", info=mess)
 
 
 @app.route('/load_minso_dia', methods=['POST', 'GET'])
@@ -214,7 +218,8 @@ def view_load_minso_dia():
     if 'Администратор ДИА' in g.user.roles:
         if request.method == "POST":
             file_name = request.form['file']
-            status = load_minso_dia(file_name)
-            log.info(f"VIEW_LOAD_MINSO. LOAD_FILE: {file_name}, status: {status}")
+            count, mess = load_minso_dia(file_name)
+            session['aux_info'] = mess
+            log.info(f"VIEW_LOAD_MINSO. LOAD_FILE: {file_name}, loaded: {count} row, mess: {mess}")
     return redirect(url_for('view_auxiliary_task_dia'))
 
