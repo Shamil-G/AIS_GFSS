@@ -13,44 +13,74 @@ report_name = 'Получатели СВут (0702)'
 report_code = '1502.02'
 
 stmt_create = """
-select unique rfbn_id, rfpm_id, iin, 
-	case when sex=0 then 'Ж' else 'M' end as sex, 
-	age,
-	appointdate, date_approve, stopdate, 
-	last_pay_sum,  
-	ksu, kut, sum_avg, sum_all,
-	knp,
-	cnt_pay_month
-from (              
-	SELECT /*+parallel(4)*/
-			 p.rn as "IIN",
-			 p.sex,
-			 floor( months_between(sipr.risk_date, p.birthdate) / 12 ) age,
-			 FIRST_VALUE(pp.rfbn_id) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) rfbn_id,
-			 FIRST_VALUE(D.rfpm_id) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) rfpm_id,
-			 FIRST_VALUE(pp.appointdate) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) appointdate,
-			 FIRST_VALUE(sipr.date_approve) OVER(PARTITION BY sipr.iin ORDER BY sipr.date_approve DESC) date_approve,
-			 FIRST_VALUE(pp.stopdate) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) stopdate,
-			 FIRST_VALUE(case when D.pay_sum>0 then D.pay_sum else d.sum_debt end) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) last_pay_sum,
-			 sipr.kut, sipr.ksu, sipr.sum_avg, sipr.sum_all,
-			 FIRST_VALUE(D.knp) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) KNP,
-			(select count(unique si.pay_month) 
-			 from si_member_2 si
-			 where d.pncd_id = si.sicid 
-			 and si.pay_date BETWEEN to_date(:date_first,'YYYY-MM-DD') AND to_date(:date_second,'YYYY-MM-DD')
-			) cnt_pay_month
-	FROM  PNPD_DOCUMENT D, 
-		sipr_maket_first_approve_2 sipr,
-	PNPT_PAYMENT PP, person p
-	WHERE D.SOURCE_ID = PP.PNPT_ID(+)
-	and   d.source_id = sipr.pnpt_id(+)
-	and   d.pncd_id = p.sicid
-	AND   coalesce(D.KNP,'000')!='010'
-	AND   D.PNCP_DATE BETWEEN to_date(:date_first,'YYYY-MM-DD') AND to_date(:date_second,'YYYY-MM-DD')
-	AND   substr(D.RFPM_ID,1,4) = '0702'
-	AND   D.RIDT_ID IN (4, 6, 7, 8)
-	AND   D.STATUS IN (0, 1, 2, 3, 5, 7)
-	AND   D.PNSP_ID > 0
+select 
+      rfbn_id, rfpm_id, iin, 
+      sex, 
+      age,
+      appointdate, date_approve, stopdate, 
+      last_pay_sum,  
+      ksu, kut, sum_avg, sum_all,
+      knp,
+      sum(p_month) curr_pay_month,
+      count(p_month) all_pay_month
+from (
+    select 
+      b.rfbn_id, b.rfpm_id, iin, 
+      sex, 
+      age,
+      b.appointdate, b.date_approve, b.stopdate, 
+      b.last_pay_sum,  
+      b.ksu, b.kut, b.sum_avg, b.sum_all,
+      b.knp,
+      case when b.pay_month>=to_date('2023-01-01','YYYY-MM-DD') then 1 else 0 end p_month
+    from (
+        select unique 
+          a.rfbn_id, a.rfpm_id, p.rn as iin, 
+          case when p.sex=0 then 'Ж' else 'M' end as sex, 
+          floor( months_between(a.risk_date, p.birthdate) / 12 ) age,
+          a.appointdate, a.date_approve, a.stopdate, 
+          a.last_pay_sum,  
+          a.ksu, a.kut, a.sum_avg, a.sum_all,
+          a.knp,
+          si.pay_month
+        from (              
+          SELECT /*+parallel(4)*/
+               unique d.pncd_id,
+               FIRST_VALUE(pp.rfbn_id) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) rfbn_id,
+               FIRST_VALUE(D.rfpm_id) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) rfpm_id,
+               FIRST_VALUE(pp.appointdate) OVER(PARTITION BY D.PNCD_ID ORDER BY pp.appointdate DESC) appointdate,
+               FIRST_VALUE(sipr.risk_date) OVER(PARTITION BY D.PNCD_ID ORDER BY sipr.risk_date DESC) risk_date,
+               FIRST_VALUE(sipr.date_approve) OVER(PARTITION BY sipr.iin ORDER BY sipr.date_approve DESC) date_approve,
+               FIRST_VALUE(pp.stopdate) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) stopdate,
+               FIRST_VALUE(case when D.pay_sum>0 then D.pay_sum else d.sum_debt end) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) last_pay_sum,
+               sipr.kut, sipr.ksu, sipr.sum_avg, sipr.sum_all,
+               FIRST_VALUE(D.knp) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) KNP
+          FROM  PNPD_DOCUMENT D, 
+                sipr_maket_first_approve_2 sipr,
+                PNPT_PAYMENT PP
+          WHERE D.SOURCE_ID = PP.PNPT_ID(+)
+          and   d.source_id = sipr.pnpt_id(+)
+          AND   coalesce(D.KNP,'000')!='010'
+          AND   D.PNCP_DATE BETWEEN to_date(:date_first,'YYYY-MM-DD') AND to_date(:date_second,'YYYY-MM-DD')
+          AND   substr(D.RFPM_ID,1,4) = '0702'
+          AND   D.RIDT_ID IN (4, 6, 7, 8)
+          AND   D.STATUS IN (0, 1, 2, 3, 5, 7)
+          AND   D.PNSP_ID > 0
+        ) a, person p, si_member_2 si
+        where a.pncd_id = si.sicid 
+        and   a.pncd_id = p.sicid
+        and   si.pay_date BETWEEN to_date(:date_first,'YYYY-MM-DD') AND to_date(:date_second,'YYYY-MM-DD')  
+    ) b
+)
+group by 
+      rfbn_id, rfpm_id, iin, 
+      sex, 
+      age,
+      appointdate, date_approve, stopdate, 
+      last_pay_sum,  
+      ksu, kut, sum_avg, sum_all,
+      knp
+order by rfbn_id, rfpm_id, iin
 )	 
 order by rfbn_id, rfpm_id, iin
 """
@@ -79,6 +109,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(13, 13, 21)
 	worksheet.set_column(14, 14, 7)
 	worksheet.set_column(15, 15, 12)
+	worksheet.set_column(16, 16, 10)
 
 	worksheet.merge_range('A3:A4', '№', common_format)
 	worksheet.merge_range('B3:B4', 'Код региона', common_format)
@@ -95,7 +126,8 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('M3:M4', 'СМД', common_format)
 	worksheet.merge_range('N3:N4', 'Сумма первой назначенной выплаты', common_format)
 	worksheet.merge_range('O3:O4', 'КНП', common_format)
-	worksheet.merge_range('P3:P4', 'Кол-во периодов', common_format)
+	worksheet.merge_range('P3:P4', 'Периодов в выбранном диапазоне', common_format)
+	worksheet.merge_range('R3:R4', 'Всего-во периодов', common_format)
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
@@ -175,7 +207,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (1,2,3,5,14,15):
+					if col in (1,2,3,5,14,15,16):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
 					if col in(4,):
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
