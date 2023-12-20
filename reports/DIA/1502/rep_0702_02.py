@@ -81,8 +81,6 @@ group by
       ksu, kut, sum_avg, sum_all,
       knp
 order by rfbn_id, rfpm_id, iin
-)	 
-order by rfbn_id, rfpm_id, iin
 """
 
 active_stmt = stmt_create
@@ -109,7 +107,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(13, 13, 21)
 	worksheet.set_column(14, 14, 7)
 	worksheet.set_column(15, 15, 12)
-	worksheet.set_column(16, 16, 10)
+	worksheet.set_column(16, 16, 12)
 
 	worksheet.merge_range('A3:A4', '№', common_format)
 	worksheet.merge_range('B3:B4', 'Код региона', common_format)
@@ -127,7 +125,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('N3:N4', 'Сумма первой назначенной выплаты', common_format)
 	worksheet.merge_range('O3:O4', 'КНП', common_format)
 	worksheet.merge_range('P3:P4', 'Периодов в выбранном диапазоне', common_format)
-	worksheet.merge_range('R3:R4', 'Всего-во периодов', common_format)
+	worksheet.merge_range('Q3:Q4', 'Всего периодов', common_format)
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
