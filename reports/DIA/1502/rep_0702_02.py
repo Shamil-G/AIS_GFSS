@@ -12,7 +12,9 @@ report_code = '1502.02'
 
 stmt_create = """
 select 
-      rfbn_id, rfpm_id, iin, 
+      rfbn_id, rfpm_id, 
+	  iin, 
+	  birthdate,
       sex, 
       age,
       appointdate, date_approve, stopdate, 
@@ -23,7 +25,9 @@ select
       sum(all_month) all_pay_month
 from (
     select 
-      b.rfbn_id, b.rfpm_id, iin, 
+      b.rfbn_id, b.rfpm_id, 
+	  iin, 
+	  birthdate,
       sex, 
       age,
       b.appointdate, b.date_approve, b.stopdate, 
@@ -34,7 +38,7 @@ from (
       case when b.pay_month is null then 0 else 1 end all_month	  
     from (
         select unique 
-          a.rfbn_id, a.rfpm_id, p.rn as iin, 
+          a.rfbn_id, a.rfpm_id, p.rn as iin, p.birthdate,
           case when p.sex=0 then 'Ж' else 'M' end as sex, 
           floor( months_between(a.risk_date, p.birthdate) / 12 ) age,
           a.appointdate, a.date_approve, a.stopdate, 
@@ -73,7 +77,9 @@ from (
     ) b
 )
 group by 
-      rfbn_id, rfpm_id, iin, 
+      rfbn_id, rfpm_id, 
+	  iin, 
+	  birthdate,
       sex, 
       age,
       appointdate, date_approve, stopdate, 
@@ -95,37 +101,39 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(1, 1, 14)
 	worksheet.set_column(2, 2, 14)
 	worksheet.set_column(3, 3, 14)
-	worksheet.set_column(4, 4, 8)
-	worksheet.set_column(5, 5, 12)
+	worksheet.set_column(4, 4, 12)
+	worksheet.set_column(5, 5, 8)
 	worksheet.set_column(6, 6, 12)
 	worksheet.set_column(7, 7, 12)
 	worksheet.set_column(8, 8, 12)
-	worksheet.set_column(9, 9, 18)
-	worksheet.set_column(10, 10, 8)
+	worksheet.set_column(9, 9, 12)
+	worksheet.set_column(10, 10, 18)
 	worksheet.set_column(11, 11, 8)
-	worksheet.set_column(12, 12, 12)
-	worksheet.set_column(13, 13, 21)
-	worksheet.set_column(14, 14, 7)
-	worksheet.set_column(15, 15, 12)
+	worksheet.set_column(12, 12, 8)
+	worksheet.set_column(13, 13, 12)
+	worksheet.set_column(14, 14, 21)
+	worksheet.set_column(15, 15, 7)
 	worksheet.set_column(16, 16, 12)
+	worksheet.set_column(17, 17, 12)
 
 	worksheet.merge_range('A3:A4', '№', common_format)
 	worksheet.merge_range('B3:B4', 'Код региона', common_format)
 	worksheet.merge_range('C3:C4', 'Код выплаты', common_format)
 	worksheet.merge_range('D3:D4', 'ИИН получателя', common_format)
-	worksheet.merge_range('E3:E4', 'Пол', common_format)
-	worksheet.merge_range('F3:F4', 'Возраст на дату риска', common_format)
-	worksheet.merge_range('G3:G4', 'Дата риска', common_format)
-	worksheet.merge_range('H3:H4', 'Дата назначения', common_format)
-	worksheet.merge_range('I3:I4', 'Дата окончания', common_format)
-	worksheet.merge_range('J3:J4', 'Размер СВ', common_format)
-	worksheet.merge_range('K3:K4', 'КСУ', common_format)
-	worksheet.merge_range('L3:L4', 'КУТ', common_format)
-	worksheet.merge_range('M3:M4', 'СМД', common_format)
-	worksheet.merge_range('N3:N4', 'Сумма первой назначенной выплаты', common_format)
-	worksheet.merge_range('O3:O4', 'КНП', common_format)
-	worksheet.merge_range('P3:P4', 'Периодов в выбранном диапазоне', common_format)
-	worksheet.merge_range('Q3:Q4', 'Всего периодов', common_format)
+	worksheet.merge_range('E3:E4', 'Дата рождения', common_format)	
+	worksheet.merge_range('F3:F4', 'Пол', common_format)
+	worksheet.merge_range('G3:G4', 'Возраст на дату риска', common_format)
+	worksheet.merge_range('H3:H4', 'Дата риска', common_format)
+	worksheet.merge_range('I3:I4', 'Дата назначения', common_format)
+	worksheet.merge_range('J3:J4', 'Дата окончания', common_format)
+	worksheet.merge_range('K3:K4', 'Размер СВ', common_format)
+	worksheet.merge_range('L3:L4', 'КСУ', common_format)
+	worksheet.merge_range('M3:M4', 'КУТ', common_format)
+	worksheet.merge_range('N3:N4', 'СМД', common_format)
+	worksheet.merge_range('O3:O4', 'Сумма первой назначенной выплаты', common_format)
+	worksheet.merge_range('P3:P4', 'КНП', common_format)
+	worksheet.merge_range('Q3:Q4', 'Периодов в выбранном диапазоне', common_format)
+	worksheet.merge_range('R3:R4', 'Всего периодов', common_format)
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
@@ -206,13 +214,13 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (1,2,3,5,14,15,16):
+					if col in (1,2,3,6,15,16,17):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col in(4,):
+					if col in(5,):
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
-					if col in (6,7,8):
+					if col in (4,7,8,9):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
-					if col in (9,10,11,12,13):
+					if col in (10,11,12,13,14):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
 					# ADD to SUMMARY
 					# if col in (9):
@@ -225,14 +233,13 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				row_cnt += 1
 
 			# SUMMARY
-			# worksheet.write(row_cnt + shift_row, 9, m_val[0], money_format)
+			# worksheet.write(row_cnt + shift_row, 10, m_val[0], money_format)
 
-			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 14, f'Дата отчета: {begin_report} - {now}', date_format_it)
+			finish_report = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(1, 15, f'Дата отчета: {begin_report} - {finish_report}', date_format_it)
 
 			workbook.close()
-			now = datetime.datetime.now()
-			log.info(f'Формирование отчета {file_name} завершено: {now.strftime("%d-%m-%Y %H:%M:%S")}')
+			log.info(f'Формирование отчета {file_name} завершено. {begin_report} - {finish_report}')
 			set_status_report(file_name, 2)
 			return file_name
 
