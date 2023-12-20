@@ -69,6 +69,7 @@ from (
         ) a, person p, si_member_2 si
         where a.pncd_id = si.sicid 
         and   a.pncd_id = p.sicid
+		and	  si.knp = '012'
         and   si.pay_date BETWEEN to_date(:date_first,'YYYY-MM-DD') AND to_date(:date_second,'YYYY-MM-DD')  
     ) b
 )
@@ -213,6 +214,9 @@ def do_report(file_name: str, date_first: str, date_second: str):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
 					if col in (9,10,11,12,13):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
+					# ADD to SUMMARY
+					# if col in (9):
+					# 	m_val[0] = m_val[0] + list_val
 					col += 1
 				cnt_part += 1
 				if cnt_part > 24999:
@@ -220,7 +224,8 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					cnt_part = 0
 				row_cnt += 1
 
-			worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
+			# SUMMARY
+			# worksheet.write(row_cnt + shift_row, 9, m_val[0], money_format)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 			worksheet.write(1, 11, f'Дата формирования: {now}', date_format_it)
