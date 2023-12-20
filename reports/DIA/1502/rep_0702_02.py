@@ -6,8 +6,6 @@ from   util.logger import log
 from   db_config import report_db_user, report_db_password, report_db_dsn
 from   model.call_report import set_status_report
 
-# from cx_Oracle import SessionPool
-# con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
 report_name = 'Получатели СВут (0702)'
 report_code = '1502.02'
@@ -22,7 +20,7 @@ select
       ksu, kut, sum_avg, sum_all,
       knp,
       sum(p_month) curr_pay_month,
-      count(p_month) all_pay_month
+      sum(all_month) all_pay_month
 from (
     select 
       b.rfbn_id, b.rfpm_id, iin, 
@@ -32,7 +30,8 @@ from (
       b.last_pay_sum,  
       b.ksu, b.kut, b.sum_avg, b.sum_all,
       b.knp,
-      case when b.pay_month>=to_date('2023-01-01','YYYY-MM-DD') then 1 else 0 end p_month
+      case when b.pay_month>=to_date('2023-01-01','YYYY-MM-DD') then 1 else 0 end p_month,
+      case when b.pay_month is null then 0 else 1 end all_month	  
     from (
         select unique 
           a.rfbn_id, a.rfpm_id, p.rn as iin, 
@@ -67,10 +66,10 @@ from (
           AND   D.STATUS IN (0, 1, 2, 3, 5, 7)
           AND   D.PNSP_ID > 0
         ) a, person p, si_member_2 si
-        where a.pncd_id = si.sicid 
+        where a.pncd_id = si.sicid(+) 
         and   a.pncd_id = p.sicid
-		and	  si.knp = '012'
-        and   si.pay_date BETWEEN to_date(:date_first,'YYYY-MM-DD') AND to_date(:date_second,'YYYY-MM-DD')  
+		and	  si.knp(+) = '012'
+        and   si.pay_date(+) BETWEEN to_date(:date_first,'YYYY-MM-DD') AND to_date(:date_second,'YYYY-MM-DD')  
     ) b
 )
 group by 
@@ -132,6 +131,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
+	begin_report = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 	#cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
 	#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
 	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
@@ -189,7 +189,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'За период: {date_first}', title_name_report)
+			worksheet.write(1, 0, f'За период: {date_first} - {date_second}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 3
@@ -228,7 +228,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			# worksheet.write(row_cnt + shift_row, 9, m_val[0], money_format)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 11, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 14, f'Дата отчета: {begin_report} - {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
