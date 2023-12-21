@@ -16,7 +16,7 @@ stmt_create = """
 select  unique rfbn_id, iin, 
   age,
   risk_date, date_approve, stopdate, 
-  ksu, real_ksu, sum_avg, sum_all
+  ksu, sum_avg, sum_all
 from (              
   SELECT 
         p.rn as "IIN",
@@ -60,9 +60,8 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(5, 5, 12)
 	worksheet.set_column(6, 6, 12)
 	worksheet.set_column(7, 7, 8)
-	worksheet.set_column(8, 8, 12)
+	worksheet.set_column(8, 8, 16)
 	worksheet.set_column(9, 9, 16)
-
 
 	worksheet.merge_range('A3:A4', '№', common_format)
 	worksheet.merge_range('B3:B4', 'Код региона', common_format)
@@ -72,8 +71,9 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('F3:F4', 'Дата назначения', common_format)
 	worksheet.merge_range('G3:G4', 'Дата окончания', common_format)
 	worksheet.merge_range('H3:H4', 'КСУ', common_format)
-	worksheet.merge_range('I3:I4', 'КСУ факт', common_format)
-	worksheet.merge_range('J3:J4', 'СМД', common_format)
+	worksheet.merge_range('I3:I4', 'СМД', common_format)
+	worksheet.merge_range('J3:J4', 'Сумма первой назначенной выплаты', common_format)
+	
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
@@ -163,11 +163,11 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (1,2,3,8,7):
+					if col in (1,2,3,7):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
 					if col in (4,5,6):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
-					if col in (9,10):
+					if col in (8,9):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
 					col += 1
 				cnt_part += 1
