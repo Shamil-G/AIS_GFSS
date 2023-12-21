@@ -9,8 +9,8 @@ from   model.call_report import set_status_report
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
-report_name = 'Получатели СВбр'
-report_code = '1504.02'
+report_name = 'Получатели СВбр с количеством месяцев участия СО'
+report_code = '1504.04'
 
 stmt_create = """
 select  unique rfbn_id, iin, 
@@ -25,9 +25,13 @@ from (
 		sipr.risk_date,
 		sipr.date_approve, 
 		sipr.date_stop AS STOPDATE, 
-		sipr.ksu, 
-		sipr.sum_avg, 
-		sipr.sum_all
+		sipr.ksu, sipr.sum_avg, sipr.sum_all,
+       ( 
+         SELECT COUNT(UNIQUE SI.PAY_MONTH) 
+         FROM SI_MEMBER_2 SI 
+         WHERE SI.SICID=D.PNCD_ID
+         AND   SI.PAY_MONTH<=SIPR.RISK_DATE
+       ) as real_ksu
   FROM  PNPD_DOCUMENT D, 
     sipr_maket_first_approve_2 sipr,
     PNPT_PAYMENT PP, person p
@@ -62,7 +66,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(7, 7, 8)
 	worksheet.set_column(8, 8, 12)
 	worksheet.set_column(9, 9, 16)
-
+	worksheet.set_column(10, 10, 16)
 
 	worksheet.merge_range('A3:A4', '№', common_format)
 	worksheet.merge_range('B3:B4', 'Код региона', common_format)
@@ -74,13 +78,14 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('H3:H4', 'КСУ', common_format)
 	worksheet.merge_range('I3:I4', 'КСУ факт', common_format)
 	worksheet.merge_range('J3:J4', 'СМД', common_format)
+	worksheet.merge_range('K3:K4', 'Сумма первой назначенной выплаты', common_format)
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	begin_report = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-
+	#cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
+	#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
 	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
@@ -176,12 +181,12 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					cnt_part = 0
 				row_cnt += 1
 
-			finish_report = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 8, f'Дата отчета: {begin_report} - {finish_report}', date_format_it)
+			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(1, 9, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
-			log.info(f'Формирование отчета {file_name} завершено. {begin_report} - {finish_report}')
-			
+			now = datetime.datetime.now()
+			log.info(f'Формирование отчета {file_name} завершено: {now.strftime("%d-%m-%Y %H:%M:%S")}')
 			set_status_report(file_name, 2)
 			return file_name
 
