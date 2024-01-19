@@ -115,15 +115,17 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(5, 5, 12)
 	worksheet.set_column(6, 6, 12)
 	worksheet.set_column(7, 7, 12)
+	worksheet.set_column(8, 8, 12)
 
 	worksheet.write(2, 0, '№', common_format)
 	worksheet.write(2, 1, 'Код региона', common_format)
 	worksheet.write(2, 2, 'общее кол-во дел', common_format)
-	worksheet.write(2, 3, '1 день', common_format)
-	worksheet.write(2, 4, '2 дня', common_format)
-	worksheet.write(2, 5, '3 дня', common_format)
-	worksheet.write(2, 6, '4 дня', common_format)
-	worksheet.write(2, 7, 'больше 4', common_format)
+	worksheet.write(2, 3, 'менее 5 дней', common_format)
+	worksheet.write(2, 4, 'от 5 до 9 дней', common_format)
+	worksheet.write(2, 5, 'от 10 до 14 дней', common_format)
+	worksheet.write(2, 6, 'от 15 до 19 дней', common_format)
+	worksheet.write(2, 7, 'от 20 до 24 дней', common_format)
+	worksheet.write(2, 8, 'больше 25', common_format)
 
 
 def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
@@ -203,7 +205,7 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 				for list_val in record:
 					if col == 1:
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
-					if col in (2,3,4,5,6,7):
+					if col in (2,3,4,5,6,7,8):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
 					col += 1
 				row_cnt += 1
@@ -215,6 +217,7 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			worksheet.write(row_cnt+2, 5, "=SUM(F4:F"+str(row_cnt+2)+")", digital_format)
 			worksheet.write(row_cnt+2, 6, "=SUM(G4:G"+str(row_cnt+2)+")", digital_format)
 			worksheet.write(row_cnt+2, 7, "=SUM(H4:H"+str(row_cnt+2)+")", digital_format)
+			worksheet.write(row_cnt+2, 8, "=SUM(I4:I"+str(row_cnt+2)+")", digital_format)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 			worksheet.write(1, 7, f'Дата формирования: {now}', date_format_it)
