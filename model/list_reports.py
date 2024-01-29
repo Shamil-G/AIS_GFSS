@@ -422,6 +422,15 @@ dict_reports = {
                     "data_approve": "07.12.2023",
                     "author": "Адильханова А.",
                     "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                } 
+                ,
+                {
+                "name": "Необратившиеся отказные",
+                "num_rep": "07",
+                "proc": "rep_dmn_12",
+                "data_approve": "29.01.2024",
+                "author": "Адильханова А.",
+                "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
                 }                
             ]
         }
