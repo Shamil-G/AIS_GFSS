@@ -165,8 +165,11 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					log.info(f'{file_name}. LOADED {row_cnt} records.')
 					cnt_part = 0
 
+			# Шифр отчета
+			worksheet.write(0, 6, report_code, title_name_report)
+
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 7, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 6, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()

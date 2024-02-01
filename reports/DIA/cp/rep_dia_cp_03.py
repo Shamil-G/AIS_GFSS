@@ -80,7 +80,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
 
-			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'left'})
 			date_format_it.set_align('vcenter')
 			date_format_it.set_italic()
 
@@ -144,7 +144,10 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			#worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(0, 4, f'Дата формирования: {now}', date_format_it)
+			# Шифр отчета
+			worksheet.write(0, 3, report_code, title_name_report)
+			# 
+			worksheet.write(1, 3, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
