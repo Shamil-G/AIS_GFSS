@@ -8,7 +8,7 @@ from   model.manage_reports import set_status_report
 
 
 report_name = 'Участники ЕП'
-report_code = 'ЕдПл.01'
+report_code = 'CP.01'
 
 stmt_1 = """
 	select /*+ parallel (4)*/
@@ -90,7 +90,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
 
-			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'left'})
 			date_format_it.set_align('vcenter')
 			date_format_it.set_italic()
 
@@ -152,11 +152,11 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					cnt_part = 0
 				row_cnt += 1
 
-			#worksheet.write(row_cnt+shift_row, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
-			#worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
-
+			# Шифр отчета
+			worksheet.write(0, 5, report_code, title_name_report)
+			#
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 6, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 5, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()

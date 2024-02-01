@@ -8,7 +8,7 @@ from   model.manage_reports import set_status_report
 
 
 report_name = 'Списочная часть смешанных ЕП-шников(СВ)'
-report_code = 'CP.04'
+report_code = 'CP.05'
 
 stmt_2 = """
 with all_data as (
@@ -164,6 +164,9 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				if cnt_part > 999:
 					log.info(f'{file_name}. LOADED {row_cnt} records.')
 					cnt_part = 0
+
+			# Шифр отчета
+			worksheet.write(0, 7, report_code, title_name_report)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 			worksheet.write(1, 7, f'Дата формирования: {now}', date_format_it)

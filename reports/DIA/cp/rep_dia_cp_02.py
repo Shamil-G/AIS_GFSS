@@ -78,7 +78,7 @@ def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 			title_format.set_text_wrap()
 			title_format.set_bold()
 
-			title_name_report = workbook.add_format({'align': 'left', 'font_color': 'black', 'font_size': '14'})
+			title_name_report = workbook.add_format({'align': 'left', 'font_color': 'black', 'font_size': '13'})
 			title_name_report .set_align('vcenter')
 			title_name_report .set_bold()
 
@@ -93,7 +93,7 @@ def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
 
-			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'left'})
 			date_format_it.set_align('vcenter')
 			date_format_it.set_italic()
 
@@ -153,9 +153,11 @@ def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 
 			#worksheet.write(row_cnt+shift_row, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
 			#worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
+			# Шифр отчета
+			worksheet.write(0, 4, report_code, title_name_report)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(0, 5, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 4, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
