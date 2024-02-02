@@ -10,7 +10,7 @@ import oracledb
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
 report_name = 'Список лиц, которым назначена социальная выплата на случай потери дохода в связи с беременностью и родами, усыновлением/удочерением ребенка'
-report_code = '0704_СВ'
+report_code = '6020.4'
 
 stmt_1 = """
 SELECT 
@@ -21,6 +21,7 @@ SELECT
           case when p.sex=0 then 'ж' else 'м' end sx,--"Пол",
           sfa.birthdate,
           sfa.risk_date risk,--"Дата риска",
+		  sfa.date_approve d_resh, --"Дата решения",
           sfa.sum_avg sumavg,--"СМД, тенге",
           sfa.ksu sfa_ksu, --"КСУ",
           sfa.kzd sfa_kzd,--"КЗД",
@@ -48,14 +49,15 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(4, 4, 40)
 	worksheet.set_column(5, 5, 8)
 	worksheet.set_column(6, 6, 16)
-	worksheet.set_column(7, 7, 12)
-	worksheet.set_column(8, 8, 11)
-	worksheet.set_column(9, 9, 8)
+	worksheet.set_column(7, 7, 16)
+	worksheet.set_column(8, 8, 12)
+	worksheet.set_column(9, 9, 11)
 	worksheet.set_column(10, 10, 8)
 	worksheet.set_column(11, 11, 8)
-	worksheet.set_column(12, 12, 12)
-	worksheet.set_column(13, 13, 15)
-	worksheet.set_column(14, 14, 12)
+	worksheet.set_column(12, 12, 8)
+	worksheet.set_column(13, 13, 12)
+	worksheet.set_column(14, 14, 15)
+	worksheet.set_column(15, 15, 12)
 
 
 	worksheet.write(2, 0, '№', common_format)
@@ -66,13 +68,14 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2, 5, 'Пол', common_format)
 	worksheet.write(2, 6, 'Дата рождения', common_format)
 	worksheet.write(2, 7, 'Дата риска', common_format)
-	worksheet.write(2, 8, 'СМД, тенге', common_format)
-	worksheet.write(2, 9, 'КСУ', common_format)
-	worksheet.write(2, 10, 'КЗД', common_format)
-	worksheet.write(2, 11, 'МЗП', common_format)
-	worksheet.write(2, 12, 'Количество месяцев', common_format)
-	worksheet.write(2, 13, 'Назначенный размер', common_format)
-	worksheet.write(2, 14, 'Статус', common_format)
+	worksheet.write(2, 8, 'Дата решения', common_format)
+	worksheet.write(2, 9, 'СМД, тенге', common_format)
+	worksheet.write(2, 10, 'КСУ', common_format)
+	worksheet.write(2, 11, 'КЗД', common_format)
+	worksheet.write(2, 12, 'МЗП', common_format)
+	worksheet.write(2, 13, 'Количество месяцев', common_format)
+	worksheet.write(2, 14, 'Назначенный размер', common_format)
+	worksheet.write(2, 15, 'Статус', common_format)
 	
 
 
@@ -159,7 +162,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				for list_val in record:
 					if col in (2,4):
 						worksheet.write(row_cnt+shift_row, col, list_val, name_format)
-					if col in (6,7):
+					if col in (6,7,8):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
 					else:
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
@@ -171,7 +174,9 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					cnt_part = 0
 
 			#worksheet.write(row_cnt+1, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
-
+			# Шифр отчета
+			worksheet.write(0, 7, report_code, title_name_report)
+			
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 			worksheet.write(1, 7, f'Дата формирования: {now}', date_format_it)
 
