@@ -175,10 +175,10 @@ def do_report(file_name: str, date_first: str, date_second: str):
 
 			#worksheet.write(row_cnt+1, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
 			# Шифр отчета
-			worksheet.write(0, 10, report_code, title_name_report)
+			worksheet.write(0, 12, report_code, title_name_report)
 			
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 10, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 12, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
