@@ -11,7 +11,7 @@ else:
 
 if using == 'PROD':
     pool_min = 10
-    pool_max = 120
+    pool_max = 40
     pool_inc = 10
     Debug = True
     username = 'reports'
