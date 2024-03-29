@@ -345,8 +345,23 @@ dict_reports = {
                     "params": {"date_first": "Период:"}
                 }
             ]
+        },
+        {
+            "grp_name": "Консолидированные отчеты", 
+            "module_dir": f"{REPORT_MODULE_PATH}.DIA.320",
+            "live_time": "0",
+            "list": 
+            [
+                {
+                    "name": "Количество участников и суммы взносов по частоте участия за период",
+                    "num_rep": "01",
+                    "proc": "rep_dia_freq_co",
+                    "data_approve": "14.07.2024",
+                    "author": "Гусейнов Ш.А.",
+                    "params": {"date_first": "С", "date_second": "по"},
+                }
+            ]
         }
-
     ]
     ,
     "ДСР":

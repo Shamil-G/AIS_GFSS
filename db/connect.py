@@ -49,12 +49,12 @@ def select(stmt):
     mistake = 0
     err_mess = ''
     try:
-        with get_connection().cursor() as cursor:
-            #log_outcoming.info(f"\nВыбираем данные: {stmt}")
-            cursor.execute(stmt)
-            recs = cursor.fetchall()
-            for rec in recs:
-                results.append(rec)
+        with get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(stmt)
+                recs = cursor.fetchall()
+                for rec in recs:
+                    results.append(rec)
     except oracledb.DatabaseError as e:
         error, = e.args
         mistake = 1
@@ -68,10 +68,11 @@ def select_one(stmt, args):
     mistake = 0
     err_mess = ''
     try:
-        with get_connection().cursor() as cursor:
+        with get_connection() as conection:
+            with connection.cursor() as cursor:
             #log_outcoming.info(f"\nВыбираем данные: {stmt}")
-            cursor.execute(stmt, args)
-            rec = cursor.fetchone()
+                cursor.execute(stmt, args)
+                rec = cursor.fetchone()
     except oracledb.DatabaseError as e:
         error, = e.args
         mistake = 1
@@ -90,22 +91,18 @@ def plsql_execute(cursor, f_name, cmd, args):
         log.error(f"ERROR ------execute------> FNAME:{f_name}\nIP_Addr: {ip_addr()}, args: {args}\nerror: {error.code} : {error.message}")
 
 
-def plsql_proc_s(f_name, proc_name, args):
-    with get_connection().cursor() as cursor:
-        plsql_proc(cursor, f_name, proc_name, args)
-
-
-def plsql_func_s(f_name, proc_name, args):
-    with get_connection().cursor() as cursor:
-        return plsql_func(cursor, f_name, proc_name, args)
-
-
 def plsql_proc(cursor, f_name, proc_name, args):
     try:
         cursor.callproc(proc_name, args)
     except oracledb.DatabaseError as e:
         error, = e.args
         log.error(f"ERROR -----plsql-proc-----> FNAME: {f_name}\nARGS: {args}\nerror: {error.code} : {error.message}")
+
+
+def plsql_proc_s(f_name, proc_name, args):
+    with get_connection() as connection:
+        with connection.cursor as cursor:
+            plsql_proc(cursor, f_name, proc_name, args)
 
 
 def plsql_func(cursor, f_name, func_name, args):
@@ -116,6 +113,12 @@ def plsql_func(cursor, f_name, func_name, args):
         error, = e.args
         log.error(f"ERROR -----plsql-func-----> FNAME: {f_name}\nargs: {args}\nerror: {error.code} : {error.message}")
     return ret
+
+
+def plsql_func_s(f_name, proc_name, args):
+    with get_connection() as connection:
+        with connection.cursor as cursor:
+            return plsql_func(cursor, f_name, proc_name, args)
 
 
 if __name__ == "__main__":
