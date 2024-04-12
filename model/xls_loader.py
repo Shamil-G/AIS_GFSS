@@ -46,7 +46,7 @@ def load_csv(file_name, table_name: str, columns: list):
     with open(full_path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=';')
         line_count = 0
-        with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
+        with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
             with connection.cursor() as cursor:
                 # CLEAR TABLE BEFORE LOAD
                 cursor.execute(f'truncate table {table_name}')
@@ -100,7 +100,7 @@ def load_excel(file_name, table_name: str, columns: list):
     sheet = wb.active
 
     cnt_rows=0
-    with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
+    with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
         with connection.cursor() as cursor:
             # CLEAR TABLE BEFORE LOAD
             cursor.execute(f'truncate table {table_name}')

@@ -77,7 +77,10 @@ def view_extract_params(rep_number):
         if rep_num == rep.get('num'):
             params = rep.get('params')
             session['rep_name'] = rep['name']
-            if len(params)>0:
+            if params and len(params)>0:
+                session['params'] = params
+                return redirect(url_for('view_set_params'))
+            if params and len(params)>0:
                 session['params'] = params
                 return redirect(url_for('view_set_params'))
     return redirect(url_for('view_root'))

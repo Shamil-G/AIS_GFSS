@@ -57,7 +57,7 @@ def list_reports_by_day(request_day):
             else:
                 stmt = stmt_list_reports
             cursor.execute(stmt, i_date=request_day)
-            if debug_level > 2:
+            if debug_level > 3:
                 log.info(f'LIST REPORTS BY DAY. request_day: {request_day}\n--------\n{stmt}\n--------')
             rows = cursor.fetchall() 
             if rows:

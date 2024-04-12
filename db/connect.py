@@ -1,5 +1,6 @@
 # from concurrent.futures.thread import BrokenThreadPool
 # from gc import enable
+from socket import close
 import db_config as cfg
 from util.logger import log
 #from ais_gfss_parameter import using
@@ -16,17 +17,20 @@ def init_session(connection, requestedTag_ignored):
 
 
 # Для работы "толстого клиента", сначала выполняется init_oracle_client
-# Для работы с версией БД ЦРТР требуется толлстый клиент
+# Для работы с версией БД ЦРТР требуется толстый клиент
 oracledb.init_oracle_client(lib_dir=cfg.LIB_DIR)
 
-_pool = oracledb.create_pool(user=cfg.username, password=cfg.password, dsn=cfg.dsn,
-                                timeout=cfg.timeout, wait_timeout=cfg.wait_timeout,
-                                max_lifetime_session=cfg.max_lifetime_session,
-                                encoding=cfg.encoding, 
-                                min=cfg.pool_min, max=cfg.pool_max, 
-                                increment=cfg.pool_inc,
-                                expire_time=15,
-                                threaded=True, sessionCallback=init_session)
+_pool = oracledb.create_pool(user=cfg.username, 
+                             password=cfg.password, 
+                             dsn=cfg.dsn,
+                             timeout=cfg.timeout, 
+                             wait_timeout=cfg.wait_timeout,
+                             max_lifetime_session=cfg.max_lifetime_session,
+                             min=cfg.pool_min, max=cfg.pool_max, 
+                             increment=cfg.pool_inc,
+                             expire_time=15,
+                             session_callback=init_session)
+
 log.info(f'Пул соединенй БД Oracle создан. Timeout: {_pool.timeout}, wait_timeout: {_pool.wait_timeout}, '
             f'max_lifetime_session: {_pool.max_lifetime_session}, min: {cfg.pool_min}, max: {cfg.pool_max}')
 
@@ -48,39 +52,38 @@ def select(stmt):
     results = []
     mistake = 0
     err_mess = ''
-    try:
-        with get_connection() as connection:
-            with connection.cursor() as cursor:
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            try:
                 cursor.execute(stmt)
                 recs = cursor.fetchall()
                 for rec in recs:
                     results.append(rec)
-    except oracledb.DatabaseError as e:
-        error, = e.args
-        mistake = 1
-        err_mess = f"Oracle error: {error.code} : {error.message}"
-        log.error(f"ERROR with ------select------>\nmess: {err_mess}")
-    finally:
-        return mistake, results, err_mess
+            except oracledb.DatabaseError as e:
+                error, = e.args
+                mistake = 1
+                err_mess = f"Oracle error: {error.code} : {error.message}"
+                log.error(f"ERROR with ------select------>\nmess: {err_mess}")
+            finally:
+                return mistake, results, err_mess
 
 
 def select_one(stmt, args):
     mistake = 0
     err_mess = ''
-    try:
-        with get_connection() as conection:
-            with connection.cursor() as cursor:
-            #log_outcoming.info(f"\nВыбираем данные: {stmt}")
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            try:
                 cursor.execute(stmt, args)
                 rec = cursor.fetchone()
-    except oracledb.DatabaseError as e:
-        error, = e.args
-        mistake = 1
-        rec = ''
-        err_mess = f"Oracle error: {error.code} : {error.message}"
-        log.error(f"ERROR ------select------>\n{stmt}\nARGS: {args}\n{err_mess}")
-    finally:
-        return mistake, rec, err_mess
+            except oracledb.DatabaseError as e:
+                error, = e.args
+                mistake = 1
+                rec = ''
+                err_mess = f"Oracle error: {error.code} : {error.message}"
+                log.error(f"ERROR ------select------>\n{stmt}\nARGS: {args}\n{err_mess}")
+            finally:
+                return mistake, rec, err_mess
 
 
 def plsql_execute(cursor, f_name, cmd, args):
@@ -101,7 +104,7 @@ def plsql_proc(cursor, f_name, proc_name, args):
 
 def plsql_proc_s(f_name, proc_name, args):
     with get_connection() as connection:
-        with connection.cursor as cursor:
+        with connection.cursor() as cursor:
             plsql_proc(cursor, f_name, proc_name, args)
 
 
@@ -112,12 +115,13 @@ def plsql_func(cursor, f_name, func_name, args):
     except oracledb.DatabaseError as e:
         error, = e.args
         log.error(f"ERROR -----plsql-func-----> FNAME: {f_name}\nargs: {args}\nerror: {error.code} : {error.message}")
-    return ret
+    finally:
+        return ret
 
 
 def plsql_func_s(f_name, proc_name, args):
     with get_connection() as connection:
-        with connection.cursor as cursor:
+        with connection.cursor() as cursor:
             return plsql_func(cursor, f_name, proc_name, args)
 
 

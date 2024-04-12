@@ -121,7 +121,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 	log.info(f'DO REPORT. START {report_code}. RFPM_ID: 0701, DATE_FROM: {date_first}, FILE_PATH: {file_name}')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
+	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
