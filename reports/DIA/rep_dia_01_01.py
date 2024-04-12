@@ -136,8 +136,8 @@ def make_report(init_report_path: str, rfpm_id: str, date_from: str, date_to: st
             title_format.set_bold()
 
             title_name_report = workbook.add_format({'align': 'left', 'font_color': 'black', 'font_size': '14'})
-            title_name_report .set_align('vcenter')
-            title_name_report .set_bold()
+            title_name_report.set_align('vcenter')
+            title_name_report.set_bold()
 
             common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
             common_format.set_align('vcenter')

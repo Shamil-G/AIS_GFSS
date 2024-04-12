@@ -6,39 +6,113 @@ import oracledb
 import os.path
 from   model.manage_reports import set_status_report
 
-report_name = 'Мониторинг списочной части по платежам, рассчитанным от дохода менее 1 МЗП'
+report_name = 'РњРѕРЅРёС‚РѕСЂРёРЅРі РїРѕСЃС‚СѓРїР»РµРЅРёСЏ РЎРћ РѕС‚ РїР»Р°С‚РµР»СЊС‰РёРєРѕРІ, СЃ РєРѕС‚РѕСЂС‹РјРё РїСЂРѕРІРµРґРµРЅР° РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅРѕ-СЂР°Р·СЉСЏСЃРЅРёС‚РµР»СЊРЅР°СЏ СЂР°Р±РѕС‚'
 report_code = 'minCO.02'
 
 # 
-#document.status:  0 - Документ сформирован на выплату, 1 - Сформирован платеж, 2 - Платеж на выплате
+#document.status:  0 - Р”РѕРєСѓРјРµРЅС‚ СЃС„РѕСЂРјРёСЂРѕРІР°РЅ РЅР° РІС‹РїР»Р°С‚Сѓ, 1 - РЎС„РѕСЂРјРёСЂРѕРІР°РЅ РїР»Р°С‚РµР¶, 2 - РџР»Р°С‚РµР¶ РЅР° РІС‹РїР»Р°С‚Рµ
 stmt_load = "begin sswh.ctrl_min_so.load_so; end;"
 
 stmt_report = """
-			select
-				  nvl(rb.RFBN_ID, 'нет') rfbn_area, --Код района
-				  rb.NAME name_area,				--Район
-				  m.p_rnn,							--БИН/ИИН предприятия
-				  nvl(n.name_ip, n.fio) name_org,	--Наименование предприятия
-				  m.cnt_worker,						-- Общее количество сотрудников
-				  p.rn iin,							-- ИИН сотрудника
-				  m.PAY_MONTH,						-- Период платежа
-				  m.sum_pay,						-- Платежи менее 1 МЗП, за период
-				  min_so(m.PAY_MONTH) as base_size,	-- Мин. ставка СО
-				  min_so(m.PAY_MONTH) - m.sum_pay as debt	-- Недоплачено до мин.ставки СО 11=(10-9)
-			from min_so_history m, person p
-				 , CTRL_MINSO c
-				 , rfrr_id_region r
-				 , nk_minfin_iin n
-				 , rfbn_branch_site rb
-			where trunc(m.ctrl_date,'MM')=trunc(to_date(:control_month,'YYYY-MM-DD'),'MM')
-			and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -13)
-			and   m.p_rnn = r.id(+)
-			and   m.p_rnn = n.iin(+)
-			and   m.sicid = p.sicid
-			and   r.rfbn_id = rb.RFBN_ID(+)
-			AND   coalesce(r.typ, 'I') = 'I'
-			order by 1,2,3
-	"""
+		with before_ctrl as(
+		  select unique cs.bin,
+				 first_value(ms.ctrl_date) over(partition by ms.p_rnn order by ms.ctrl_date desc) debt_date
+		  from min_so_history ms, ctrl_minso cs
+		  where ms.p_rnn=cs.bin
+
+		  and   cs.bin='000640002969'
+
+		  and   ms.ctrl_date<=cs.ctrl_date
+		  and   ms.pay_month>add_months(cs.ctrl_date,-12)
+		)
+		,
+		after_ctrl as(
+		  select unique cs.bin,
+				 first_value(ms.ctrl_date) over(partition by ms.p_rnn order by ms.ctrl_date desc) ctrl_date
+		  from min_so_history ms, ctrl_minso cs
+		  where ms.p_rnn=cs.bin
+
+		  and   cs.bin='000640002969'
+
+		  and   ms.ctrl_date>cs.ctrl_date
+		)
+		,
+		src_list as (
+		   select h.*, p.rn, f.debt_date
+				  ,cs.rfbn_id, cs.ctrl_date as check_date
+		   from before_ctrl f, min_so_history h, person p
+				, ctrl_minso cs
+		   where h.ctrl_date=f.debt_date
+		   and   cs.bin=h.p_rnn
+
+		   and   h.p_rnn='000640002969'
+		--    and h.sicid=728535
+
+		   and h.p_rnn=f.bin
+		   and p.sicid=h.sicid
+		)
+		,
+		success_list as (
+		select --f.ctrl_date,
+			   f.bin, h.sicid, h.pay_month, p.rn as iin
+			   from before_ctrl f, min_so_history h, person p
+			   where h.ctrl_date=f.debt_date
+
+		--        and p.sicid=728535
+
+			   and h.p_rnn=f.bin
+			   and p.sicid=h.sicid
+		MINUS
+		select --L.ctrl_date,
+			   L.bin, h.sicid, h.pay_month, p.rn as iin
+			   from after_ctrl L, min_so_history h, person p
+			   where h.ctrl_date=L.ctrl_date
+
+		--        and p.sicid=728535
+
+			   and h.p_rnn=L.bin
+			   and p.sicid=h.sicid
+		)
+		select
+			   src.rfbn_id,
+			   sl.bin,
+			   src.cnt_worker,
+			   sl.iin,
+			   src.pay_month,
+			   src.sum_pay,
+			   min_so(src.pay_month),
+			   (min_so(src.pay_month)-src.sum_pay) as sum_debt,
+			   src.debt_date date_debt,
+			   src.check_date,
+			   af.ctrl_date,
+			   sum(si.sum_pay)
+		from success_list sl
+			 , src_list src
+			 , after_ctrl af
+			 , si_member_2 si
+		where src.p_rnn=sl.bin
+		and   src.pay_month=sl.pay_month
+		and   src.sicid=sl.sicid
+		and   sl.bin=af.bin
+
+		and   si.sicid(+)=sl.sicid
+		and   si.pay_date>=src.check_date
+		and   si.pay_month(+)=sl.pay_month
+		and   si.p_rnn(+)=sl.bin
+		group by
+			   src.rfbn_id,
+			   sl.bin,
+			   src.cnt_worker,
+			   sl.iin,
+			   src.pay_month,
+			   src.sum_pay,
+			   min_so(src.pay_month),
+			   (min_so(src.pay_month)-src.sum_pay),
+			   src.debt_date,
+			   src.check_date,
+			   af.ctrl_date
+		order by bin, iin, pay_month desc
+		"""
 
 
 def format_worksheet(worksheet, common_format):
@@ -47,17 +121,19 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_row(2, 14)
 	#worksheet.set_row(3, 48)
 
-	worksheet.set_column(0, 0, 9)
-	worksheet.set_column(1, 1, 12)
-	worksheet.set_column(2, 2, 48)
+	worksheet.set_column(0, 0, 8)
+	worksheet.set_column(1, 1, 8)
+	worksheet.set_column(2, 2, 16)
 	worksheet.set_column(3, 3, 14)
-	worksheet.set_column(4, 4, 120)
-	worksheet.set_column(5, 5, 18)
-	worksheet.set_column(6, 6, 14)
+	worksheet.set_column(4, 4, 14)
+	worksheet.set_column(5, 5, 12)
+	worksheet.set_column(6, 6, 12)
 	worksheet.set_column(7, 7, 12)
-	worksheet.set_column(8, 8, 14)
-	worksheet.set_column(9, 9, 12)
-	worksheet.set_column(10, 10, 16)
+	worksheet.set_column(8, 8, 15)
+	worksheet.set_column(9, 9, 15)
+	worksheet.set_column(10, 10, 12)
+	worksheet.set_column(11, 11, 12)
+	worksheet.set_column(12, 12, 12)
 
 	worksheet.write(2,0, '1', common_format)
 	worksheet.write(2,1, '2', common_format)
@@ -70,25 +146,29 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2,8, '9', common_format)
 	worksheet.write(2,9, '10', common_format)
 	worksheet.write(2,10, '11', common_format)
-	worksheet.write(3,0, '№', common_format)
-	worksheet.write(3,1, 'Код района', common_format)
-	worksheet.write(3,2, 'Район', common_format)
-	worksheet.write(3,3, 'БИН/ИИН предприятия', common_format)
-	worksheet.write(3,4, 'Наименование предприятия', common_format)
-	worksheet.write(3,5, 'Общее количество сотрудников за которых поступили СО', common_format)
-	worksheet.write(3,6, 'ИИН сотрудника', common_format)
-	worksheet.write(3,7, 'Период платежа', common_format)
-	worksheet.write(3,8, 'Платежи менее 1 МЗП, за период', common_format)
-	worksheet.write(3,9, 'Мин. ставка СО', common_format)
-	worksheet.write(3,10, 'Недоплачено до мин.ставки СО 11=(10-9)', common_format)
-
+	worksheet.write(2,11, '12', common_format)
+	worksheet.write(2,12, '13', common_format)
+	worksheet.write(3,0, 'в„–', common_format)
+	worksheet.write(3,1, 'РљРѕРґ СЂР°Р№РѕРЅР°', common_format)
+	worksheet.write(3,2, 'Р‘РРќ/РРРќ РїСЂРµРґРїСЂРёСЏС‚РёСЏ', common_format)
+	worksheet.write(3,3, 'РћР±С‰РµРµ РєРѕР»РёС‡РµСЃС‚РІРѕ СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ', common_format)
+	worksheet.write(3,4, 'РРРќ СЃРѕС‚СЂСѓРґРЅРёРєР°', common_format)
+	worksheet.write(3,5, 'РџРµСЂРёРѕРґ РїР»Р°С‚РµР¶Р°', common_format)
+	worksheet.write(3,6, 'РЎСѓРјРјР° РїР»Р°С‚РµР¶Р°', common_format)
+	worksheet.write(3,7, 'РњРёРЅ.РЎРћ', common_format)
+	worksheet.write(3,8, 'Р—Р°РґРѕР»Р¶РµРЅРЅРѕСЃС‚СЊ', common_format)
+	worksheet.write(3,9, 'Р”Р°С‚Р° Р·Р°РґРѕР»Р¶РµРЅРЅРѕСЃС‚Рё', common_format)
+	worksheet.write(3,10, 'Р”Р°С‚Р° СЃРІРµСЂРєРё', common_format)
+	worksheet.write(3,11, 'Р”Р°С‚Р° СЂР°СЃС‡РµС‚Р°', common_format)
+	worksheet.write(3,12, 'РЎСѓРјРјР° РїР»Р°С‚РµР¶Р°', common_format)
+	
 
 def do_report(file_name: str, date_first: str):
 	if os.path.isfile(file_name):
-		log.info(f'Отчет уже существует {file_name}')
+		log.info(f'РћС‚С‡РµС‚ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ {file_name}: {date_first}')
 		return file_name
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
+	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
@@ -131,9 +211,10 @@ def do_report(file_name: str, date_first: str):
 			money_format.set_align('vcenter')
 
 			now = datetime.datetime.now()
-			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
-			worksheet = workbook.add_worksheet('Список')
+			log.info(f'РќР°С‡Р°Р»Рѕ С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
+			worksheet = workbook.add_worksheet('РЎРїРёСЃРѕРє')
 			sql_sheet = workbook.add_worksheet('SQL')
+			
 			merge_format = workbook.add_format({
 				'bold':     False,
 				'border':   6,
@@ -142,13 +223,13 @@ def do_report(file_name: str, date_first: str):
 				'fg_color': '#FAFAD7',
 				'text_wrap': True
 			})
-			#sql_sheet.merge_range('A1:I70', f"{get_stmt_1}\n{stmt_2}\n{stmt_3}", merge_format)
+			sql_sheet.merge_range('A1:I70', f'{stmt_report}', merge_format)
 
 			worksheet.activate()
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'За период: {date_first}', title_name_report)
+			worksheet.write(1, 0, f'Р—Р° РїРµСЂРёРѕРґ: {date_first}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 3
@@ -158,9 +239,9 @@ def do_report(file_name: str, date_first: str):
 			cursor.execute(stmt_load)
 
 			log.info(f'REPORT {report_code}. CREATE REPORT')
-			cursor.execute(stmt_report, control_month=date_first)
+			cursor.execute(stmt_report)
 
-			log.info(f'REPORT: {report_code}. Формируем выходную EXCEL таблицу')
+			log.info(f'REPORT: {report_code}. Р¤РѕСЂРјРёСЂСѓРµРј РІС‹С…РѕРґРЅСѓСЋ EXCEL С‚Р°Р±Р»РёС†Сѓ')
 			#cursor.execute(stmt_3)
 
 			records = []
@@ -170,13 +251,13 @@ def do_report(file_name: str, date_first: str):
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (2,4):
-						worksheet.write(row_cnt+shift_row, col, list_val, region_name_format)
-					if col in (1,3,5,6):
+					# if col in (1,4):
+					# 	worksheet.write(row_cnt+shift_row, col, list_val, region_name_format)
+					if col in (1,2,3,4):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col in (7,):
+					if col in (5,9,10,11):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
-					if col in (8,9,10):
+					if col in (6,7,8,12):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
 					col += 1
 				row_cnt += 1
@@ -185,18 +266,21 @@ def do_report(file_name: str, date_first: str):
 					log.info(f'{file_name}. LOADED {row_cnt} records.')
 					cnt_part = 0
 
+			# РЁРёС„СЂ РѕС‚С‡РµС‚Р°
+			worksheet.write(0, 11, report_code, title_name_report)
+
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 9, f'Дата формирования: {now}', date_format_italic)
+			worksheet.write(1, 11, f'Р”Р°С‚Р° С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ: {now}', date_format_italic)
 
 			workbook.close()
 			set_status_report(file_name, 2)
-			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {now}')
+			log.info(f'REPORT: {report_code}. Р¤РѕСЂРјРёСЂРѕРІР°РЅРёРµ РѕС‚С‡РµС‚Р° {file_name} Р·Р°РІРµСЂС€РµРЅРѕ: {now}')
 
 
 def thread_report(file_name: str, date_first: str):
 	import threading
 	log.info(f'THREAD REPORT. {datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} -> {file_name}')
-	log.info(f'THREAD REPORT. PARAMS: date_from: {date_first}')
+	log.info(f'THREAD REPORT. PARAMS NONE')
 	threading.Thread(target=do_report, args=(file_name, date_first), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
 
@@ -209,5 +293,5 @@ def get_file_full_name(part_name, params):
 
 
 if __name__ == "__main__":
-    log.info(f'Отчет {report_code} запускается.')
-    do_report('0701_02.xlsx', '01.10.2022','31.10.2022')
+    log.info(f'РћС‚С‡РµС‚ {report_code} Р·Р°РїСѓСЃРєР°РµС‚СЃСЏ.')
+    do_report('minSO_02.xlsx', '01.10.2022','31.10.2022')

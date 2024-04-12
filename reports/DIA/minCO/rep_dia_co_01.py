@@ -87,7 +87,7 @@ def do_report(file_name: str, date_first: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
+	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
@@ -141,7 +141,7 @@ def do_report(file_name: str, date_first: str):
 				'fg_color': '#FAFAD7',
 				'text_wrap': True
 			})
-			#sql_sheet.merge_range('A1:I70', f"{get_stmt_1}\n{stmt_2}\n{stmt_3}", merge_format)
+			sql_sheet.merge_range('A1:I70', f'{stmt_report}', merge_format)
 
 			worksheet.activate()
 			format_worksheet(worksheet=worksheet, common_format=title_format)
@@ -184,6 +184,9 @@ def do_report(file_name: str, date_first: str):
 					log.info(f'{file_name}. LOADED {row_cnt} records.')
 					cnt_part = 0
 
+			# Шифр отчета
+			worksheet.write(0, 9, report_code, title_name_report)
+
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 			worksheet.write(1, 9, f'Дата формирования: {now}', date_format_italic)
 
@@ -209,4 +212,4 @@ def get_file_full_name(part_name, params):
 
 if __name__ == "__main__":
     log.info(f'Отчет {report_code} запускается.')
-    do_report('0701_02.xlsx', '01.10.2022','31.10.2022')
+    do_report('minSO_01.xlsx', '01.10.2022','31.10.2022')

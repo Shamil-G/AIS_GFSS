@@ -81,7 +81,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 		return file_name
 	begin_report = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
+	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 

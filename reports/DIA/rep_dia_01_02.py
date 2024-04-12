@@ -122,7 +122,7 @@ def make_report(rfpm_id: str, date_from: str, date_to: str):
 	else:
 		cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
 		#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
-		with cx_Oracle.connect(user='sswh', password='sswh', dsn="172.16.17.12/gfss", encoding="UTF-8") as connection:
+		with cx_Oracle.connect(user='sswh', password='sswh', dsn="172.16.17.12/gfss") as connection:
 			workbook = xlsxwriter.Workbook(file_path)
 
 			title_format = workbook.add_format({'align': 'center', 'font_color': 'black'})

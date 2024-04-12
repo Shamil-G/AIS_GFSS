@@ -80,7 +80,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 	#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
+	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 

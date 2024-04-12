@@ -27,7 +27,6 @@ report_db_user = 'sswh'
 report_db_password = 'sswh'
 dsn = '192.168.20.60:1521/gfssdb.gfss.kz'
 password = 'reports'
-encoding = 'UTF-8'
 timeout = 15       # В секундах. Время простоя, после которого курсор освобождается
 wait_timeout = 15000  # Время (в миллисекундах) ожидания доступного сеанса в пуле, перед тем как выдать ошибку
 max_lifetime_session = 30  # Время в секундах, в течении которого может существоват сеанс
