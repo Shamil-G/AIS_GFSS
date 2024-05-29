@@ -31,8 +31,9 @@ SELECT
           case when p.status in (4,2) then 'Умерший' else 'Получатель' end status
         FROM sipr_maket_first_approve_2 sfa, person p
         WHERE sfa.sicp_id = p.sicid
-        AND sfa.rfpm_id LIKE '0704%'
-        AND trunc(sfa.date_approve) Between to_date(:d1,'yyyy-mm-dd') And to_date(:d2,'yyyy-mm-dd')
+        AND substr(sfa.rfpm_id,1,4) = '0704'
+        AND sfa.date_approve >= to_date(:d1,'yyyy-mm-dd') 
+		And sfa.date_approve < to_date(:d2,'yyyy-mm-dd') + 1
         order by rfbn_id, p.lastname
 """
 

@@ -36,7 +36,8 @@ stmt_1 = """
       and pt.pnpt_id=pd.pnpt_id(+)
       and pd.sicid=p2.sicid(+)
       and substr(pt.rfpm_id,1,4) = '0701'
-      and doc.pncp_date Between to_date(:dt_from,'yyyy-mm-dd') And to_date(:dt_to,'yyyy-mm-dd')
+      and doc.pncp_date >= to_date(:dt_from,'yyyy-mm-dd') 
+	  And doc.pncp_date <  to_date(:dt_to,'yyyy-mm-dd') + 1
       and doc.ridt_id in (6,7,8)
 	  and doc.status in (0,1,2)
 	  and months_between(pt.appointdate, p2.birthdate) between 12*18 and 12*23

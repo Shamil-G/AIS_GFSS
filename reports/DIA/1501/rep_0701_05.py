@@ -49,7 +49,8 @@ stmt_1 = """
 	AND pD.RIDT_ID IN (4, 6, 7, 8)
 	AND pD.STATUS IN (0, 1, 2, 3, 5, 7)
 	AND pD.PNSP_ID > 0
-	and pd.pncp_date between to_date(:date_first,'YYYY-MM-DD') and to_date(:date_second,'YYYY-MM-DD') 
+	and pd.pncp_date >= to_date(:date_first,'YYYY-MM-DD') 
+	and pd.pncp_date <  to_date(:date_second,'YYYY-MM-DD') + 1
 	order by sfa.rfbn_id, p.lastname
 """
 

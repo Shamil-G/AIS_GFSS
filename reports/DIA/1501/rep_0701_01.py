@@ -31,7 +31,8 @@ from (
     and substr(pt.rfpm_id,1,4) = :i_rfpm_id
 	and doc.ridt_id in (6,7,8)
 	and doc.status in (0,1,2)
-    and doc.pncp_date Between to_date(:dt_from,'yyyy-mm-dd') And to_date(:dt_to,'yyyy-mm-dd')
+    and doc.pncp_date >= to_date(:dt_from,'yyyy-mm-dd') 
+	and doc.pncp_date <  to_date(:dt_to,'yyyy-mm-dd') + 1
     group by substr(pt.rfpm_id,8,1)
     union 
     select /*+ parallel(4) */ 
@@ -43,7 +44,8 @@ from (
          pnpd_document doc,
          pnpd_payment_dependant pd
     where substr(pt.rfpm_id,1,4) = :i_rfpm_id
-    and doc.pncp_date Between to_date(:dt_from,'yyyy-mm-dd') And to_date(:dt_to,'yyyy-mm-dd')
+    and doc.pncp_date >= to_date(:dt_from,'yyyy-mm-dd') 
+	and doc.pncp_date <  to_date(:dt_to,'yyyy-mm-dd') + 1
 	and doc.ridt_id in (6,7,8)
 	and doc.status in (0,1,2)
     and pt.pnpt_id=doc.source_id

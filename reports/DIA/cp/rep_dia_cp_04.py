@@ -15,7 +15,8 @@ with all_data as (
                select /*+parallel(2)*/ si.sicid, sfa.rfbn_id, sfa.iin, sfa.rfpm_id,  sfa.risk_date, sfa.sum_avg, sfa.kzd,mrzp, sfa.count_donation, sfa.sum_all, sfa.date_approve, si.type_payment
                from   si_member_2 si, sipr_maket_first_approve_2 sfa
                where  si.sicid=sfa.sicid
-               and    trunc(sfa.date_approve) Between to_date(:d1,'YYYY-MM-DD') And to_date(:d2,'YYYY-MM-DD')
+               and    sfa.date_approve >= to_date(:d1,'YYYY-MM-DD') 
+			   and    sfa.date_approve <  to_date(:d2,'YYYY-MM-DD') + 1
                and    si.pay_month between add_months(sfa.risk_date,-24) and sfa.risk_date
                and    si.pay_date > add_months(sfa.risk_date,-24)
          ),

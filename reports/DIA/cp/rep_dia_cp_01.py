@@ -23,7 +23,8 @@ stmt_1 = """
 	from si_member_2 pd, person p
 	where pd.type_payment = 'О'
 	and	  pd.knp = '012'
-	and   trunc(pd.pay_date_gfss,'DD') between to_date(:dt_from, 'YYYY-MM-DD') and to_date(:dt_to, 'YYYY-MM-DD')
+	and   pd.pay_date_gfss >= to_date(:dt_from, 'YYYY-MM-DD') 
+	and   pd.pay_date_gfss <  to_date(:dt_to, 'YYYY-MM-DD') + 1
     and	  pd.pay_date_gfss >= to_date('01.02.2023','dd.mm.yyyy')
     and   pd.pay_date >= to_date('01.02.2023','dd.mm.yyyy')
 	and   pd.pay_date > (to_date(:dt_from, 'YYYY-MM-DD') - 14 )

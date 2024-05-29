@@ -17,7 +17,8 @@ stmt_1 = """
             where si.sicid = p.sicid
             and si.type_payment = 'О'
             and si.knp = '012'
-            and trunc(si.pay_date_gfss,'DD') between to_date(:dt_from, 'yyyy-mm-dd') and to_date(:dt_to, 'yyyy-mm-dd')
+            and si.pay_date_gfss >= to_date(:dt_from, 'yyyy-mm-dd') 
+			and si.pay_date_gfss <  to_date(:dt_to, 'yyyy-mm-dd') + 1
             and si.pay_date_gfss  >= to_date('01.02.2023','dd.mm.yyyy')
             and si.pay_date		  >= to_date('01.02.2023','dd.mm.yyyy')
             and si.pay_date >= (to_date(:dt_from, 'yyyy-mm-dd') -  14)
