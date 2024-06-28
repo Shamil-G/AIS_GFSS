@@ -1,6 +1,7 @@
 from typing import List, Any
 import os.path
-import app_config as cfg
+from app_config import debug
+from ais_gfss_parameter import BASE, platform
 from util.logger import log
 
 
@@ -12,9 +13,9 @@ class I18N:
     def get_resource(self, lang, resource_name):
         file_object = ''
         return_value = ''
-        file_name = f'{cfg.BASE}/i18n.{lang}'
-        if cfg.platform == 'unix':
-            file_name = f'{cfg.BASE}/i18nu.{lang}'
+        file_name = f'{BASE}/i18n.{lang}'
+        if platform == 'unix':
+            file_name = f'{BASE}/i18nu.{lang}'
         n_objects = 0
         # if cfg.debug:
         #     log.debug(f"I18N. Lang: {lang}, resource_name: {resource_name}, file_name: {file_name}")
@@ -44,7 +45,7 @@ class I18N:
         return return_value
 
     def close(self):
-        if cfg.debug:
+        if debug:
             log.debug("I18N. CLOSE")
         for file in self.files:
             file.close()

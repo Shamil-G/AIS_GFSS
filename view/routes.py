@@ -1,4 +1,4 @@
-from app_config import REPORT_PATH, debug_level, platform
+from app_config import REPORT_PATH, debug_level
 from main_app import app, log
 from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory, g
 from flask_login import  login_required

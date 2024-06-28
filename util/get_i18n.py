@@ -2,7 +2,6 @@ from app_config import debug_level, src_lang, language
 from util.i18n import log, i18n
 from flask import request, session
 from db.connect import get_connection
-from ais_gfss_parameter import using
 
 
 def get_i18n_value(res_name):

@@ -113,3 +113,40 @@ def user_info(username):
         if debug_level > 2:
             log.info(f"REQUEST USER INFO. FINALLY. USERNAME: {username}, resp_json: {resp_json}")
         return resp_json
+
+
+def server_logout(id_user):
+    request_json = { "id_user": id_user}
+    url = f'{URL_LOGIN}/user--logout'
+    try:
+        resp = requests.post(url, json=request_json)
+        status = resp.status_code
+        if status == 200:
+            if debug_level > 2:
+                log.info(f'-----> USER LOGOUT. resp: {resp}, status: {status}, request_json: {request_json}')
+            resp_json = resp.json()
+        else:
+            log.error(f'\nERROR GET USER INFO. "id_user": {id_user}, URL: {url}, status: {status}')
+            resp_json = {"mistake": 'ERROR', "id_user": {id_user}, "mess": f'RESP STATUS: {status}'}
+    except requests.exceptions.HTTPError as errH:
+        log.error(f"=====> Http Error. request user-info. id_user: {id_user} : {errH}")
+        resp_json = {"mistake": f'{errH}', "id_user": {id_user}, "roles": []}
+    except requests.exceptions.Timeout as errT:
+        log.error(f'=====> TIMEOUT ERROR. request user-info. "id_user": {id_user} : {errT}')
+        resp_json = {"mistake": f'{errT}', "id_user": {id_user}, "roles": []}
+    except requests.exceptions.TooManyRedirects as errM:
+        log.error(f'=====> ERROR MANY REDIRECT. request user-info. "id_user": {id_user} : {errM}')
+        resp_json = {"mistake": f'{errM}', "id_user": {id_user}, "roles": []}
+    except requests.exceptions.ConnectionError as errC:
+        log.error(f'=====> ERROR CONNECTION. request user-info. "id_user": {id_user} : {errC}')
+        resp_json = {"mistake": f'{errC}', "id_user": {id_user}, "roles": []}
+    except requests.exceptions.RequestException as errE:
+        log.error(f'=====> REQUEST ERROR. request user-info. "id_user": {id_user} : {errE}')
+        resp_json = {"mistake": f'{errE}', "id_user": {id_user}, "roles": []}
+    except Exception as e:
+        log.error(f'=====> ERROR. request user-info. URL: {url}, ERROR: {e}')
+        resp_json = {"mistake": f'{e}', "id_user": {id_user}, "roles": []}
+    finally:
+        if debug_level > 2:
+            log.info(f"REQUEST USER INFO. FINALLY. id_user: {id_user}, resp_json: {resp_json}")
+        return resp_json

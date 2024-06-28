@@ -1,15 +1,8 @@
-from ais_gfss_parameter import using
+from ais_gfss_parameter import platform, ORACLE_HOME
 from util.logger import log
 import redis
 
-if using.startswith('PROD'):
-    LIB_DIR = r'/home/ais_gfss/instantclient_21_8'
-#elif using == 'DEV_WIN_HOME':
-#    LIB_DIR = r'd:/install/oracle/instantclient_19_13'
-else:
-    LIB_DIR = r'C:\instantclient_21_3'
-
-if using == 'PROD':
+if platform == 'unix':
     pool_min = 10
     pool_max = 40
     pool_inc = 10
@@ -31,7 +24,7 @@ timeout = 15       # В секундах. Время простоя, после 
 wait_timeout = 15000  # Время (в миллисекундах) ожидания доступного сеанса в пуле, перед тем как выдать ошибку
 max_lifetime_session = 30  # Время в секундах, в течении которого может существоват сеанс
 
-log.info(f"=====> DB CONFIG. using: {using}, LIB_DIR: {LIB_DIR}, DSN: {dsn}")
+log.info(f"=====> DB CONFIG. platform: {platform}, ORACLE_HOME: {ORACLE_HOME}, DSN: {dsn}")
 
 # if using != 'DEV_WIN_HOME':
 #     db_redis = redis.from_url('redis://@10.15.15.11:6379')
@@ -40,7 +33,7 @@ log.info(f"=====> DB CONFIG. using: {using}, LIB_DIR: {LIB_DIR}, DSN: {dsn}")
 class SessionConfig:
     # secret_key = 'this is secret key qer:ekjf;keriutype2tO287'
     SECRET_KEY = 'this is secret key 12345 -'
-    if using.startswith('DEV'):
+    if platform!='unix':
         #SESSION_TYPE = "filesystem"
         SESSION_TYPE = 'redis'
         SESSION_REDIS = redis.from_url('redis://@192.168.20.33:6379')
