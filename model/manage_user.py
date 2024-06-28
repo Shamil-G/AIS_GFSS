@@ -4,8 +4,8 @@ from main_app import log
 import requests
 
 
-def get_user_roles(username, passwd):
-    request_json = { "app_name": public_name, "username": username, "passwd": passwd }
+def get_user_roles(username, passwd, ip):
+    request_json = { "app_name": public_name, "username": username, "passwd": passwd, "ip_addr": ip }
     url = f'{URL_LOGIN}/get-roles'
     try:
         resp = requests.post(url, json=request_json)
