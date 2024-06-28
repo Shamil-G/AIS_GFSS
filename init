@@ -1,14 +1,15 @@
-python -m venv venv
-. /home/ais_gfss/AIS_GFSS/venv/bin/activate
-pip3.9 install --upgrade pip
-#pip3.9 install flask
-#pip3.9 install flask_login
-#pip3.9 uninstall cx_Oracle
-#pip3.9 install oracledb
-#pip3.9 install requests
-#pip3.9 install gunicorn
-#pip3.9 install gevent
-#pip3.9 install xlsxwriter
-#pip3.9 install redis
+python3 -m venv venv
+PROJECT_DIR=$HOME/REPORTS_GFSS
+. $PROJECT_DIR/venv/bin/activate
+pip install --upgrade pip
+#pip install flask
+#pip install flask_login
+#pip install oracledb
+#pip install requests
+#pip install gunicorn
+#pip install gevent
+#pip install xlsxwriter
+#pip install redis
+pip install openpyxl
 python main_app.py
 #gunicorn

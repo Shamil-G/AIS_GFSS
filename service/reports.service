@@ -1,0 +1,14 @@
+[Unit]
+Description=GUNICORN-REPORTS
+After=network.target
+
+[Service]
+Type=simple
+User=reports
+Group=reports
+WorkingDirectory=/home/reports/REPORTS_GFSS
+Environment="LD_LIBRARY_PATH=/home/oracle/client/19.3/lib" "ORACLE_HOME=/home/oracle/client/19.3"
+ExecStart=/home/reports/REPORTS_GFSS/venv/bin/gunicorn
+
+[Install] 
+WantedBy=multi-user.target

@@ -1,4 +1,4 @@
-from ais_gfss_parameter import platform, ORACLE_HOME
+from reports_gfss_parameter import platform, ORACLE_HOME
 from util.logger import log
 import redis
 

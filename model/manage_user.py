@@ -1,5 +1,5 @@
 from app_config import URL_LOGIN, debug_level
-from ais_gfss_parameter import public_name
+from reports_gfss_parameter import public_name
 from main_app import log
 import requests
 

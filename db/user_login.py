@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from db.connect import get_connection
 from main_app import app, log
 import app_config as cfg
-from ais_gfss_parameter import public_name
+from reports_gfss_parameter import public_name
 from model.manage_user import get_user_roles, server_logout
 from util.ip_addr import ip_addr
 import oracledb
@@ -25,7 +25,7 @@ class User:
         ip = ip_addr()
         if 'password' in session and 'password' in session:
             rl = get_user_roles(session['username'], session['password'])
-            if 'roles' in rl and len(rl) > 0:
+            if 'roles' in rl and len(rl) and 'id_user' in rl > 0:
                 self.username = username
                 self.password = session['password']
                 self.ip_addr = ip

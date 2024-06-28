@@ -1,4 +1,4 @@
-from ais_gfss_parameter import platform, BASE
+from reports_gfss_parameter import platform, BASE
 
 if platform=='unix':
     debug_level = 2
@@ -7,7 +7,7 @@ else:
     host = '192.168.5.17'
     debug_level = 2
 
-port = 5000
+port=5090
 src_lang = 'file'
 language = 'ru'
 debug = True

@@ -1,4 +1,4 @@
-systemctl stop ais
-systemctl start ais
+systemctl stop reports
+systemctl start reports
 sleep 3
-systemctl status -l ais
+systemctl status -l reports

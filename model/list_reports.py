@@ -1,5 +1,4 @@
 from app_config import REPORT_MODULE_PATH
-from app_config import REPORT_MODULE_PATH
 
 # live_time - время жизни отчета в часах, может указываться с 2 знаками после запятой
 # в этом случае минимальное время жизни отчета составляет 36 секунд
