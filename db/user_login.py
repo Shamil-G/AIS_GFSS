@@ -6,7 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from db.connect import get_connection
 from main_app import app, log
 import app_config as cfg
-from ais_gfss_parameter import public_name
+from reports_gfss_parameter import public_name
 from model.manage_user import get_user_roles, server_logout
 from util.ip_addr import ip_addr
 import oracledb

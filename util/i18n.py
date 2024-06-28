@@ -1,7 +1,7 @@
 from typing import List, Any
 import os.path
 from app_config import debug
-from ais_gfss_parameter import BASE, platform
+from reports_gfss_parameter import BASE, platform
 from util.logger import log
 
 

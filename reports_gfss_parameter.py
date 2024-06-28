@@ -1,6 +1,6 @@
 import os
 
-app_name = "AIS_GFSS"
+app_name = "REPORTS_GFSS"
 public_name = "АИС ГФСС"
 
 # 
@@ -13,6 +13,6 @@ if "HOME" in os.environ:
     platform='unix'
 
 if "ORACLE_HOME" in os.environ:
-    ORACLE_HOME=os.environ["ORACLE_HOME"]
+    ORACLE_HOME=f'{os.environ["ORACLE_HOME"]}/lib'
 
 BASE=f'{app_home}/{app_name}'

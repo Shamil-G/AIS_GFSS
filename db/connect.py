@@ -2,9 +2,8 @@
 # from gc import enable
 from socket import close
 import db_config as cfg
-from ais_gfss_parameter import ORACLE_HOME
+from reports_gfss_parameter import ORACLE_HOME
 from util.logger import log
-#from ais_gfss_parameter import using
 from util.ip_addr import ip_addr 
 import oracledb
 

@@ -1,9 +1,9 @@
 systemctl get-default
 systemctl daemon-reload
-systemctl enable /home/ais_gfss/AIS_GFSS/service/ais.service
-systemctl stop ais
-systemctl start ais
-systemctl status -l ais
+systemctl enable /home/reports/REPORTS_GFSS/service/reports.service
+systemctl stop reports
+systemctl start reports
+systemctl status -l reports
 
-firewall-cmd --add-port=8080/tcp --permanent
-firewall-cmd --reload
+#firewall-cmd --add-port=8090/tcp --permanent
+#firewall-cmd --reload

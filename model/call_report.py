@@ -2,7 +2,7 @@ from  db.connect import select_one, get_connection, plsql_execute
 from  main_app import log
 import importlib
 from   app_config import REPORT_PATH, debug_level
-from   ais_gfss_parameter import platform
+from   reports_gfss_parameter import platform
 from   model.list_reports import dict_reports
 from   model.manage_reports import remove_report
 from   util.trunc_date import get_year
