@@ -25,7 +25,7 @@ class User:
         ip = ip_addr()
         if 'password' in session and 'password' in session:
             rl = get_user_roles(session['username'], session['password'])
-            if 'roles' in rl and len(rl) and 'id_user' in rl > 0:
+            if 'roles' in rl and 'id_user' in rl and len(rl) > 0:
                 self.username = username
                 self.password = session['password']
                 self.ip_addr = ip
