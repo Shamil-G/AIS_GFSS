@@ -2,7 +2,7 @@
 # from gc import enable
 from socket import close
 import db_config as cfg
-from reports_gfss_parameter import ORACLE_HOME
+from reports_gfss_parameter import LD_LIBRARY_PATH
 from util.logger import log
 from util.ip_addr import ip_addr 
 import oracledb
@@ -18,7 +18,7 @@ def init_session(connection, requestedTag_ignored):
 
 # Для работы "толстого клиента", сначала выполняется init_oracle_client
 # Для работы с версией БД ЦРТР требуется толстый клиент
-oracledb.init_oracle_client(lib_dir=ORACLE_HOME)
+oracledb.init_oracle_client(lib_dir=LD_LIBRARY_PATH)
 
 _pool = oracledb.create_pool(user=cfg.username, 
                              password=cfg.password, 
