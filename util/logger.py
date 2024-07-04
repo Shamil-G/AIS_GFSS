@@ -7,10 +7,10 @@ from app_config import debug
 
 
 def init_logger():
-    logger = logging.getLogger('AIS-GFSS')
+    logger = logging.getLogger('REPORTS-GFSS')
     # logging.getLogger('PDD').addHandler(logging.StreamHandler(sys.stdout))
     # Console
-    logging.getLogger('AIS-GFSS').addHandler(logging.StreamHandler())
+    logging.getLogger('REPORTS-GFSS').addHandler(logging.StreamHandler())
     if debug:
         logger.setLevel(logging.DEBUG)
     else:
@@ -21,7 +21,7 @@ def init_logger():
     fh.setFormatter(formatter)
 
     logger.addHandler(fh)
-    logger.info('AIS-GFSS Logging started')
+    logger.info('REPORTS-GFSS Logging started')
     return logger
 
 
