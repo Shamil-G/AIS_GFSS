@@ -131,7 +131,9 @@ def do_report(file_name: str, date_first: str):
 
 			now = datetime.datetime.now()
 			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
-			worksheet = workbook.add_worksheet('Список')
+			page_num = 1
+			worksheet = []
+			worksheet.append( workbook.add_worksheet(f'Список {page_num}') )
 			sql_sheet = workbook.add_worksheet('SQL')
 			merge_format = workbook.add_format({
 				'bold':     False,
@@ -141,15 +143,16 @@ def do_report(file_name: str, date_first: str):
 				'fg_color': '#FAFAD7',
 				'text_wrap': True
 			})
-			sql_sheet.merge_range('A1:I70', f'{stmt_report}', merge_format)
+			sql_sheet.merge_range(f'A1:I{len(stmt_report.splitlines())}', f'{stmt_report}', merge_format)
 
-			worksheet.activate()
-			format_worksheet(worksheet=worksheet, common_format=title_format)
+			worksheet[page_num-1].activate()
+			format_worksheet(worksheet=worksheet[page_num-1], common_format=title_format)
 
-			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'За период: {date_first}', title_name_report)
+			worksheet[page_num-1].write(0, 0, report_name, title_name_report)
+			worksheet[page_num-1].write(1, 0, f'За период: {date_first}', title_name_report)
 
 			row_cnt = 1
+			all_cnt=1
 			shift_row = 3
 			cnt_part = 0
 
@@ -167,32 +170,44 @@ def do_report(file_name: str, date_first: str):
 			#for record in records:
 			for record in records:
 				col = 1
-				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
+				worksheet[page_num-1].write(row_cnt+shift_row, 0, all_cnt, digital_format)
 				for list_val in record:
 					if col in (2,4):
-						worksheet.write(row_cnt+shift_row, col, list_val, region_name_format)
+						worksheet[page_num-1].write(row_cnt+shift_row, col, list_val, region_name_format)
 					if col in (1,3,5,6):
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
+						worksheet[page_num-1].write(row_cnt+shift_row, col, list_val, digital_format)
 					if col in (7,):
-						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
+						worksheet[page_num-1].write(row_cnt+shift_row, col, list_val, date_format)
 					if col in (8,9,10):
-						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
-					col += 1
-				row_cnt += 1
-				cnt_part += 1
-				if cnt_part > 9999:
+						worksheet[page_num-1].write(row_cnt+shift_row, col, list_val, money_format)
+					col+= 1
+				row_cnt+= 1
+				cnt_part+= 1
+				all_cnt+=1
+				if (all_cnt//1000000) +1 > page_num:
+					page_num=page_num+1
+					row_cnt=1
+					# ADD a new worksheet
+					worksheet.append( workbook.add_worksheet(f'Список {page_num}') )
+					# Formatting column and rows, ADD HEADERS
+					format_worksheet(worksheet=worksheet[page_num-1], common_format=title_format)
+					worksheet[page_num-1].write(0, 0, report_name, title_name_report)
+					worksheet[page_num-1].write(1, 0, f'За период: {date_first}', title_name_report)
+					
+
+				if cnt_part > 250000:
 					log.info(f'{file_name}. LOADED {row_cnt} records.')
 					cnt_part = 0
 
-			# Шифр отчета
-			worksheet.write(0, 9, report_code, title_name_report)
-
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 9, f'Дата формирования: {now}', date_format_italic)
+			for i in range(page_num):
+				# Шифр отчета
+				worksheet[i].write(0, 9, report_code, title_name_report)
+				worksheet[i].write(1, 9, f'Дата формирования: {now}', date_format_italic)
 
 			workbook.close()
 			set_status_report(file_name, 2)
-			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {now}')
+			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {now}, Загруено {all_cnt} записей')
 
 
 def thread_report(file_name: str, date_first: str):
