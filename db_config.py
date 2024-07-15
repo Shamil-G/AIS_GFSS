@@ -3,7 +3,7 @@ from util.logger import log
 import redis
 
 if platform == 'unix':
-    pool_min = 10
+    pool_min = 0
     pool_max = 40
     pool_inc = 10
     Debug = True
