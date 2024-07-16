@@ -104,23 +104,25 @@ def logout():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
-    if cfg.debug_level > 0:
-        log.info(f"Login Page. Method: {request.method}")
     if request.method == "POST":
         session['username'] = request.form.get('username')
         session['password'] = request.form.get('password')
 
         user = User().get_user_by_name(session['username'])
-        if user and user.have_role('Оператор'):
-            login_user(user)
-            #if authority():
-            next_page = request.args.get('next')
-            if next_page is not None:
-                log.info(f'LOGIN_PAGE. SUCCESS. GOTO NEXT PAGE: {next_page}')
-                return redirect(next_page)
-            else:
-                log.info(f'LOGIN_PAGE. SUCCESS. GOTO VIEW ROOT')
-                return redirect(url_for('view_root'))
+        if user:
+            if user.have_role('Оператор'):
+                login_user(user)
+                #if authority():
+                next_page = request.args.get('next')
+                if next_page is not None:
+                    log.info(f'LOGIN_PAGE. SUCCESS. GOTO NEXT PAGE: {next_page}')
+                    return redirect(next_page)
+                else:
+                    return redirect(url_for('view_root'))
+        else:
+            flash("Имя пользователя или пароль неверны")
+            log.info(f'LOGIN_PAGE. SUCCESS. GOTO VIEW ROOT')
+            return redirect(url_for('view_root'))
     flash('Введите имя и пароль')
     info = ''
     if 'info' in session:
@@ -147,20 +149,20 @@ def authority():
         return redirect(url_for('login_page'))
     username = session['username']
     try:
-        if username:
-            log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, lang: {session['language']}")
-            # Создаем объект регистрации
-            user = User().get_user_by_name(username)
-            password = session['password']
-            if user and user.is_authenticated() and check_password_hash(user.password, password) or (username == 'sha' and password == 'sha1'):
+        log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, lang: {session['language']}")
+        # Создаем объект регистрации
+        user = User().get_user_by_name(username)
+        password = session['password']
+        if user:
+            if user.is_authenticated() and check_password_hash(user.password, password) or (username == 'sha' and password == 'sha1'):
                 login_user(user)
                 log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, authenticated: {user.is_authenticated()}")
                 return True
-            else: 
-                hash_pwd = generate_password_hash(password)
-                log.error(f'AUTHORITY.  Error PASSWORD. username: {username}, db_password: {user.password}, hash_pwd: {hash_pwd}')
-                session['info'] = get_i18n_value('ERROR_AUTH')
+        hash_pwd = generate_password_hash(password)
+        log.error(f'AUTHORITY.  Error PASSWORD. username: {username}, db_password: {password}, hash_pwd: {hash_pwd}')
+        session['info'] = get_i18n_value('ERROR_AUTH')
         return False
     except Exception as e:
         log.error(f"ERROR AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, Error Message: {e}")
+        session['info'] = "Неверно имя или пароль"
         return False

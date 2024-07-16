@@ -11,7 +11,7 @@ report_code = 'minCO.01'
 
 # 
 #document.status:  0 - Документ сформирован на выплату, 1 - Сформирован платеж, 2 - Платеж на выплате
-stmt_load = "begin sswh.ctrl_min_so.load_so; end;"
+stmt_load = "begin sswh.load_min_so_history.make; end;"
 
 stmt_report = """
 			select
