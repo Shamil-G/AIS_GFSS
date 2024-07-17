@@ -31,9 +31,8 @@ class User:
                 self.ip_addr = ip
                 self.id_user = rl['id_user']
                 self.roles = rl['roles']
-                log.info(f"LM. SUCCESS. USERNAME: {self.username}, ip_addr: {self.ip_addr}, password: {self.password}, roles: {self.roles}")
+                log.info(f"LM. SUCCESS. USERNAME: {self.username}, ip_addr: {self.ip_addr}, roles: {self.roles}")
                 return self
-            log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {ip}, password: {session['password']}")
         log.info(f"LM. FAIL. USERNAME: {username}, ip_addr: {ip}, password: {session['password']}")
         return None
 
@@ -104,31 +103,32 @@ def logout():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
+    if '_flashes' in session:
+         session['_flashes'].clear()
+    
     if request.method == "POST":
         session['username'] = request.form.get('username')
         session['password'] = request.form.get('password')
+        log.debug(f"LOGIN_PAGE. POST. lang: username: {session['username']}, password: {session['password']}, ip_addr: {ip_addr()}")
 
         user = User().get_user_by_name(session['username'])
+
+        # Если такой username существует и объект user создался, надо проверить еще права доступа
         if user:
             if user.have_role('Оператор'):
                 login_user(user)
-                #if authority():
                 next_page = request.args.get('next')
                 if next_page is not None:
-                    log.info(f'LOGIN_PAGE. SUCCESS. GOTO NEXT PAGE: {next_page}')
+                    log.info(f'LOGIN_PAGE. SUCCESS AUTHORITY. GOTO NEXT PAGE: {next_page}')
                     return redirect(next_page)
                 else:
                     return redirect(url_for('view_root'))
-        else:
-            flash("Имя пользователя или пароль неверны")
-            log.info(f'LOGIN_PAGE. SUCCESS. GOTO VIEW ROOT')
-            return redirect(url_for('view_root'))
+            else:
+                log.error(f'LOGIN_PAGE. FAIL AUTHORITY {session['username']}')
+        flash("Имя пользователя или пароль неверны")
+        log.error(f'LOGIN_PAGE. FAIL AUTHORITY')
     flash('Введите имя и пароль')
-    info = ''
-    if 'info' in session:
-        info = session['info']
-        session.pop('info')
-    return render_template('login.html', info=info)
+    return render_template('login.html')
 
 
 # @app.context_processor
@@ -139,30 +139,3 @@ def login_page():
     # if g.user.is_authenticated:
     #     log.debug('Authenticated current_user: '+str(g.user.username))
     # return{"current_user": 'admin_user'}
-
-#############################################################################
-# При использовании нового класса User, потребности в Authority нет
-def authority():
-    if 'username' not in session:
-        log.info(f"AUTHORITY. Absent USERNAME. ip_addr: {ip_addr()}")
-        session['info'] = 'USERNAME IS NULL'
-        return redirect(url_for('login_page'))
-    username = session['username']
-    try:
-        log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, lang: {session['language']}")
-        # Создаем объект регистрации
-        user = User().get_user_by_name(username)
-        password = session['password']
-        if user:
-            if user.is_authenticated() and check_password_hash(user.password, password) or (username == 'sha' and password == 'sha1'):
-                login_user(user)
-                log.info(f"AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, authenticated: {user.is_authenticated()}")
-                return True
-        hash_pwd = generate_password_hash(password)
-        log.error(f'AUTHORITY.  Error PASSWORD. username: {username}, db_password: {password}, hash_pwd: {hash_pwd}')
-        session['info'] = get_i18n_value('ERROR_AUTH')
-        return False
-    except Exception as e:
-        log.error(f"ERROR AUTHORITY. USERNAME: {username}, ip_addr: {ip_addr()}, Error Message: {e}")
-        session['info'] = "Неверно имя или пароль"
-        return False
