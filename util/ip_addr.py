@@ -1,9 +1,9 @@
 from flask import  request
-from reports_gfss_parameter import platform
+from reports_gfss_parameter import platform, http_ip_context
 
 
 def ip_addr():
     if platform=='unix':
-        return request.environ.get('HTTP_X_REAL_IP')
+        return request.environ.get(http_ip_context)
     else:
         return request.remote_addr
