@@ -1,4 +1,4 @@
-from   db_config import report_db_user, report_db_password, report_db_dsn
+import configparser
 import xlsxwriter
 import datetime
 import os.path
@@ -16,7 +16,7 @@ stmt_1 = """
 SELECT 
           sfa.rfbn_id code_region, --"Код региона",
           sfa.rfpm_id rfpm, --"Код выплаты",
-          p.rn rnn, --"ИИН",
+          p.iin rnn, --"ИИН",
           p.lastname || ' ' || p.firstname || ' ' || p.middlename fio,--"ФИО",
           case when p.sex=0 then 'ж' else 'м' end sx,--"Пол",
           sfa.birthdate,
@@ -30,7 +30,7 @@ SELECT
           sfa.count_donation donation,--"Количество месяцев",
           sfa.sum_all sfa_all, --"Назначенный размер, тенге"
           case when p.status in (4,2) then 'Умерший' else 'Получатель' end status
-        FROM sipr_maket_first_approve_2 sfa, person p
+        FROM loader.sipr_maket_first_approve_2 sfa, loader.person p
         WHERE sfa.sicp_id = p.sicid
         AND substr(sfa.rfpm_id,1,4) = '0701'
         and sfa.date_approve >= to_date(:d1,'yyyy-mm-dd') 
@@ -90,7 +90,17 @@ def do_report(file_name: str, date_first: str, date_second: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 	log.info(f'DO REPORT. START {report_code}. RFPM_ID: 0701, DATE_FROM: {date_first}, FILE_PATH: {file_name}')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+	
+	config = configparser.ConfigParser()
+	config.read('db_config.ini')
+	
+	ora_config = config['rep_db_60']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+	log.info(f'{report_code}. db_user: {db_user}, db_pasword: {db_password}, db_dsn: {db_dsn}')
+
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
