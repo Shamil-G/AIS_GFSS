@@ -1,7 +1,8 @@
 systemctl get-default
 systemctl daemon-reload
 systemctl enable /home/reports/REPORTS_GFSS/service/reports.service
-systemctl stop reports
+systemctl --now reports
+#systemctl stop reports
 systemctl start reports
 systemctl status -l reports
 

@@ -7,7 +7,7 @@ Type=simple
 User=reports
 Group=reports
 WorkingDirectory=/home/reports/REPORTS_GFSS
-Environment="LD_LIBRARY_PATH=/home/oracle/client/19.3/lib" "ORACLE_HOME=/home/oracle/client/19.3"
+Environment="LD_LIBRARY_PATH=/home/oracle/client/21.3/lib" "ORACLE_HOME=/home/oracle/client/21.3" "VENV_HOME=/home/reports/REPORTS_GFSS/venv/bin" "PATH=/home/reports/REPORTS_GFSS/venv/bin"
 ExecStart=/home/reports/REPORTS_GFSS/venv/bin/gunicorn
 
 [Install] 
