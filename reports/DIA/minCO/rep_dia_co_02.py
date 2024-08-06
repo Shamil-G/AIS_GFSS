@@ -14,95 +14,95 @@ report_code = 'minCO.02'
 stmt_load = "begin sswh.load_min_so_history.make; end;"
 
 stmt_report = """
-		with before_ctrl as(
-		  select unique cs.bin,
-				 first_value(ms.ctrl_date) over(partition by ms.p_rnn order by ms.ctrl_date desc) debt_date
-		  from min_so_history ms, ctrl_minso cs
-		  where ms.p_rnn=cs.bin
-		  -- and   cs.bin='000640002969'
-		  and   ms.ctrl_date<=cs.ctrl_date
-		  and   ms.pay_month>add_months(cs.ctrl_date,-12)
-		)
-		,
-		after_ctrl as(
-		  select unique cs.bin,
-				 first_value(ms.ctrl_date) over(partition by ms.p_rnn order by ms.ctrl_date desc) ctrl_date
-		  from min_so_history ms, ctrl_minso cs
-		  where ms.p_rnn=cs.bin
-		  -- and   cs.bin='000640002969'
-		  and   ms.ctrl_date>cs.ctrl_date
-		)
-		,
-		src_list as (
-		   select h.*, p.rn, f.debt_date
-				  ,cs.rfbn_id, cs.ctrl_date as check_date
-		   from before_ctrl f, min_so_history h, person p
-				, ctrl_minso cs
-		   where h.ctrl_date=f.debt_date
-		   and   cs.bin=h.p_rnn
-		   -- and   h.p_rnn='000640002969'
-		   -- and h.sicid=728535
-		   and h.p_rnn=f.bin
-		   and p.sicid=h.sicid
-		)
-		,
-		success_list as (
-		select --f.ctrl_date,
-			   f.bin, h.sicid, h.pay_month, p.rn as iin
-			   from before_ctrl f, min_so_history h, person p
-			   where h.ctrl_date=f.debt_date
-		--        and p.sicid=728535
-			   and h.p_rnn=f.bin
-			   and p.sicid=h.sicid
-		MINUS
-		select --L.ctrl_date,
-			   L.bin, h.sicid, h.pay_month, p.rn as iin
-			   from after_ctrl L, min_so_history h, person p
-			   where h.ctrl_date=L.ctrl_date
-		--        and p.sicid=728535
-			   and h.p_rnn=L.bin
-			   and p.sicid=h.sicid
-		)
-		select
-			   src.rfbn_id,
-			   sl.bin,
-			   src.cnt_worker,
-			   sl.iin,
-			   src.pay_month,
-			   src.sum_pay,
-			   min_so(src.pay_month),
-			   (min_so(src.pay_month)-src.sum_pay) as sum_debt,
-			   src.debt_date date_debt,
-			   src.check_date,
-			   af.ctrl_date,
-			   sum(si.sum_pay)
-		from success_list sl
-			 , src_list src
-			 , after_ctrl af
-			 , si_member_2 si
-		where src.p_rnn=sl.bin
-		and   src.pay_month=sl.pay_month
-		and   src.sicid=sl.sicid
-		and   sl.bin=af.bin
+	with before_ctrl as(
+	  select unique cs.bin,
+		 first_value(ms.ctrl_date) over(partition by ms.p_rnn order by ms.ctrl_date desc) debt_date
+	  from sswh.min_so_history ms, sswh.ctrl_minso cs
+	  where ms.p_rnn=cs.bin
+	  -- and   cs.bin='000640002969'
+	  and   ms.ctrl_date<=cs.ctrl_date
+	  and   ms.pay_month>add_months(cs.ctrl_date,-12)
+	)
+	,
+	after_ctrl as(
+	  select unique cs.bin,
+		 first_value(ms.ctrl_date) over(partition by ms.p_rnn order by ms.ctrl_date desc) ctrl_date
+	  from sswh.min_so_history ms, sswh.ctrl_minso cs
+	  where ms.p_rnn=cs.bin
+	  -- and   cs.bin='000640002969'
+	  and   ms.ctrl_date>cs.ctrl_date
+	)
+	,
+	src_list as (
+	   select h.*, p.iin, f.debt_date
+		  ,cs.rfbn_id, cs.ctrl_date as check_date
+	   from before_ctrl f, sswh.min_so_history h, loader.person p
+		, sswh.ctrl_minso cs
+	   where h.ctrl_date=f.debt_date
+	   and   cs.bin=h.p_rnn
+	   -- and   h.p_rnn='000640002969'
+	   -- and h.sicid=728535
+	   and h.p_rnn=f.bin
+	   and p.sicid=h.sicid
+	)
+	,
+	success_list as (
+	select --f.ctrl_date,
+		 f.bin, h.sicid, h.pay_month, p.iin as iin
+		 from before_ctrl f, sswh.min_so_history h, loader.person p
+		 where h.ctrl_date=f.debt_date
+	--        and p.sicid=728535
+		 and h.p_rnn=f.bin
+		 and p.sicid=h.sicid
+	MINUS
+	select --L.ctrl_date,
+		 L.bin, h.sicid, h.pay_month, p.iin as iin
+		 from after_ctrl L, sswh.min_so_history h, loader.person p
+		 where h.ctrl_date=L.ctrl_date
+	--        and p.sicid=728535
+		 and h.p_rnn=L.bin
+		 and p.sicid=h.sicid
+	)
+	select
+		 src.rfbn_id,
+		 sl.bin,
+		 src.cnt_worker,
+		 sl.iin,
+		 src.pay_month,
+		 src.sum_pay,
+		 sswh.min_so(src.pay_month),
+		 (sswh.min_so(src.pay_month)-src.sum_pay) as sum_debt,
+		 src.debt_date date_debt,
+		 src.check_date,
+		 af.ctrl_date,
+		 sum(si.sum_pay)
+	from success_list sl
+	   , src_list src
+	   , after_ctrl af
+	   , loader.si_member_2 si
+	where src.p_rnn=sl.bin
+	and   src.pay_month=sl.pay_month
+	and   src.sicid=sl.sicid
+	and   sl.bin=af.bin
 
-		and   si.sicid(+)=sl.sicid
-		and   si.pay_date>=src.check_date
-		and   si.pay_month(+)=sl.pay_month
-		and   si.p_rnn(+)=sl.bin
-		group by
-			   src.rfbn_id,
-			   sl.bin,
-			   src.cnt_worker,
-			   sl.iin,
-			   src.pay_month,
-			   src.sum_pay,
-			   min_so(src.pay_month),
-			   (min_so(src.pay_month)-src.sum_pay),
-			   src.debt_date,
-			   src.check_date,
-			   af.ctrl_date
-		order by bin, iin, pay_month desc
-		"""
+	and   si.sicid(+)=sl.sicid
+	and   si.pay_date>=src.check_date
+	and   si.pay_month(+)=sl.pay_month
+	and   si.p_rnn(+)=sl.bin
+	group by
+		 src.rfbn_id,
+		 sl.bin,
+		 src.cnt_worker,
+		 sl.iin,
+		 src.pay_month,
+		 src.sum_pay,
+		 sswh.min_so(src.pay_month),
+		 (sswh.min_so(src.pay_month)-src.sum_pay),
+		 src.debt_date,
+		 src.check_date,
+		 af.ctrl_date
+	order by bin, iin, pay_month desc
+"""
 
 
 def format_worksheet(worksheet, common_format):
