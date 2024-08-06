@@ -82,9 +82,6 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2, 16, 'Статус', common_format)
 	
 
-
-
-
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')

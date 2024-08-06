@@ -2,7 +2,7 @@ import xlsxwriter
 import datetime
 import os.path
 from logger import log
-import cx_Oracle
+import oracledb
 
 # from cx_Oracle import SessionPool
 # con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
@@ -124,9 +124,9 @@ def make_report(init_report_path: str, rfpm_id: str, date_from: str, date_to: st
         log.info(f'Отчет уже существует {file_name}')
         return file_name
     else:
-        cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
+        oracledb.init_oracle_client(lib_dir='c:/instantclient_21_3')
         #cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
-        with cx_Oracle.connect(user='sswh', password='sswh', dsn="172.16.17.12/gfss", encoding="UTF-8") as connection:
+        with oracledb.connect(user='sswh', password='sswh', dsn="172.16.17.12:1521/gfss", encoding="UTF-8") as connection:
             workbook = xlsxwriter.Workbook(file_path)
 
             title_format = workbook.add_format({'align': 'center', 'font_color': 'black'})

@@ -1,4 +1,4 @@
-from   db_config import report_db_user, report_db_password, report_db_dsn
+import configparser
 import xlsxwriter
 import datetime
 from   util.logger import log
@@ -158,7 +158,17 @@ def do_report(file_name: str, date_first: str):
 		log.info(f'Отчет уже существует {file_name}: {date_first}')
 		return file_name
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+
+	config = configparser.ConfigParser()
+	config.read('db_config.ini')
+	
+	ora_config = config['rep_db_60']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
+	
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
