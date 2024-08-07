@@ -48,6 +48,7 @@ REPORT_ABSENT = Отчет отсутствует
 REPORT_GET = Получить отчет
 REPORT_ID = Номер отчета
 REPORT_DATE = Дата отчета
+REPORT_MISTAKE = Ошибка формирования
 RFPM_ID = Код выплаты
 RFBN_ID = Код региона
 DATE_FIRST = Первая дата

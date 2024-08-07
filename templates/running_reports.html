@@ -48,6 +48,10 @@
                     <td class="td_s">
                         <a class="a_s2" href="/uploads/{{el['path']}}">{{ res_value('REPORT_GET') }}</a>
                     </td>
+                    {% elsif el['status'] == 3 or el['status'] == '3' %}
+                    <td class="td_s">
+                        <a class="a_s2" href="/uploads/{{el['path']}}">{{ res_value('REPORT_MISTAKE') }}</a>
+                    </td>
                     {% else %}
                     <td class="td_s">
                         <a class="a_s">{{ res_value('REPORT_PREPARING') }}</a>
@@ -74,7 +78,7 @@
                         {% endif %}
                     </td>
 
-                    {% if el['status'] == 2 %}
+                    {% if el['status'] == 2 or el['status'] == 3 %}
                     <td class="td_s">
                         <a class="a_s2" href="/remove-reports/{{ el['date_event'] }}/{{ el['num'] }}">{{ res_value('REMOVE_REPORT') }}</a>
                     </td>

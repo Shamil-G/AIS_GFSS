@@ -1,4 +1,4 @@
-import configparser
+from configparser import ConfigParser
 import xlsxwriter
 import datetime
 from   util.logger import log
@@ -14,29 +14,27 @@ report_code = 'minCO.01'
 stmt_load = "begin sswh.load_min_so_history.make; end;"
 
 stmt_report = """
-			select
-				  nvl(rb.RFBN_ID, 'нет') rfbn_area, --Код района
-				  rb.NAME name_area,	--Район
-				  m.p_rnn,				--БИН/ИИН предприятия
-				  nvl(n.name_ip, n.fio) name_org,	--Наименование предприятия
-				  m.cnt_worker,			-- Общее количество сотрудников
-				  p.rn iin,
-				  m.PAY_MONTH,
-				  m.sum_pay,
-				  min_so(m.PAY_MONTH) as base_size,
-				  min_so(m.PAY_MONTH) - m.sum_pay as debt
-			from min_so_history m, person p
-				 , rfrr_id_region r
-				 , nk_minfin_iin n
-				 , rfbn_branch_site rb
-			where trunc(m.ctrl_date,'MM')=trunc(to_date(:control_month,'YYYY-MM-DD'),'MM')
-			and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -13)
-			and   m.p_rnn = r.id(+)
-			and   m.p_rnn = n.iin(+)
-			and   m.sicid = p.sicid
-			and   r.rfbn_id = rb.RFBN_ID(+)
-			AND   coalesce(r.typ, 'I') = 'I'
-			order by 1,2,3
+		select
+			nvl(k.rfbn_id, 'нет') rfbn_area, --Код района
+			k.name name_area,  --Район
+			m.p_rnn,        --БИН/ИИН предприятия
+			nvl(o.nm_ru, 'Неопределено') name_org, --Наименование предприятия
+			m.cnt_worker,     -- Общее количество сотрудников
+			p.iin,
+			m.PAY_MONTH,
+			m.sum_pay,
+			sswh.min_so(m.PAY_MONTH) as base_size,
+			sswh.min_so(m.PAY_MONTH) - m.sum_pay as debt
+		from sswh.min_so_history m, 
+			 loader.person p,
+			 loader.rfon_organization o,
+			 loader.rfbn_kato k
+		where trunc(m.ctrl_date,'MM')=trunc(to_date(:control_month,'YYYY-MM-DD'),'MM')
+		and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -13)
+		and   m.p_rnn = o.bin(+)
+		and   m.sicid = p.sicid
+		and   substr(o.cato,1,2)||'00'=k.kato(+)
+		order by 1,3,4
 	"""
 
 
@@ -88,7 +86,7 @@ def do_report(file_name: str, date_first: str):
 		return file_name
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 	
-	config = configparser.ConfigParser()
+	config = ConfigParser()
 	config.read('db_config.ini')
 	
 	ora_config = config['rep_db_60']
@@ -170,10 +168,18 @@ def do_report(file_name: str, date_first: str):
 			cursor.execute(stmt_load)
 
 			log.info(f'REPORT {report_code}. CREATE REPORT')
-			cursor.execute(stmt_report, control_month=date_first)
 
+			try:
+				cursor.execute(stmt_report, control_month=date_first)
+			except oracledb.DatabaseError as e:
+				error, = e.args
+				log.error(f"ERROR. REPORT {report_code}. error_code: {error.code}, error: {error.message}\n{stmt_report}")
+				set_status_report(file_name, 3)
+				return
+			finally:
+				log.info(f'REPORT: {report_code}. Выборка из курсора завершена')
+			
 			log.info(f'REPORT: {report_code}. Формируем выходную EXCEL таблицу')
-			#cursor.execute(stmt_3)
 
 			records = []
 			records = cursor.fetchall()

@@ -45,6 +45,7 @@ REPEATE_PASSWORD = Повторите пароль:
 REPORT_ABSENT = Отчет отсутствует
 REPORT_GET = Получить отчет
 REPORT_PREPARING = Отчет готовится
+REPORT_MISTAKE = Ошибка формирования
 ROLE = Роль
 SHORT_DESCR = Краткое описание:
 SOFT_DEVELOPERS = Разработчик ПО

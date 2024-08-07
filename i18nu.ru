@@ -48,6 +48,7 @@ REPORT_GET = Получить отчет
 REPORT_ID = Номер отчета
 REPORT_PREPARING = Отчет готовится
 REPORT_STATUS = Статус
+REPORT_MISTAKE = Ошибка формирования
 ROLE = Роль
 RUNNING_REPORTS = Выполняющиеся отчеты
 SHORT_DESCR = Краткое описание:
