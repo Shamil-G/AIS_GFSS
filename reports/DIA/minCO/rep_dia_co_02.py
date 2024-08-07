@@ -1,4 +1,4 @@
-import configparser
+from configparser import ConfigParser
 import xlsxwriter
 import datetime
 from   util.logger import log
@@ -63,7 +63,7 @@ stmt_report = """
 		 and h.p_rnn=L.bin
 		 and p.sicid=h.sicid
 	)
-	select
+	select /*+ parallel(4) */
 		 src.rfbn_id,
 		 sl.bin,
 		 src.cnt_worker,
@@ -159,7 +159,7 @@ def do_report(file_name: str, date_first: str):
 		return file_name
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 
-	config = configparser.ConfigParser()
+	config = ConfigParser()
 	config.read('db_config.ini')
 	
 	ora_config = config['rep_db_60']
@@ -240,10 +240,17 @@ def do_report(file_name: str, date_first: str):
 			cursor.execute(stmt_load)
 
 			log.info(f'REPORT {report_code}. CREATE REPORT')
-			cursor.execute(stmt_report)
+			try:
+				cursor.execute(stmt_report)
+			except oracledb.DatabaseError as e:
+				error, = e.args
+				log.error(f"ERROR. REPORT {report_code}. error_code: {error.code}, error: {error.message}\n{stmt_report}")
+				set_status_report(file_name, 3)
+				return
+			finally:
+				log.info(f'REPORT: {report_code}. Выборка из курсора завершена')
 
 			log.info(f'REPORT: {report_code}. Формируем выходную EXCEL таблицу')
-			#cursor.execute(stmt_3)
 
 			records = []
 			records = cursor.fetchall()
