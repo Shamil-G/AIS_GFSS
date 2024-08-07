@@ -1,6 +1,6 @@
 from typing import List, Any
 import os.path
-from app_config import debug
+from app_config import debug_level
 from reports_gfss_parameter import BASE, platform
 from util.logger import log
 
@@ -45,7 +45,7 @@ class I18N:
         return return_value
 
     def close(self):
-        if debug:
+        if debug_level>2:
             log.debug("I18N. CLOSE")
         for file in self.files:
             file.close()
