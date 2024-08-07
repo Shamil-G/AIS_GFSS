@@ -14,7 +14,7 @@ report_code = 'minCO.01'
 stmt_load = "begin sswh.load_min_so_history.make; end;"
 
 stmt_report = """
-		select
+		select /*+ parallel(4) */
 			nvl(k.rfbn_id, 'нет') rfbn_area, --Код района
 			k.name name_area,  --Район
 			m.p_rnn,        --БИН/ИИН предприятия
@@ -33,7 +33,7 @@ stmt_report = """
 		and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -13)
 		and   m.p_rnn = o.bin(+)
 		and   m.sicid = p.sicid
-		and   substr(o.cato,1,2)||'00'=k.kato(+)
+		and   substr(o.cato,1,4)=k.kato(+)
 		order by 1,3,4
 	"""
 
