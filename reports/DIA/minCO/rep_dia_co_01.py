@@ -33,7 +33,8 @@ stmt_report = """
 		and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -13)
 		and   m.p_rnn = o.bin(+)
 		and   m.sicid = p.sicid
-		and   substr(o.cato,1,4)=substr(k.cato_reg,1,4)		order by 1,3,4
+		and   substr(o.cato,1,4)=substr(k.cato_reg,1,4)		
+		order by 1,3,4
 	"""
 
 
