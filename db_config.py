@@ -6,13 +6,11 @@ if platform == 'unix':
     pool_min = 0
     pool_max = 40
     pool_inc = 10
-    Debug = True
     username = 'reports'
 else:
     pool_min = 4
     pool_max = 10
     pool_inc = 4
-    Debug = True
     username = 'reports_test'
 
 report_db_dsn = '172.16.17.12:1521/gfss'
@@ -20,9 +18,15 @@ report_db_user = 'sswh'
 report_db_password = 'sswh'
 dsn = '192.168.20.60:1521/gfssdb.gfss.kz'
 password = 'reports'
-timeout = 15       # В секундах. Время простоя, после которого курсор освобождается
-wait_timeout = 15000  # Время (в миллисекундах) ожидания доступного сеанса в пуле, перед тем как выдать ошибку
+
+expire_time = 15  # количество минут между отправкой keepalive
+timeout = 300     # В секундах. Время простоя, после которого курсор освобождается
+wait_timeout = 2000  # Время (в миллисекундах) ожидания доступного сеанса в пуле, перед тем как выдать ошибку
 max_lifetime_session = 180  # Время в секундах, в течении которого может существоват сеанс
+retry_count = 5
+retry_delay = 1
+
+Debug = True
 
 log.info(f"=====> DB CONFIG. platform: {platform}, ORACLE_HOME: {ORACLE_HOME}, DSN: {dsn}")
 
