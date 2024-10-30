@@ -211,7 +211,7 @@ def do_report(file_name: str, date_first: str):
 			money_format.set_align('vcenter')
 
 			now = datetime.datetime.now()
-			start_time = now().strftime("%H:%M:%S")
+			start_time = now.strftime("%H:%M:%S")
 			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
 			worksheet = workbook.add_worksheet('Список')
 			sql_sheet = workbook.add_worksheet('SQL')
