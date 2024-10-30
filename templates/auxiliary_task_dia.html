@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block body %}
-<form action="/load_minso_dia" class="form_aux" style="padding-left: 1%" method="POST" id="form_input">
+<form action="/load_minso_dia" class="form_aux" style="padding-left: 1%" method="POST" id="form_input" enctype="multipart/form-data">
     <a style="color: #ddd; text-decoration: none; padding: 2px 0px">01. {{ res_value('LOAD_LIST_ORG_MINSO') }}</a>
     <br>
     <label class="upload-file__label" for="file" id="label_file_input">

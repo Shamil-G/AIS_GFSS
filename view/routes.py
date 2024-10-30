@@ -1,12 +1,14 @@
-from reports_gfss_parameter import platform
-from app_config import REPORT_PATH, debug_level
-from main_app import app, log
 from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory, g
 from flask_login import  login_required
+from werkzeug.utils import secure_filename
+import os
+
+from reports_gfss_parameter import platform
+from app_config import REPORT_PATH, debug_level, UPLOAD_PATH
+from main_app import app, log
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
 from model.auxiliary_task import load_minso_dia
 from model.call_report import call_report, check_report
-import os
 from model.manage_user import change_passwd
 from model.reports import list_reports_by_day
 from model.manage_reports import remove_report
@@ -221,9 +223,14 @@ def view_auxiliary_task_dia():
 def view_load_minso_dia():
     if 'Администратор ДИА' in g.user.roles:
         if request.method == "POST":
-            file_name = request.form['file']
-            count, mess = load_minso_dia(file_name)
-            session['aux_info'] = mess
-            log.info(f"VIEW_LOAD_MINSO. LOAD_FILE: {file_name}, loaded: {count} row, mess: {mess}")
+            log.info(f'request: {request}')
+            uploaded_file = request.files['file']
+            if uploaded_file.filename!='':
+                secure_fname = secure_filename(uploaded_file.filename)
+                file_name = os.path.join(UPLOAD_PATH,secure_fname)
+                uploaded_file.save(file_name)
+                count, mess = load_minso_dia(file_name)
+                session['aux_info'] = mess
+                log.info(f"VIEW_LOAD_MINSO. LOAD_FILE: {file_name}, loaded: {count} row, mess: {mess}")
     return redirect(url_for('view_auxiliary_task_dia'))
 
