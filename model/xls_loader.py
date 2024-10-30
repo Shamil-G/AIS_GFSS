@@ -124,7 +124,7 @@ def load_excel(file_name, table_name: str, columns: list):
                         log.info(f'{stmt_load}, PARAMS: {params}')
                     except oracledb.DatabaseError as e:
                         error, = e.args
-                        log.error(f"{stmt_load}, PARAMS: {params}\n\t\t\t\tERROR_MESSAGE for LINE {cnt_rows+1}: {error.message}\n")
+                        log.error(f"ERROR: {stmt_load}, PARAMS: {params}\n\t\t\t\t\tLINE {cnt_rows+1}: {error.message}\n")
                                         
                     # plsql_execute(cursor, 'load_excel', stmt_load, params)
                     # cnt_rows=cnt_rows+1
