@@ -2,10 +2,13 @@ from   db_config import report_db_user, report_db_password, report_db_dsn
 import oracledb
 from  db.connect import plsql_execute
 from openpyxl import load_workbook
-from util.logger import log
+from util.logger import init_logger_loads_file
 import datetime
 import os.path
 import csv
+
+
+log = init_logger_loads_file
 
 
 def create_insert_command(t_name, cols: list):
@@ -96,7 +99,7 @@ def load_excel(file_name, table_name: str, columns: list):
 
     wb = load_workbook(path)
     sheet_number = len(wb.worksheets)
-    log.info(f"Книга загружена. Всего листов: {sheet_number}, путь: {path}")
+    log.info(f"Книга загружена. Всего листов: {sheet_number}, путь: {path}\nНачинается загрузка таблицы: {table_name}")
     sheet = wb.active
 
     cnt_rows=0
@@ -118,10 +121,10 @@ def load_excel(file_name, table_name: str, columns: list):
                     try:
                         cursor.execute(stmt_load, params)
                         cnt_rows=cnt_rows+1
-                        log.info(f'SUCCESS: {stmt_load}, PARAMS: {params}')
+                        log.info(f'{stmt_load}, PARAMS: {params}')
                     except oracledb.DatabaseError as e:
                         error, = e.args
-                        log.error(f"ERROR : {stmt_load}, PARAMS: {params}\nerror_message: {error.code} : {error.message}\n")
+                        log.error(f"{stmt_load}, PARAMS: {params}\n\t\t\t\tERROR_MESSAGE for LINE {cnt_rows+1}: {error.message}\n")
                                         
                     # plsql_execute(cursor, 'load_excel', stmt_load, params)
                     # cnt_rows=cnt_rows+1
