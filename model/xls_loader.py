@@ -124,11 +124,11 @@ def load_excel(file_name, table_name: str, columns: list):
                         current_row=current_row+1
                         cursor.execute(stmt_load, params)
                         cnt_rows=cnt_rows+1
-                        log_file.write(f'{now.strftime("%d-%m-%Y %H:%M:%S")} - INFO  - {stmt_load}, PARAMS: {params}')
+                        log_file.write(f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} - INFO  - {stmt_load}, PARAMS: {params}')
                     except oracledb.DatabaseError as e:
                         error, = e.args
-                        log_file.write(f"ERROR: {stmt_load}, PARAMS: {params}\n\t\t\t\t\t\tLINE {current_row}: {error.message}\n")
-                        log.error(f"ERROR: {stmt_load}, PARAMS: {params}\n\t\t\t\t\t\tLINE {current_row}: {error.message}\n")
+                        log_file.write(f"{datetime.datetime.now()} - ERROR - {stmt_load}, PARAMS: {params}\n\t\t\t\t\t\tLINE {current_row}: {error.message}\n")
+                        log.error(f"{stmt_load}, PARAMS: {params}\n\t\t\t\t\t\tLINE {current_row}: {error.message}\n")
                                         
                     # plsql_execute(cursor, 'load_excel', stmt_load, params)
                     # cnt_rows=cnt_rows+1
