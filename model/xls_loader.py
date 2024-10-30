@@ -1,14 +1,12 @@
 from   db_config import report_db_user, report_db_password, report_db_dsn
 import oracledb
 from  db.connect import plsql_execute
+from  app_config import LOG_PATH
+from  util.logger import log
 from openpyxl import load_workbook
-from util.logger import init_logger_loads_file
 import datetime
 import os.path
 import csv
-
-
-log = init_logger_loads_file()
 
 
 def create_insert_command(t_name, cols: list):
@@ -80,7 +78,7 @@ def load_excel(file_name, table_name: str, columns: list):
 
     if not file_name.endswith('.xlsx') and not file_name.endswith('.xls'):
         mess = f"Файл {file_name} не является EXCEL файлом"
-        log.error(mess)    
+        log.info(mess)    
         return 0, mess
     
     count_columns, stmt_load = create_insert_command(table_name, columns)
@@ -97,9 +95,12 @@ def load_excel(file_name, table_name: str, columns: list):
         log.info(mess)
         return 0, mess
 
+    log_file = open(f'{LOG_PATH}/load_{table_name}.log','w')
+
     wb = load_workbook(path)
     sheet_number = len(wb.worksheets)
     log.info(f"Книга загружена. Всего листов: {sheet_number}, путь: {path}\nНачинается загрузка таблицы: {table_name}")
+    log_file.write(f"Книга {file_name} загружена. Всего листов: {sheet_number}, путь: {path}\nНачинается загрузка таблицы: {table_name}")
     sheet = wb.active
 
     cnt_rows=0
@@ -108,6 +109,7 @@ def load_excel(file_name, table_name: str, columns: list):
             # CLEAR TABLE BEFORE LOAD
             cursor.execute(f'truncate table {table_name}')
             params = []
+            current_row = 0
             for sheet in wb.worksheets:
                 for i in range(2, sheet.max_row+1):
                     params.clear()
@@ -119,17 +121,21 @@ def load_excel(file_name, table_name: str, columns: list):
                         else:
                             params.append(sheet.cell(row=i, column=col).value)
                     try:
+                        current_row=current_row+1
                         cursor.execute(stmt_load, params)
                         cnt_rows=cnt_rows+1
-                        log.info(f'{stmt_load}, PARAMS: {params}')
+                        log_file.write(f'{now.strftime("%d-%m-%Y %H:%M:%S")} - INFO  - {stmt_load}, PARAMS: {params}')
                     except oracledb.DatabaseError as e:
                         error, = e.args
-                        log.error(f"ERROR: {stmt_load}, PARAMS: {params}\n\t\t\t\t\tLINE {cnt_rows+1}: {error.message}\n")
+                        log_file.write(f"ERROR: {stmt_load}, PARAMS: {params}\n\t\t\t\t\t\tLINE {current_row}: {error.message}\n")
+                        log.error(f"ERROR: {stmt_load}, PARAMS: {params}\n\t\t\t\t\t\tLINE {current_row}: {error.message}\n")
                                         
                     # plsql_execute(cursor, 'load_excel', stmt_load, params)
                     # cnt_rows=cnt_rows+1
                 now = datetime.datetime.now()
-                log.info(f'Загрузка sheet {sheet} завершена.\n+++++ Загружено {cnt_rows}/{sheet.max_row} записей. {now.strftime("%d-%m-%Y %H:%M:%S")}')
+                log.info(f'Загрузка sheet {sheet} завершена.\n+++++ Загружено {cnt_rows}/{sheet.max_row}({current_row}) записей. {now.strftime("%d-%m-%Y %H:%M:%S")}')
+                log_file.write(f"{now.strftime("%d-%m-%Y %H:%M:%S")} - INFO  - Загрузка sheet {sheet} завершена.\n+++++ Загружено {cnt_rows}/{sheet.max_row}({current_row}) записей. {now.strftime("%d-%m-%Y %H:%M:%S")}")
+                log_file.close()                
             cursor.execute('commit')
     return cnt_rows, f'Загружено {cnt_rows} строк'
 

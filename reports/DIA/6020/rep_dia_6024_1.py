@@ -6,9 +6,10 @@ from   util.logger import log
 from   model.call_report import set_status_report
 import oracledb
 
+# Тестовый режим
 
-report_name = 'Список лиц, которым назначена социальная выплата на случай потери дохода в связи с беременностью и родами, усыновлением/удочерением ребенка'
-report_code = '6020.4'
+report_name = 'Список лиц, которым назначена социальная выплата 0704 и которые платили сами за себя'
+report_code = '6020.4.1'
 
 stmt_1 = """
 SELECT 
