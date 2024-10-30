@@ -115,13 +115,13 @@ def load_excel(file_name, table_name: str, columns: list):
                             params.append(str.strip(sheet.cell(row=i, column=col).value))
                         else:
                             params.append(sheet.cell(row=i, column=col).value)
-                    log.info(f'-----------------------------------------------------\n{stmt_load}\nPARAMS: {params}')
                     try:
                         cursor.execute(stmt_load, params)
                         cnt_rows=cnt_rows+1
+                        log.info(f'SUCCESS: {stmt_load}, PARAMS: {params}')
                     except oracledb.DatabaseError as e:
                         error, = e.args
-                        log.error(f"ERROR ------execute------> FNAME: XLS_LOADER\nargs: {params}\nerror: {error.code} : {error.message}")
+                        log.error(f"ERROR : {stmt_load}, PARAMS: {params}\nerror_message: {error.code} : {error.message}\n")
                                         
                     # plsql_execute(cursor, 'load_excel', stmt_load, params)
                     # cnt_rows=cnt_rows+1
