@@ -279,7 +279,7 @@ def do_report(file_name: str, date_first: str):
 			now = datetime.datetime.now()
 			stop_time = now.strftime("%H:%M:%S")
 
-			worksheet.write(1, 11, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({start_time} - {stop_time})', date_format_italic)
+			worksheet.write(1, 10, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({start_time} - {stop_time})', date_format_italic)
 
 			workbook.close()
 			set_status_report(file_name, 2)
