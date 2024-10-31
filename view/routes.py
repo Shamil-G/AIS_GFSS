@@ -229,8 +229,10 @@ def view_load_minso_dia():
                 secure_fname = secure_filename(uploaded_file.filename)
                 file_name = os.path.join(UPLOAD_PATH,secure_fname)
                 uploaded_file.save(file_name)
-                count, mess = load_minso_dia(file_name)
+                count, all_cnt, table_name, mess = load_minso_dia(file_name)
                 session['aux_info'] = mess
-                log.info(f"VIEW_LOAD_MINSO. LOAD_FILE: {file_name}, loaded: {count} row, mess: {mess}")
+                log.info(f"VIEW_LOAD_MINSO. LOAD_FILE: {file_name}, loaded: {count}/{all_cnt} , mess: {mess}")
+                if count<all_cnt:
+                    return send_from_directory(UPLOAD_PATH, f'load_{table_name}.log')                
     return redirect(url_for('view_auxiliary_task_dia'))
 

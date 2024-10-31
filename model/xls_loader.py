@@ -137,7 +137,7 @@ def load_excel(file_name, table_name: str, columns: list):
                 log_file.write(f"{now.strftime("%d-%m-%Y %H:%M:%S")} - INFO  - Загрузка sheet {sheet} завершена.\n+++++ Загружено {cnt_rows}/{sheet.max_row}({current_row}) записей. {now.strftime("%d-%m-%Y %H:%M:%S")}\n")
                 log_file.close()                
             cursor.execute('commit')
-    return cnt_rows, f'Загружено {cnt_rows} строк'
+    return cnt_rows, current_row, f'Загружено {cnt_rows}/{current_row} строк'
 
 
 if __name__ == "__main__":
