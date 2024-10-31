@@ -12,28 +12,37 @@ report_name = 'Список лиц, которым назначена социа
 report_code = '6020.4.1'
 
 stmt_1 = """
-SELECT 
-          sfa.rfbn_id code_region, --"Код региона",
-          sfa.rfpm_id rfpm, --"Код выплаты",
-          p.rn rnn, --"ИИН",
-          p.lastname || ' ' || p.firstname || ' ' || p.middlename fio,--"ФИО",
-          case when p.sex=0 then 'ж' else 'м' end sx,--"Пол",
-          sfa.birthdate,
-          sfa.risk_date risk,--"Дата риска",
-		  sfa.date_approve d_resh, --"Дата решения",
-          sfa.sum_avg sumavg,--"СМД, тенге",
-          sfa.ksu sfa_ksu, --"КСУ",
-          sfa.kzd sfa_kzd,--"КЗД",
-          sfa.mrzp sfa_mrzp,--"МЗП",
-          sfa.count_donation donation,--"Количество месяцев",
-          sfa.sum_all sfa_all, --"Назначенный размер, тенге"
-          case when p.status in (4,2) then 'Умерший' else 'Получатель' end status
-        FROM sipr_maket_first_approve_2 sfa, person p
-        WHERE sfa.sicp_id = p.sicid
-        AND substr(sfa.rfpm_id,1,4) = '0704'
-        AND sfa.date_approve >= to_date(:d1,'yyyy-mm-dd') 
-		And sfa.date_approve < to_date(:d2,'yyyy-mm-dd') + 1
-        order by rfbn_id, p.lastname
+SELECT --/*+parallel(4)*/
+      sfa.rfbn_id code_region, --"Код региона",
+      sfa.rfpm_id rfpm, --"Код выплаты",
+      p.rn rnn, --"ИИН",
+      p.lastname || ' ' || p.firstname || ' ' || p.middlename fio,--"ФИО",
+      case when p.sex=0 then 'ж' else 'м' end sx,--"Пол",
+      sfa.birthdate,
+      sfa.risk_date risk,--"Дата риска",
+      sfa.date_approve d_resh, --"Дата решения",
+      sfa.sum_avg sumavg,--"СМД, тенге",
+      sfa.ksu sfa_ksu, --"КСУ",
+      sfa.kzd sfa_kzd,--"КЗД",
+      sfa.mrzp sfa_mrzp,--"МЗП",
+      sfa.count_donation donation,--"Количество месяцев",
+      sfa.sum_all sfa_all, --"Назначенный размер, тенге"
+      case when p.status in (4,2) then 'Умерший' else 'Получатель' end status
+FROM sipr_maket_first_approve_2 sfa, person p
+WHERE sfa.sicp_id = p.sicid
+AND substr(sfa.rfpm_id,1,4) = '0704'
+AND sfa.date_approve >= to_date(:d1,'yyyy-mm-dd') 
+And sfa.date_approve < to_date(:d2,'yyyy-mm-dd') + 1
+and p.rn not in (
+    select p2.rn 
+    from si_member_2 si, person p2
+    where si.sicid=p.sicid
+    and  p2.rn!=si.p_rnn
+    and  si.pay_date >= add_months(sfa.risk_date, -12)
+    and  si.pay_date <= sfa.risk_date
+    and  p2.rn=p.rn
+)
+order by rfbn_id, p.lastname
 """
 
 active_stmt = stmt_1

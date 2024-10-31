@@ -127,7 +127,7 @@ def load_excel(file_name, table_name: str, columns: list):
                         log_file.write(f'{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} - INFO  - {stmt_load}, PARAMS: {params}\n')
                     except oracledb.DatabaseError as e:
                         error, = e.args
-                        log_file.write(f"{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} - ERROR - {stmt_load}, PARAMS: {params}\n\t\t\t\t\t\tLINE {current_row}: {error.message}\n")
+                        log_file.write(f"{datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} - ERROR - {stmt_load}, PARAMS: {params}\n\t\t\t\tLINE {current_row}: {error.message}\n")
                         log.error(f"{stmt_load}, PARAMS: {params}\n\t\t\t\t\t\t LINE {current_row}: {error.message}\n")
                                         
                     # plsql_execute(cursor, 'load_excel', stmt_load, params)
