@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 import os
 
 from reports_gfss_parameter import platform
-from app_config import REPORT_PATH, debug_level, UPLOAD_PATH
+from app_config import REPORT_PATH, debug_level, LOG_PATH
 from main_app import app, log
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
 from model.auxiliary_task import load_minso_dia
@@ -227,12 +227,14 @@ def view_load_minso_dia():
             uploaded_file = request.files['file']
             if uploaded_file.filename!='':
                 secure_fname = secure_filename(uploaded_file.filename)
-                file_name = os.path.join(UPLOAD_PATH,secure_fname)
+                file_name = os.path.join(LOG_PATH,secure_fname)
                 uploaded_file.save(file_name)
                 count, all_cnt, table_name, mess = load_minso_dia(file_name)
                 session['aux_info'] = mess
                 log.info(f"VIEW_LOAD_MINSO. LOAD_FILE: {file_name}, loaded: {count}/{all_cnt} , mess: {mess}")
                 if count<all_cnt:
-                    return send_from_directory(UPLOAD_PATH, f'load_{table_name}.log')                
+                    log.info(f"VIEW_LOAD_MINSO. DOWNLOAD LOG with ERROR: {LOG_PATH}/load_{secure_fname}.log")
+                    return send_from_directory(LOG_PATH, f'load_{table_name}.log')                
+    log.info(f"VIEW_LOAD_MINSO. info: {session['aux_info']}")
     return redirect(url_for('view_auxiliary_task_dia'))
 
