@@ -3,7 +3,7 @@ from util.logger import log
 import redis
 
 if platform == 'unix':
-    pool_min = 0
+    pool_min = 1
     pool_max = 40
     pool_inc = 10
     username = 'reports'
@@ -19,12 +19,13 @@ report_db_password = 'sswh'
 dsn = '192.168.20.60:1521/gfssdb.gfss.kz'
 password = 'reports'
 
-expire_time = 15  # количество минут между отправкой keepalive
+expire_time = 2  # количество минут между отправкой keepalive
+tcp_connect_timeout = 5 # Кол-во секунд ождания установления соединения
 timeout = 300     # В секундах. Время простоя, после которого курсор освобождается
 wait_timeout = 2000  # Время (в миллисекундах) ожидания доступного сеанса в пуле, перед тем как выдать ошибку
 max_lifetime_session = 180  # Время в секундах, в течении которого может существоват сеанс
-retry_count = 5
-retry_delay = 1
+retry_count = 1
+retry_delay = 2
 
 Debug = True
 
