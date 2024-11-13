@@ -29,6 +29,7 @@ _pool = oracledb.create_pool(user=cfg.username,
                              min=cfg.pool_min, max=cfg.pool_max, 
                              increment=cfg.pool_inc,
                              expire_time=cfg.expire_time,
+                             tcp_connect_timeout=cfg.tcp_connect_timeout,
                              session_callback=init_session)
 
 log.info(f'Пул соединенй БД Oracle создан. Timeout: {_pool.timeout}, wait_timeout: {_pool.wait_timeout}, '

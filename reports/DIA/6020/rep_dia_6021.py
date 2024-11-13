@@ -30,7 +30,7 @@ SELECT
           sfa.count_donation donation,--"Количество месяцев",
           sfa.sum_all sfa_all, --"Назначенный размер, тенге"
           case when p.status in (4,2) then 'Умерший' else 'Получатель' end status
-        FROM loader.sipr_maket_first_approve_2 sfa, loader.person p
+        FROM sswh.sipr_maket_first_approve_2 sfa, sswh.person p
         WHERE sfa.sicp_id = p.sicid
         AND substr(sfa.rfpm_id,1,4) = '0701'
         and sfa.date_approve >= to_date(:d1,'yyyy-mm-dd') 
@@ -91,7 +91,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 	config = configparser.ConfigParser()
 	config.read('db_config.ini')
 	
-	ora_config = config['rep_db_60']
+	ora_config = config['rep_db_12']
 	db_user=ora_config['db_user']
 	db_password=ora_config['db_password']
 	db_dsn=ora_config['db_dsn']
