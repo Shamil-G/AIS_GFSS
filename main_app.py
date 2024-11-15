@@ -1,6 +1,7 @@
 from __init__ import app, log
 import app_config as cfg
-from db.user_login import * 
+#from db.user_login import * 
+from ldap.user_login import *
 from view.routes import *
 
 

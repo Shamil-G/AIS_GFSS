@@ -3,7 +3,7 @@ import logging.config
 from logging.handlers import RotatingFileHandler
 import reports_gfss_parameter as cfg
 import app_config as cfg_app
-from app_config import debug_level
+from app_config import debug
 
 
 def init_logger():
@@ -11,7 +11,7 @@ def init_logger():
     # logging.getLogger('PDD').addHandler(logging.StreamHandler(sys.stdout))
     # Console
     logging.getLogger('REPORTS-GFSS').addHandler(logging.StreamHandler())
-    if debug_level>2:
+    if debug>2:
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
