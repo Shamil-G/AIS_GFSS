@@ -83,7 +83,7 @@ def login_page():
                 log.info(f'LOGIN_PAGE. SUCCESS AUTHORITY. GOTO NEXT PAGE: {next_page}')
                 return redirect(next_page)
             else:
-                return redirect(url_for('view_systems'))
+                return redirect(url_for('view_root'))
         else:
             log.error(f'LOGIN_PAGE. FAIL USERNAME. {session['username']}')
         flash("Имя пользователя или пароль неверны")
