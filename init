@@ -1,8 +1,9 @@
-python3 -m venv venv
+#python3 -m venv venv
 PROJECT_DIR=$HOME/REPORTS_GFSS
 . $PROJECT_DIR/venv/bin/activate
+echo 'DIR' $PROJECT_DIR
 pip install --upgrade pip
-#pip install flask
+pip install flask
 #pip install flask_login
 #pip install oracledb
 #pip install requests
@@ -12,5 +13,5 @@ pip install --upgrade pip
 #pip install redis
 #pip install openpyxl
 #python main_app.py
-pip3 install ldap3
+pip install ldap3
 gunicorn
