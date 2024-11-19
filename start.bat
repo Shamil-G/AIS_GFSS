@@ -1,7 +1,6 @@
-set VIRTUAL_ENV=C:/Projects/AIS_GFSS/venv
-rem python -m venv venv
-rem call %VIRTUAL_ENV%/bin/activate
-call %VIRTUAL_ENV%/Scripts/activate.bat
+python -m venv venv
+rem . /home/reports/REPORTS_GFSS/venv/bin/activate
+call C:\Projects\REPORTS_GFSS\venv\Scripts\activate.bat
 
 python -m pip install --upgrade pip
 pip install oracledb
@@ -11,5 +10,6 @@ pip install redis
 pip install flask_session
 pip install openpyxl
 pip install requests
+pip install ldap3
 rem pip freeze > requirements.txt
 python main_app.py

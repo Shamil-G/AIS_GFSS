@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 import os
 
 from reports_gfss_parameter import platform
-from app_config import REPORT_PATH, debug_level, LOG_PATH
+from app_config import REPORT_PATH, LOG_PATH
 from main_app import app, log
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
 from model.auxiliary_task import load_minso_dia
@@ -44,20 +44,20 @@ def utility_processor():
 @login_required
 def view_root():
     owners = get_owner_reports()
-    if debug_level > 1 and 'username' in session:
-        log.info(f"VIEW_ROOT. USERNAME: {session['username']}")
+    if 'username' in session:
+        log.debug(f"VIEW_ROOT. USERNAME: {session['username']}")
     return render_template("index.html", owner_cursor=owners)
 
 
 @app.route('/dep/<string:dep_name>', methods=['GET','POST'])
 @login_required
 def view_set_dep(dep_name):
-    log.info(f'SET_DEP: {dep_name}')
+    log.debug(f'SET_DEP: {dep_name}')
     #if request.method == 'POST':
     session['dep_name'] = dep_name
+    log.debug(f"DEP_NAME: {session['dep_name']}")
     list_groups = get_list_groups()
-    if debug_level > 2:
-        log.info(f"DEP_NAME: {session['dep_name']}, LIST_GROUPS: {list_groups}")
+    log.debug(f"DEP_NAME: {session['dep_name']}, LIST_GROUPS: {list_groups}")
     return render_template("list_grps.html", cursor=list_groups)
 
 
@@ -65,10 +65,11 @@ def view_set_dep(dep_name):
 @login_required
 def view_set_grp_name(grp):
     session['grp_name'] = str(grp)
+    log.debug(f'+++ SET GRP NAME. GRP_NAME: {grp}')
+    grps = get_list_reports()
+    log.debug(f'+++ GROUPS: {grps}')
     if request.method == 'GET':
-        if debug_level > 2:
-            log.info(f'SET GRP NAME. GRP: {grp}')
-        return render_template("list_reports.html", cursor=get_list_reports())
+        return render_template("list_reports.html", cursor=grps)
 
 
 @app.route('/extract-params/<int:rep_number>', methods=['GET', 'POST'])
@@ -76,6 +77,7 @@ def view_set_grp_name(grp):
 def view_extract_params(rep_number):
     rep_num = str(rep_number).zfill(2)
     session['rep_code'] = rep_num
+    log.debug(f'+++ VIEW EXTRACT PARAMS: {rep_number}')
     for rep in get_list_reports():
         if rep_num == rep.get('num'):
             params = rep.get('params')
@@ -104,8 +106,7 @@ def view_set_params():
         for parm in list_params:
             p = request.form[parm]
             new_params[parm] = p
-        if debug_level > 3:
-            log.info(f"EDIT_PARAMS. REP_CODE: {rep_code}, new_params: {new_params}")
+        log.debug(f"EDIT_PARAMS. REP_CODE: {rep_code}, new_params: {new_params}")
         #Если параметры вытащили, то вызовем отчет
         if new_params:
             rep_code = session['rep_code']
@@ -114,8 +115,7 @@ def view_set_params():
                     report = rep
                     report['params'] = new_params
                     result = call_report(session['dep_name'], session['grp_name'], session['rep_code'], new_params)
-                    if debug_level > 3:
-                        log.info(f"EDIT_PARAMS. RESULT: {result}, PARAMS: {new_params}, report: {report}")
+                    log.debug(f"EDIT_PARAMS. RESULT: {result}, PARAMS: {new_params}, report: {report}")
                     if 'status' in result:
                         status = result['status']
                         # 0 - отчет начал готовится
@@ -172,11 +172,9 @@ def view_running_reports():
         session['request_date'] = date.today().strftime('%Y-%m-%d')
     if request.method == "POST":
         session['request_date'] = request.form['request_date']
-    if debug_level > 2:
-        log.info(f"RUNNING REPORTS. REQUEST DATE: {session['request_date']}")
+    log.debug(f"RUNNING REPORTS. REQUEST DATE: {session['request_date']}")
     list_reports = list_reports_by_day(session['request_date'])
-    if debug_level > 2:
-        log.info(f'RUNNING REPORTS. LIST REPORTS: {list_reports}')
+    log.debug(f'RUNNING REPORTS. LIST REPORTS: {list_reports}')
     return render_template("running_reports.html", list = list_reports, request_date=session['request_date'])
 
 
@@ -187,8 +185,7 @@ def uploaded_file(full_path):
     path, file_name = os.path.split(full_path)
     if full_path.startswith(REPORT_PATH):
         status = check_report(full_path)
-        if debug_level > 2:
-            log.info(f"UPLOADED_FILE. STATUS: {status} : {type(status)}, PATH: {path}, file_name: {file_name}, REPORT_PATH: {REPORT_PATH}")
+        log.debug(f"UPLOADED_FILE. STATUS: {status} : {type(status)}, PATH: {path}, file_name: {file_name}, REPORT_PATH: {REPORT_PATH}")
         if status == 2:
             log.info(f"UPLOADED_FILE. PATH: {path}, FILE_NAME: {file_name}")
             return send_from_directory(path, file_name)

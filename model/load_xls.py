@@ -1,7 +1,7 @@
 from db.connect import get_connection, plsql_execute
 import loads_config as cfg
-from openpyxl import load_workbook
-from model.logger import log
+from   openpyxl import load_workbook
+from   util.logger import log
 import datetime
 import os.path
 import csv

@@ -1,15 +1,8 @@
-from typing import List, Any
 from flask import render_template, request, redirect, flash, url_for, g, session
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user
-from util.get_i18n import get_i18n_value
-from werkzeug.security import check_password_hash, generate_password_hash
-from db.connect import get_connection
 from main_app import app, log
-import app_config as cfg
-from reports_gfss_parameter import public_name
 from model.manage_user import get_user_roles, server_logout
 from util.ip_addr import ip_addr
-import oracledb
 
 
 login_manager = LoginManager(app)
@@ -67,8 +60,7 @@ class User:
 
 @login_manager.user_loader
 def loader_user(id_user):
-    if cfg.debug_level > 1:
-        log.debug(f"LM. Loader ID User: {id_user}")
+    log.debug(f"LM. Loader ID User: {id_user}")
     return User().get_user_by_name(id_user)
 
 

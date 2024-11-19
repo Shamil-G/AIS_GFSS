@@ -11,7 +11,7 @@ def init_logger():
     # logging.getLogger('PDD').addHandler(logging.StreamHandler(sys.stdout))
     # Console
     logging.getLogger('REPORTS-GFSS').addHandler(logging.StreamHandler())
-    if debug>2:
+    if debug:
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)

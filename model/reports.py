@@ -1,4 +1,3 @@
-from app_config import debug_level
 from main_app import log
 from db.connect import get_connection
 from datetime import datetime
@@ -46,19 +45,16 @@ def list_reports_by_day(request_day):
     current_day = datetime.today().strftime('%Y-%m-%d')
     results = []
     stmt = ''
-    if debug_level > 2:
-        log.info(f'LIST REPORTS BY DAY. request_day: {request_day}, current_day: {current_day}')
+    log.info(f'LIST REPORTS BY DAY. request_day: {request_day}, current_day: {current_day}')
     with get_connection() as connection:
         with connection.cursor() as cursor:
-            if debug_level > 1:
-                log.info(f'LIST REPORTS BY DAY. CURSOR CREATED')
+            log.debug(f'LIST REPORTS BY DAY. CURSOR CREATED')
             if first_day(request_day) == request_day or last_day(request_day) == request_day:
                 stmt = stmt_list_reports_month
             else:
                 stmt = stmt_list_reports
             cursor.execute(stmt, i_date=request_day)
-            if debug_level > 3:
-                log.info(f'LIST REPORTS BY DAY. request_day: {request_day}\n--------\n{stmt}\n--------')
+            log.debug(f'LIST REPORTS BY DAY. request_day: {request_day}\n--------\n{stmt}\n--------')
             rows = cursor.fetchall() 
             if rows:
                 for row in rows:
@@ -82,7 +78,6 @@ def list_reports_by_day(request_day):
                                  "rfpm_id": row[4], "rfbn_id": row[5], 
                                  "name": row[6], "live_time": row[7], "status": status, "path": row[9]}
                         results.append(info)
-                        if debug_level > 1:
-                            log.info(f"LIST REPORTS BY DAY. status: {info['status']}, exist: {file_exist}, path: {info['path']}")
+                        log.debug(f"LIST REPORTS BY DAY. status: {info['status']}, exist: {file_exist}, path: {info['path']}")
                 rows.clear()
     return results

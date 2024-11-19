@@ -4,6 +4,7 @@ from app_config import ldap_admins, ldap_server, ldap_user, ldap_password, ldap_
 from util.ip_addr import ip_addr
 from util.logger import log
 from ldap.ldap_user_info import connect_ldap
+from model.manage_user import get_user_roles
 
        
 class LDAP_User:
@@ -15,7 +16,7 @@ class LDAP_User:
             self.password = session['password']
         if src_user:
             success, user_info = connect_ldap(src_user, self.password)
-            log.debug(f'LM. success: {success}, html_user: {src_user}, password: {self.password}, user_info: {user_info}')
+            log.debug(f'LDAP LM. SUCCESS: {success}, html_user: {src_user}, password: {self.password}, user_info: {user_info}')
             if success > 0:
                 login_name=''
                 full_name=''
@@ -39,20 +40,21 @@ class LDAP_User:
                 session['full_name'] = full_name 
                 self.post = post
                 session['post'] = post
-                self.dep_name = dep_name
-                session['dep_name'] = dep_name
+                self.depname = dep_name
+                session['depname'] = dep_name
                 self.ou = ou
                 session['ou'] = ou
                 
-                # log.debug(f'ldap_admins: {ldap_admins}')
-                
+                result = get_user_roles(full_name, self.password, ip)
+                self.roles=result['roles']
+
                 if session['full_name'] in ldap_admins:
                     session['admin']=1
                 
                 self.ip_addr = ip
-                log.info(f"LM. SUCCESS. USERNAME: {self.username}, ip_addr: {self.ip_addr}\n\tFIO: {self.full_name}\n\tadmin: {session['admin']}")
+                log.info(f"LDAP LM. SUCCESS. \n\tUSERNAME: {self.username}, ip_addr: {self.ip_addr}\n\tFIO: {self.full_name}\n\tadmin: {session['admin']}\n\troles: {self.roles}")
                 return self
-        log.info(f"LM. FAIL. USERNAME: {src_user}, ip_addr: {ip}, password: {session['password']}, admin: {session['admin']}")
+        log.debug(f"LDAP LM. FAIL. \n\tUSERNAME: {src_user}, ip_addr: {ip}, password: {session['password']}\n\tadmin: {session['admin']}")
         return None
 
     def have_role(self, role_name):

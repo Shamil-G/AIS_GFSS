@@ -2,8 +2,6 @@ from ldap3 import Server, Connection, SUBTREE
 from flask import session
 
 from main_app import log
-from app_config import debug_level
-from ldap3 import Server, Connection, SUBTREE
 from app_config import ldap_admins, ldap_server, ldap_user, ldap_password, ldap_ignore_ou, ldap_boss
 
 
@@ -34,14 +32,14 @@ def connect_ldap(username:str, password:str):
     
     if status==1:
         principalName = user_info['principalName']
-        log.info(f'NOW CONNECT as {principalName} : {password}')
+        log.debug(f'NOW CONNECT as {principalName} : {password}')
         conn_usr = get_connect(principalName, password)
 
         if conn_usr:
-            log.info(f'CONNECT LDAP. SUCCESS. USER_INFO: {user_info}')
+            log.debug(f'CONNECT LDAP. SUCCESS. USER_INFO: {user_info}')
             return 1, user_info
         
-    log.info(f'---\nUSER NOT FOUND user: {username} : {password}.\nMISTAKE !!!\n---------------------------')
+    log.info(f'---\nUSER NOT FOUND user: {username}\nMISTAKE !!!\n---------------------------')
     return 0,''
 
 
@@ -63,7 +61,7 @@ def search_user(username:str):
     conn_src.unbind()
     # Connection closed
     if len(users_list)>1:
-        log.info(f'SEARCH USER. ERROR. TOO MANY USERS. count: {len(users_list)}, username: {username}')
+        log.debug(f'SEARCH USER. ERROR. TOO MANY USERS. count: {len(users_list)}, username: {username}')
 
     for user in users_list:
         dn = user['distinguishedName']
@@ -110,16 +108,16 @@ def ldap_user_info(username:str):
     if not username:
         log.info(f'\n---\nLDAP_USER_INFO\n\tEMPTY USER_NAME!!!\n---')
     if username:
-        log.info(f'\n---\nLDAP_USER_INFO\n\tNOW SEARCH_USER: {username}\n---')
+        log.debug(f'\n---\nLDAP_USER_INFO\n\tNOW SEARCH_USER: {username}\n---')
         ou, user_info = search_user(username)
-        log.info(f'\n---\nLDAP_USER_INFO\n\tFOUND USERS: {len(user_info)}\n\t{user_info}\n---')
+        log.debug(f'\n---\nLDAP_USER_INFO\n\tFOUND USERS: {len(user_info)}\n\t{user_info}\n---')
         dep=''
         if user_info:
             dep = search_dep(ou)
             if dep:
                 user_info['ou_name']=dep['ou_name']
                 user_info['dep_name']=dep['dep_name']
-                log.info(f'\n---\nLDAP_USER_INFO. {user_info}, DEPS: {dep}\n---')
+                log.debug(f'\n---\nLDAP_USER_INFO. {user_info}, DEPS: {dep}\n---')
                 return 1, user_info
             
         log.info(f'ERROR. LDAP_USER_INFO. ou: {ou}, user: {user_info}, dep: {dep}')

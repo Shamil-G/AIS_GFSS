@@ -3,7 +3,7 @@ from reports_gfss_parameter import BASE
 styles = 'styles'
 
 debug=False
-debug_level = 2
+
 host = 'localhost'
 port=5090
 src_lang = 'file'

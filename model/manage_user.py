@@ -1,4 +1,4 @@
-from app_config import URL_LOGIN, debug_level
+from app_config import URL_LOGIN
 from reports_gfss_parameter import public_name
 from main_app import log
 import requests
@@ -11,8 +11,7 @@ def get_user_roles(username, passwd, ip):
         resp = requests.post(url, json=request_json)
         status = resp.status_code
         if status == 200:
-            if debug_level > 2:
-                log.info(f'-----> GET USER ROLES. resp: {resp}, status: {status}, request_json: {request_json}')
+            log.debug(f'-----> GET USER ROLES. resp: {resp}, status: {status}, request_json: {request_json}')
             resp_json = resp.json()
         else:
             log.error(f'\nERROR GET USER ROLES. "username": {username}, URL: {url}, status: {status}')
@@ -36,8 +35,7 @@ def get_user_roles(username, passwd, ip):
         log.error(f'---> GET USER ROLES. URL: {url}, ERROR: {e}')
         resp_json = {"mistake": f'{e}', "username": username, "roles": []}
     finally:
-        if debug_level > 2:
-            log.info(f"GET ROLES. FINALLY. USERNAME: {username}, resp_json: {resp_json}")
+        log.info(f"GET ROLES. FINALLY. USERNAME: {username}, resp_json: {resp_json}")
         return resp_json
 
 
@@ -48,8 +46,7 @@ def change_passwd(username, passwd, new_passwd):
         resp = requests.post(url, json=request_json)
         status = resp.status_code
         if status == 200:
-            if debug_level > 2:
-                log.info(f'-----> GET CHANGE PASSWORD. resp: {resp}, status: {status}, request_json: {request_json}')
+            log.debug(f'-----> GET CHANGE PASSWORD. resp: {resp}, status: {status}, request_json: {request_json}')
             resp_json = resp.json()
         else:
             log.error(f'\nERROR CHANGE PASSWORD. "username": {username}, URL: {url}, status: {status}')
@@ -73,8 +70,7 @@ def change_passwd(username, passwd, new_passwd):
         log.error(f'=====> GET CHANGE PASSWORD. URL: {url}, ERROR: {e}')
         resp_json = {"mistake": f'{e}', "username": username, "roles": []}
     finally:
-        if debug_level > 2:
-            log.info(f"CHANGE PASSWORD. FINALLY. USERNAME: {username}, resp_json: {resp_json}")
+        log.info(f"CHANGE PASSWORD. FINALLY. USERNAME: {username}, resp_json: {resp_json}")
         return resp_json
 
 
@@ -85,8 +81,7 @@ def user_info(username):
         resp = requests.post(url, json=request_json)
         status = resp.status_code
         if status == 200:
-            if debug_level > 2:
-                log.info(f'-----> GET CHANGE PASSWORD. resp: {resp}, status: {status}, request_json: {request_json}')
+            log.debug(f'-----> GET CHANGE PASSWORD. resp: {resp}, status: {status}, request_json: {request_json}')
             resp_json = resp.json()
         else:
             log.error(f'\nERROR GET USER INFO. "username": {username}, URL: {url}, status: {status}')
@@ -110,8 +105,7 @@ def user_info(username):
         log.error(f'=====> ERROR. request user-info. URL: {url}, ERROR: {e}')
         resp_json = {"mistake": f'{e}', "username": username, "roles": []}
     finally:
-        if debug_level > 2:
-            log.info(f"REQUEST USER INFO. FINALLY. USERNAME: {username}, resp_json: {resp_json}")
+        log.info(f"REQUEST USER INFO. FINALLY. USERNAME: {username}, resp_json: {resp_json}")
         return resp_json
 
 
@@ -122,8 +116,7 @@ def server_logout(id_user):
         resp = requests.post(url, json=request_json)
         status = resp.status_code
         if status == 200:
-            if debug_level > 2:
-                log.info(f'-----> USER LOGOUT. resp: {resp}, status: {status}, request_json: {request_json}')
+            log.debug(f'-----> USER LOGOUT. resp: {resp}, status: {status}, request_json: {request_json}')
             resp_json = resp.json()
         else:
             log.error(f'\nERROR GET USER INFO. "id_user": {id_user}, URL: {url}, status: {status}')
@@ -147,6 +140,5 @@ def server_logout(id_user):
         log.error(f'=====> ERROR. request user-info. URL: {url}, ERROR: {e}')
         resp_json = {"mistake": f'{e}', "id_user": {id_user}, "roles": []}
     finally:
-        if debug_level > 2:
-            log.info(f"REQUEST USER INFO. FINALLY. id_user: {id_user}, resp_json: {resp_json}")
+        log.debug(f"REQUEST USER INFO. FINALLY. id_user: {id_user}, resp_json: {resp_json}")
         return resp_json

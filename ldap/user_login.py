@@ -3,10 +3,9 @@ from flask_login import LoginManager, login_required, logout_user, login_user, c
 from os import environ
 
 from ldap.ldap_login import LDAP_User
-from ldap.ldap_user_info import ldap_user_info
 # from db.connect import get_connection
 from main_app import app, log
-import app_config as cfg
+from app_config import styles
 # from gfss_parameter import public_name
 from util.ip_addr import ip_addr
 
@@ -20,8 +19,7 @@ log.debug("user_login стартовал...")
 
 @login_manager.user_loader
 def loader_user(id_user):
-    if cfg.debug_level > 1:
-        log.debug(f"LM. Loader ID User: {id_user}")
+    log.debug(f"LM. Loader ID User: {id_user}")
     # return User().get_user_by_name(id_user)
     return LDAP_User().get_user_by_name(id_user)
 
@@ -62,7 +60,7 @@ def login_page():
     if "STYLE" in environ:
         session['styles']=environ["STYLES"]
     else:
-        session['styles']=cfg.styles
+        session['styles']=styles
     
     if '_flashes' in session:
          session['_flashes'].clear()
