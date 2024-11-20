@@ -1,5 +1,5 @@
 import multiprocessing
-from reports_gfss_parameter import app_name, BASE
+from gfss_parameter import app_name, BASE
 from app_config import port
 
 bind = f"localhost:{port}"
