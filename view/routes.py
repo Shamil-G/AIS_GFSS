@@ -106,7 +106,7 @@ def view_set_params():
         for parm in list_params:
             p = request.form[parm]
             new_params[parm] = p
-        log.debug(f"EDIT_PARAMS. REP_CODE: {rep_code}, new_params: {new_params}")
+        log.debug(f"EDIT_PARAMS. new_params: {new_params}")
         #Если параметры вытащили, то вызовем отчет
         if new_params:
             rep_code = session['rep_code']
@@ -166,15 +166,15 @@ def view_running_reports():
 def uploaded_file(full_path):
     if platform == 'unix' and not full_path.startswith('/'):
         full_path = f'/{full_path}'
-    path, file_name = path.split(full_path)
+    file_path, file_name = path.split(full_path)
     if full_path.startswith(REPORT_PATH):
         status = check_report(full_path)
-        log.debug(f"UPLOADED_FILE. STATUS: {status} : {type(status)}, PATH: {path}, file_name: {file_name}, REPORT_PATH: {REPORT_PATH}")
+        log.debug(f"UPLOADED_FILE. STATUS: {status} : {type(status)}, PATH: {file_path}, file_name: {file_name}, REPORT_PATH: {REPORT_PATH}")
         if status == 2:
-            log.info(f"UPLOADED_FILE. PATH: {path}, FILE_NAME: {file_name}")
-            return send_from_directory(path, file_name)
+            log.info(f"UPLOADED_FILE. PATH: {file_path}, FILE_NAME: {file_name}")
+            return send_from_directory(file_path, file_name)
     else:
-        log.info(f"UPLOADED_FILE. FULL_PATH: {full_path}\nsplit_path: {path}\nreprt_path: {REPORT_PATH}")
+        log.info(f"UPLOADED_FILE. FULL_PATH: {full_path}\nsplit_path: {file_path}\nreprt_path: {REPORT_PATH}")
     return redirect(url_for('view_running_reports'))
 
 

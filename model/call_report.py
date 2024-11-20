@@ -1,5 +1,5 @@
 import importlib
-# import os
+from os import path, mkdir
 
 from   db.connect import select_one, get_connection, plsql_execute
 from   main_app import log
@@ -64,8 +64,8 @@ create unique index XN_LOAD_REPORT_STATUS_DATE_EXECUTE_NUM on LOAD_REPORT_STATUS
         
 
 def check_dir(dir_path: str):
-    if not os.path.isdir(dir_path):
-        os.mkdir(dir_path)
+    if not path.isdir(dir_path):
+        mkdir(dir_path)
         
         
 
