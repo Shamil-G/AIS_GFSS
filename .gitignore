@@ -4,6 +4,7 @@ venv/
 /.vs
 *.xlsx
 /env
+/spool
 *.txt
 /.idea
 ais_gfss_parameter.py
