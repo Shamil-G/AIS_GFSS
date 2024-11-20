@@ -1,8 +1,8 @@
 # from concurrent.futures.thread import BrokenThreadPool
 # from gc import enable
-from socket import close
+# from socket import close
 import db_config as cfg
-from reports_gfss_parameter import LD_LIBRARY_PATH
+from gfss_parameter import LD_LIBRARY_PATH
 from util.logger import log
 from util.ip_addr import ip_addr 
 import oracledb

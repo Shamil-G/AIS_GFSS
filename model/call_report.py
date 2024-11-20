@@ -1,12 +1,14 @@
-from  db.connect import select_one, get_connection, plsql_execute
-from  main_app import log
 import importlib
+# import os
+
+from   db.connect import select_one, get_connection, plsql_execute
+from   main_app import log
 from   app_config import REPORT_PATH
-from   reports_gfss_parameter import platform
+from   gfss_parameter import platform
 from   model.list_reports import dict_reports
 from   model.manage_reports import remove_report
 from   util.trunc_date import get_year
-import os
+
 
 
 stmt_table = """

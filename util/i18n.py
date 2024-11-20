@@ -1,6 +1,7 @@
 from typing import List, Any
-import os.path
-from reports_gfss_parameter import BASE, platform
+from os import path
+
+from gfss_parameter import BASE, platform
 from util.logger import log
 
 
@@ -25,7 +26,7 @@ class I18N:
                 break
             n_objects = n_objects + 1
 
-        if file_object == '' and os.path.exists(file_name):
+        if file_object == '' and path.exists(file_name):
             log.debug(f"---------->  I18N. FILE EXIST : {file_name}")
             file = open(file_name, "r")
             if file is not None:

@@ -1,6 +1,7 @@
-from reports_gfss_parameter import platform, ORACLE_HOME
+from gfss_parameter import platform, ORACLE_HOME
 from util.logger import log
-import redis
+from redis import from_url
+# import redis
 
 if platform == 'unix':
     pool_min = 1
@@ -41,11 +42,11 @@ class SessionConfig:
     if platform!='unix':
         #SESSION_TYPE = "filesystem"
         SESSION_TYPE = 'redis'
-        SESSION_REDIS = redis.from_url('redis://@192.168.20.33:6379')
+        SESSION_REDIS = from_url('redis://@192.168.20.33:6379')
     else:
         #SESSION_TYPE = "filesystem"
         SESSION_TYPE = 'redis'
-        SESSION_REDIS = redis.from_url('redis://@192.168.20.33:6379')
+        SESSION_REDIS = from_url('redis://@192.168.20.33:6379')
     SESSION_USE_SIGNER = True
     # SESSION_REDIS = Redis(host='10.15.15.11', port='6379')
     # SESSION_PERMANENT = False

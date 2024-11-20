@@ -1,5 +1,5 @@
 from flask import  request
-from reports_gfss_parameter import platform, http_ip_context
+from gfss_parameter import platform, http_ip_context
 
 
 def ip_addr():

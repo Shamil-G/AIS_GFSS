@@ -1,4 +1,4 @@
-from reports_gfss_parameter import app_name
+from gfss_parameter import app_name
 
 from flask import Flask
 from util.logger import log

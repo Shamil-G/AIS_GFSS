@@ -5,6 +5,7 @@ from util.ip_addr import ip_addr
 from util.logger import log
 from ldap.ldap_user_info import connect_ldap
 from model.manage_user import get_user_roles
+from gfss_parameter import public_name
 
        
 class LDAP_User:
@@ -45,7 +46,7 @@ class LDAP_User:
                 self.ou = ou
                 session['ou'] = ou
                 
-                result = get_user_roles(full_name, self.password, ip)
+                result = get_user_roles(public_name, full_name, ip)
                 self.roles=result['roles']
 
                 if session['full_name'] in ldap_admins:

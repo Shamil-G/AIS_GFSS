@@ -1,19 +1,19 @@
+from os import path
 from flask import  session, flash, request, render_template, redirect, url_for, send_from_directory, g
 from flask_login import  login_required
 from werkzeug.utils import secure_filename
-import os
 
-from reports_gfss_parameter import platform
+from gfss_parameter import platform
 from app_config import REPORT_PATH, LOG_PATH
 from main_app import app, log
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
 from model.auxiliary_task import load_minso_dia
 from model.call_report import call_report, check_report
-from model.manage_user import change_passwd
 from model.reports import list_reports_by_day
 from model.manage_reports import remove_report
 from datetime import date
 from util.get_i18n import get_i18n_value
+# from model.manage_user import change_passwd
 
 
 list_params = []
@@ -124,8 +124,8 @@ def view_set_params():
                         # Если отчет готов(status==2), то выслать его получателю
                         if status == 2:
                             if 'file_path' in result:
-                                row_path = os.path.normpath(result['file_path'])
-                                head_tail = os.path.split(row_path)
+                                row_path = path.normpath(result['file_path'])
+                                head_tail = path.split(row_path)
                                 file_path = str(head_tail[0])
                                 file_name = str(head_tail[1])
                                 log.info(f"EDIT_PARAMS. SEND REPORT. FILE_PATH: {file_path}, FILE_NAME: {file_name}")
@@ -147,22 +147,6 @@ def set_language(lang):
         return redirect(url_for('view_root'))
 
 
-@app.route('/change-passwd', methods=['POST', 'GET'])
-def view_change_password():
-    log.info(f"CHANGE PASSWORD")
-    if '_flashes' in session:
-        session['_flashes'].clear()
-    if request.method == "POST":
-        passwd_1 = request.form['password_1']
-        passwd_2 = request.form['password_2']
-        if passwd_1 != passwd_2:
-            flash('Пароли не совпадают')
-        else:
-            change_passwd(session['username'], session['password'], passwd_1)
-            return redirect(url_for('view_root'))
-    return render_template("change_passwd.html")
-
-
 @app.route('/running-reports', methods=['POST', 'GET'])
 @login_required
 def view_running_reports():
@@ -182,7 +166,7 @@ def view_running_reports():
 def uploaded_file(full_path):
     if platform == 'unix' and not full_path.startswith('/'):
         full_path = f'/{full_path}'
-    path, file_name = os.path.split(full_path)
+    path, file_name = path.split(full_path)
     if full_path.startswith(REPORT_PATH):
         status = check_report(full_path)
         log.debug(f"UPLOADED_FILE. STATUS: {status} : {type(status)}, PATH: {path}, file_name: {file_name}, REPORT_PATH: {REPORT_PATH}")
@@ -224,7 +208,7 @@ def view_load_minso_dia():
             uploaded_file = request.files['file']
             if uploaded_file.filename!='':
                 secure_fname = secure_filename(uploaded_file.filename)
-                file_name = os.path.join(LOG_PATH,secure_fname)
+                file_name = path.join(LOG_PATH,secure_fname)
                 uploaded_file.save(file_name)
                 count, all_cnt, table_name, mess = load_minso_dia(file_name)
                 session['aux_info'] = mess
@@ -235,3 +219,17 @@ def view_load_minso_dia():
     log.info(f"VIEW_LOAD_MINSO. info: {session['aux_info']}")
     return redirect(url_for('view_auxiliary_task_dia'))
 
+# @app.route('/change-passwd', methods=['POST', 'GET'])
+# def view_change_password():
+#     log.info(f"CHANGE PASSWORD")
+#     if '_flashes' in session:
+#         session['_flashes'].clear()
+#     if request.method == "POST":
+#         passwd_1 = request.form['password_1']
+#         passwd_2 = request.form['password_2']
+#         if passwd_1 != passwd_2:
+#             flash('Пароли не совпадают')
+#         else:
+#             change_passwd(session['username'], session['password'], passwd_1)
+#             return redirect(url_for('view_root'))
+#     return render_template("change_passwd.html")

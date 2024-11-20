@@ -1,4 +1,4 @@
-from reports_gfss_parameter import BASE
+from gfss_parameter import BASE
 
 styles = 'styles'
 
