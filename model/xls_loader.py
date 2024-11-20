@@ -1,9 +1,11 @@
+from configparser import ConfigParser
+from openpyxl import load_workbook
+
 from   db_config import report_db_user, report_db_password, report_db_dsn
 import oracledb
 from  db.connect import plsql_execute
 from  app_config import LOG_PATH
 from  util.logger import log
-from openpyxl import load_workbook
 import datetime
 import os.path
 import csv
@@ -103,8 +105,17 @@ def load_excel(file_name, table_name: str, columns: list):
     log_file.write(f"Книга {file_name} загружена. Всего листов: {sheet_number}, путь: {path}\nНачинается загрузка таблицы: {table_name}")
     sheet = wb.active
 
+    config = ConfigParser()
+    
+    config.read('db_config.ini')
+
+    ora_config = config['sswh_db_60']
+    db_user=ora_config['db_user']
+    db_password=ora_config['db_password']
+    db_dsn=ora_config['db_dsn']
+    
     cnt_rows=0
-    with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+    with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
         with connection.cursor() as cursor:
             # CLEAR TABLE BEFORE LOAD
             cursor.execute(f'truncate table {table_name}')
