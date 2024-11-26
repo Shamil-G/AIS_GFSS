@@ -8,7 +8,7 @@ from   model.manage_reports import set_status_report
 
 
 report_name = 'Участники ЕП'
-report_code = 'CP.02'
+report_code = 'ЕП.02'
 
 stmt_1 = """
       Select  

@@ -8,7 +8,7 @@ from   model.manage_reports import set_status_report
 
 
 report_name = 'Участники ЕП в разрезе областей'
-report_code = 'CP.03'
+report_code = 'ЕП.03'
 
 stmt_1 = """
       select coalesce(rg.name, 'Неопределен'), 

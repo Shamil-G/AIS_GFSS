@@ -7,8 +7,8 @@ from   util.logger import log
 from   model.manage_reports import set_status_report
 
 
-report_name = 'Списочная часть чистых ЕП-шников(СВ)'
-report_code = 'ЕП.04'
+report_name = 'Списочная часть смешанных ПЗ-шников(СВ)'
+report_code = 'ПЗ.05'
 
 stmt_2 = """
 with all_data as (
@@ -21,24 +21,24 @@ with all_data as (
                and    si.pay_date > add_months(sfa.risk_date,-24)
          ),
 ep as (
-               select sicid, rfbn_id, iin, rfpm_id, risk_date, sum_avg, kzd,mrzp, count_donation, sum_all, date_approve
+               select unique sicid
                from   all_data a
-               where  nvl(a.type_payment,'U')='О'
+               where  nvl(a.type_payment,'U')='PZ'
          )
         ,
 non_ep as (
                select unique sicid
                from   all_data a
-               where  nvl(a.type_payment,'U')!='О' --or type_payer is null
+               where  nvl(a.type_payment,'U')!='PZ' --or type_payer is null
          )
-select ep.sicid, ep.rfbn_id, ep.iin, ep.rfpm_id, ep.risk_date, ep.sum_avg, ep.kzd, ep.mrzp, ep.count_donation, ep.sum_all, ep.date_approve
+select a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd, a.mrzp, a.count_donation, a.sum_all, a.date_approve
 from (
-      select unique sicid from ep
-      minus
-      select unique sicid from non_ep
-     )b, ep
-where b.sicid=ep.sicid
-group by ep.sicid, ep.rfbn_id, ep.iin, ep.rfpm_id, ep.risk_date, ep.sum_avg, ep.kzd, ep.mrzp, ep.count_donation, ep.sum_all, ep.date_approve
+      select sicid from ep
+      intersect
+      select sicid from non_ep
+     )b, all_data a
+where b.sicid=a.sicid
+group by a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd, a.mrzp, a.count_donation, a.sum_all, a.date_approve
 """
 
 active_stmt = stmt_2
@@ -167,10 +167,10 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					cnt_part = 0
 
 			# Шифр отчета
-			worksheet.write(0, 8, report_code, title_name_report)
+			worksheet.write(0, 7, report_code, title_name_report)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 8, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 7, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
