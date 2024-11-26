@@ -7,8 +7,8 @@ from   db_config import report_db_user, report_db_password, report_db_dsn
 from   model.manage_reports import set_status_report
 
 
-report_name = 'Участники ЕП'
-report_code = 'ЕП.01'
+report_name = 'Участники ПЗ'
+report_code = 'ПЗ.01'
 
 stmt_1 = """
 	select /*+ parallel (4)*/
@@ -21,7 +21,7 @@ stmt_1 = """
 		p.birthdate, 
 		floor(months_between(to_date(:dt_to, 'YYYY-MM-DD'), p.birthdate)/12) age
 	from si_member_2 pd, person p
-	where pd.type_payment = 'О'
+	where pd.type_payment = 'PZ'
 	and	  pd.knp = '012'
 	and   pd.pay_date_gfss >= to_date(:dt_from, 'YYYY-MM-DD') 
 	and   pd.pay_date_gfss <  to_date(:dt_to, 'YYYY-MM-DD') + 1

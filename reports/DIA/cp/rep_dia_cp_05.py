@@ -8,7 +8,7 @@ from   model.manage_reports import set_status_report
 
 
 report_name = 'Списочная часть смешанных ЕП-шников(СВ)'
-report_code = 'CP.05'
+report_code = 'ЕП.05'
 
 stmt_2 = """
 with all_data as (

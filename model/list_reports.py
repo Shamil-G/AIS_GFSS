@@ -256,7 +256,7 @@ dict_reports = {
             "list": 
             [
                 {
-                    "name": "Сведения о численности получателей и сумм их выплат (made by Адильханова)",
+                    "name": "Сведения о численности участников и сумм их СО",
                     "num_rep": "01",
                     "proc": "rep_dia_cp_01",
                     "data_approve": "12.07.2023",
@@ -293,6 +293,54 @@ dict_reports = {
                 "proc": "rep_dia_cp_05",
                 "data_approve": "31.10.2023",
                 "author": "Адильханова А.К.",
+                "params": {"date_first": "С", "date_second": "по"},
+                }
+            ]
+        },
+        {
+            "grp_name": "Пл.Занятость", 
+            "module_dir": f"{REPORT_MODULE_PATH}.DIA.pz",
+            "live_time": "0",
+            "list": 
+            [
+                {
+                    "name": "Сведения о численности участников и сумм их СО",
+                    "num_rep": "01",
+                    "proc": "rep_dia_pz_01",
+                    "data_approve": "26.11.2024",
+                    "author": "Гусейнов Ш.А.",
+                    "params": {"date_first": "С", "date_second": "по"},
+                },
+                {
+                "name": "Участники ПЗ, в разрезе пола и возраста",
+                "num_rep": "02",
+                "proc": "rep_dia_pz_02",
+                "data_approve": "26.11.2024",
+                "author": "Гусейнов Ш.А.",
+                "params": {"date_first": "C", "date_second": "по", "srfbn_id": "Код региона:2"},
+                },
+                {
+                "name": "Участники ПЗ, в разрезе регионов",
+                "num_rep": "03",
+                "proc": "rep_dia_pz_03",
+                "data_approve": "26.11.2024",
+                "author": "Гусейнов Ш.А.",
+                "params": {"date_first": "C", "date_second": "по"},
+                },
+                {
+                "name": "Списочная часть чистых ПЗ-шников(СВ)",
+                "num_rep": "04",
+                "proc": "rep_dia_pz_04",
+                "data_approve": "26.11.2024",
+                "author": "Гусейнов Ш.А.",
+                "params": {"date_first": "С", "date_second": "по"},
+                },
+                {
+                "name": "Списочная часть смешанных ПЗ-шников(СВ)",
+                "num_rep": "05",
+                "proc": "rep_dia_pz_05",
+                "data_approve": "26.11.2024",
+                "author": "Гусейнов Ш.А.",
                 "params": {"date_first": "С", "date_second": "по"},
                 }
             ]

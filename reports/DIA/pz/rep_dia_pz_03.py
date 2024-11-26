@@ -7,29 +7,25 @@ from   db_config import report_db_user, report_db_password, report_db_dsn
 from   model.manage_reports import set_status_report
 
 
-report_name = 'Участники ЕП'
-report_code = 'ЕП.01'
+report_name = 'Участники ПЗ в разрезе областей'
+report_code = 'ПЗ.03'
 
 stmt_1 = """
-	select /*+ parallel (4)*/
-		pd.PAY_DATE,
-		pd.sum_pay,
-		case when p.sex=0 then 'ж' else 'м' end sex,
-		rN,
-		pay_month,
-		pd.pay_date_gfss,
-		p.birthdate, 
-		floor(months_between(to_date(:dt_to, 'YYYY-MM-DD'), p.birthdate)/12) age
-	from si_member_2 pd, person p
-	where pd.type_payment = 'О'
-	and	  pd.knp = '012'
-	and   pd.pay_date_gfss >= to_date(:dt_from, 'YYYY-MM-DD') 
-	and   pd.pay_date_gfss <  to_date(:dt_to, 'YYYY-MM-DD') + 1
-    and	  pd.pay_date_gfss >= to_date('01.02.2023','dd.mm.yyyy')
-    and   pd.pay_date >= to_date('01.02.2023','dd.mm.yyyy')
-	and   pd.pay_date > (to_date(:dt_from, 'YYYY-MM-DD') - 14 )
-	and   pd.pay_date <= to_date(:dt_to, 'YYYY-MM-DD')
-	and   pd.sicid = p.sicid
+      select coalesce(rg.name, 'Неопределен'), 
+			count(unique p.sicid) cnt_all, sum(si.sum_pay) sum_pay, rg.rfrg_id
+      from  si_member_2 si, person p, rfrg_region rg
+            where si.sicid = p.sicid
+            and si.type_payment = 'PZ'
+            and si.knp = '012'
+            and si.pay_date_gfss >= to_date(:dt_from, 'yyyy-mm-dd') 
+			and si.pay_date_gfss <  to_date(:dt_to, 'yyyy-mm-dd') + 1
+            and si.pay_date_gfss  >= to_date('01.02.2023','dd.mm.yyyy')
+            and si.pay_date		  >= to_date('01.02.2023','dd.mm.yyyy')
+            and si.pay_date >= (to_date(:dt_from, 'yyyy-mm-dd') -  14)
+            and si.pay_date <= to_date(:dt_to, 'yyyy-mm-dd')
+			and substr(p.branchid,1,2) = rg.rfrg_id(+)
+      group by rg.name, rg.rfrg_id
+      order by 4
 """
 
 active_stmt = stmt_1
@@ -41,24 +37,14 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_row(3, 22)
 
 	worksheet.set_column(0, 0, 8)
-	worksheet.set_column(1, 1, 14)
+	worksheet.set_column(1, 1, 35)
 	worksheet.set_column(2, 2, 16)
-	worksheet.set_column(3, 3, 8)
-	worksheet.set_column(4, 4, 14)
-	worksheet.set_column(5, 5, 12)
-	worksheet.set_column(6, 6, 12)
-	worksheet.set_column(7, 7, 12)
-	worksheet.set_column(8, 8, 8)
+	worksheet.set_column(3, 3, 16)
 
 	worksheet.merge_range('A3:A4', '№', common_format)
-	worksheet.merge_range('B3:B4', 'Дата платежа', common_format)
-	worksheet.merge_range('C3:C4', 'Сумма СО', common_format)
-	worksheet.merge_range('D3:D4', 'Пол', common_format)
-	worksheet.merge_range('E3:E4', 'ИИН', common_format)
-	worksheet.merge_range('F3:F4', 'Период', common_format)
-	worksheet.merge_range('G3:G4', 'Дата поступления в ГФСС', common_format)
-	worksheet.merge_range('H3:H4', 'Дата рождения', common_format)
-	worksheet.merge_range('I3:I4', 'Возраст', common_format)
+	worksheet.merge_range('B3:B4', 'Регион', common_format)
+	worksheet.merge_range('C3:C4', 'Количество участников ЕП (уникальное)', common_format)
+	worksheet.merge_range('D3:D4', 'Сумма', common_format)
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
@@ -79,6 +65,10 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			title_name_report = workbook.add_format({'align': 'left', 'font_color': 'black', 'font_size': '14'})
 			title_name_report .set_align('vcenter')
 			title_name_report .set_bold()
+
+			name_format = workbook.add_format({'align': 'left', 'font_color': 'black'})
+			name_format.set_align('vcenter')
+			name_format.set_border(1)
 
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')
@@ -138,13 +128,11 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
 				for list_val in record:
-					if col in (2,4,8):
-						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col == 3:
-						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
-					if col in (1,5,6,7):
-						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
+					if col == 1:
+						worksheet.write(row_cnt+shift_row, col, list_val, name_format)
 					if col in (2,):
+						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
+					if col in (3,):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
 					col += 1
 				cnt_part += 1
@@ -153,11 +141,14 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					cnt_part = 0
 				row_cnt += 1
 
-			# Шифр отчета
-			worksheet.write(0, 5, report_code, title_name_report)
-			#
+			#worksheet.write(row_cnt+shift_row, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
+			#worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
+
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 5, f'Дата формирования: {now}', date_format_it)
+			# Шифр отчета
+			worksheet.write(0, 3, report_code, title_name_report)
+			# 
+			worksheet.write(1, 3, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
