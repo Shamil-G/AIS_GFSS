@@ -81,10 +81,10 @@ def format_worksheet(worksheet, common_format):
 
 
 def do_report(file_name: str, date_first: str):
+	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 	
 	config = ConfigParser()
 	config.read('db_config.ini')

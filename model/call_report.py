@@ -238,6 +238,7 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                                 params['file_name']=file_name
 
                                 # Получаем полный путь к файлу - результату
+                                log.info(f'CALL_REPORT. PARAMS: {params}')
 
                                 if platform == 'unix':
                                     from os import fork
