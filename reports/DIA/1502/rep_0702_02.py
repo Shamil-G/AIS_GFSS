@@ -1,3 +1,4 @@
+from configparser import ConfigParser
 import xlsxwriter
 import datetime
 import os.path
@@ -141,9 +142,17 @@ def do_report(file_name: str, date_first: str, date_second: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 	begin_report = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-	#cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
-	#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+
+	config = ConfigParser()
+	config.read('db_config.ini')
+
+	ora_config = config['rep_db_60']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
+
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
