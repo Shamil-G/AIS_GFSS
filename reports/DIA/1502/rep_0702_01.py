@@ -243,6 +243,8 @@ def do_report(file_name: str, date_first: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 
+	start_time = now.strftime("%d-%m-%Y %H:%M:%S")
+	
 	config = ConfigParser()
 	config.read('db_config.ini')
 	
@@ -314,11 +316,21 @@ def do_report(file_name: str, date_first: str):
 			cnt_part = 0
 			m_val = [0]
 
-			log.info(f'{file_name}. Загружаем данные за период {date_first}')
-			cursor.execute(active_stmt, dt_from=date_first)
+			log.info(f'Выполняем Execute для отчета: {report_code}')
+			try:
+				cursor.execute(active_stmt, dt_from=date_first)
+			except oracledb.DatabaseError as e:
+				error, = e.args
+				log.error(f"ERROR. REPORT {report_code}. error_code: {error.code}, error: {error.message}\n{stmt_report}")
+				set_status_report(file_name, 3)
+				return
+			finally:
+				log.info(f'REPORT: {report_code}. Execute выполнен')
 
+			log.info(f'Выполняем FetchAll для отчета: {report_code}')
 			records = cursor.fetchall()
 			
+			log.info(f'Для отчета: {report_code} выбираем записи из курсора за период {date_first}')
 			#for record in records:
 			for record in records:
 				col = 1
@@ -339,7 +351,7 @@ def do_report(file_name: str, date_first: str):
 					col += 1
 				cnt_part += 1
 				if cnt_part > 9999:
-					log.info(f'{file_name}. LOADED {row_cnt} records.')
+					log.info(f'В отчет {report_code} загружено {row_cnt} записей')
 					cnt_part = 0
 				row_cnt += 1
 			#worksheet.write(row_cnt+shift_row, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
@@ -351,7 +363,7 @@ def do_report(file_name: str, date_first: str):
 
 			workbook.close()
 			now = datetime.datetime.now()
-			log.info(f'Формирование отчета {file_name} завершено: {now.strftime("%d-%m-%Y %H:%M:%S")}')
+			log.info(f'Формирование отчета {report_code} завершено, время создания: {start_time} - {now.strftime("%d-%m-%Y %H:%M:%S")}, файл: {file_name}')
 			set_status_report(file_name, 2)
 			return file_name
 

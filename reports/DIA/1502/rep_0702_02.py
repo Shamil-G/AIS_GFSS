@@ -141,7 +141,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	begin_report = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+	start_time = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 
 	config = ConfigParser()
 	config.read('db_config.ini')
@@ -150,6 +150,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 	db_user=ora_config['db_user']
 	db_password=ora_config['db_password']
 	db_dsn=ora_config['db_dsn']
+
 	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
 
 	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
@@ -214,12 +215,21 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			cnt_part = 0
 			m_val = [0]
 
-			log.info(f'{file_name}. Загружаем данные за период {date_first} - {date_second}')
-			cursor.execute(active_stmt, date_first=date_first, date_second=date_second)
-
+			log.info(f'Выполняем Execute для отчета: {report_code}')
+			try:
+				cursor.execute(active_stmt, date_first=date_first, date_second=date_second)
+			except oracledb.DatabaseError as e:
+				error, = e.args
+				log.error(f"ERROR. REPORT {report_code}. error_code: {error.code}, error: {error.message}\n{stmt_report}")
+				set_status_report(file_name, 3)
+				return
+			finally:
+				log.info(f'REPORT: {report_code}. Execute выполнен')
+				
+			log.info(f'Выполняем FetchAll для отчета: {report_code}')
 			records = cursor.fetchall()
 
-			#for record in records:
+			log.info(f'Для отчета {report_code} выбираем записи из курсора за период {date_first} - {date_second}')
 			for record in records:
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
@@ -245,11 +255,10 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			# SUMMARY
 			# worksheet.write(row_cnt + shift_row, 10, m_val[0], money_format)
 
-			finish_report = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 			worksheet.write(1, 15, f'Дата отчета: {begin_report} - {finish_report}', date_format_it)
 
 			workbook.close()
-			log.info(f'Формирование отчета {file_name} завершено. {begin_report} - {finish_report}')
+			log.info(f'Формирование отчета {report_code} завершено, время создания: {start_time} - {now.strftime("%d-%m-%Y %H:%M:%S")}, файл: {file_name}')
 			set_status_report(file_name, 2)
 			return file_name
 
