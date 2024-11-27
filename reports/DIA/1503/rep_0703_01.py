@@ -1,9 +1,9 @@
+from configparser import ConfigParser
 import xlsxwriter
 import datetime
 import os.path
 import oracledb
 from   util.logger import log
-from   db_config import report_db_user, report_db_password, report_db_dsn
 from   model.call_report import set_status_report
 
 # from cx_Oracle import SessionPool
@@ -123,11 +123,22 @@ def format_worksheet(worksheet, common_format):
 
 def do_report(file_name: str, date_first: str):
 	if os.path.isfile(file_name):
-		log.info(f'Отчет уже существует {file_name}')
+		log.info(f'Отчет {report_code} уже существует: {file_name}')
 		return file_name
-	#cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
-	#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+
+	start_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
+	
+	config = ConfigParser()
+	config.read('db_config.ini')
+	
+	ora_config = config['rep_db_12']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+
+	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
+	
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
@@ -189,12 +200,22 @@ def do_report(file_name: str, date_first: str):
 			cnt_part = 0
 			m_val = [0]
 
-			log.info(f'{file_name}. Загружаем данные за период {date_first}')
-			cursor.execute(active_stmt, dt_from=date_first)
-
+			log.info(f'Выполняем Execute для отчета: {report_code}')
+			try:
+				cursor.execute(active_stmt, dt_from=date_first)
+			except oracledb.DatabaseError as e:
+				error, = e.args
+				log.error(f"ERROR. REPORT {report_code}. error_code: {error.code}, error: {error.message}\n{stmt_report}")
+				set_status_report(file_name, 3)
+				return
+			finally:
+				log.info(f'REPORT: {report_code}. Execute выполнен')
+				
+			log.info(f'Выполняем FetchAll для отчета: {report_code}')
 			records = cursor.fetchall()
 			
 			#for record in records:
+			log.info(f'Для отчета: {report_code} выбираем записи из курсора за период {date_first}')
 			for record in records:
 				col = 1
 				worksheet.write(row_cnt+shift_row, 0, row_cnt, digital_format)
@@ -214,19 +235,19 @@ def do_report(file_name: str, date_first: str):
 					col += 1
 				cnt_part += 1
 				if cnt_part > 9999:
-					log.info(f'{file_name}. LOADED {row_cnt} records.')
+					log.info(f'В отчет {report_code} загружено {row_cnt} записей')
 					cnt_part = 0
 				row_cnt += 1
 			#worksheet.write(row_cnt+shift_row, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
 
 			worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
 
-			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 17, f'Дата формирования: {now}', date_format_it)
+			stop_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
+			worksheet.write(1, 17, f'Дата формирования: {stop_time}', date_format_it)
 
 			workbook.close()
-			now = datetime.datetime.now()
-			log.info(f'Формирование отчета {file_name} завершено: {now.strftime("%d-%m-%Y %H:%M:%S")}')
+
+			log.info(f'Формирование отчета {report_code} завершено, время создания: {start_time} - {stop_time}, файл: {file_name}')
 			set_status_report(file_name, 2)
 			return file_name
 
