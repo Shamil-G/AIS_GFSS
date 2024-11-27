@@ -243,12 +243,12 @@ def do_report(file_name: str, date_first: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 
-	start_time = now.strftime("%d-%m-%Y %H:%M:%S")
+	start_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
 	
 	config = ConfigParser()
 	config.read('db_config.ini')
 	
-	ora_config = config['rep_db_60']
+	ora_config = config['rep_db_12']
 	db_user=ora_config['db_user']
 	db_password=ora_config['db_password']
 	db_dsn=ora_config['db_dsn']
@@ -358,12 +358,11 @@ def do_report(file_name: str, date_first: str):
 
 			worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
 
-			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 12, f'Дата формирования: {now}', date_format_it)
+			stop_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
+			worksheet.write(1, 12, f'Дата формирования: {stop_time}', date_format_it)
 
 			workbook.close()
-			now = datetime.datetime.now()
-			log.info(f'Формирование отчета {report_code} завершено, время создания: {start_time} - {now.strftime("%d-%m-%Y %H:%M:%S")}, файл: {file_name}')
+			log.info(f'Формирование отчета {report_code} завершено, время создания: {start_time} - {stop_time}, файл: {file_name}')
 			set_status_report(file_name, 2)
 			return file_name
 

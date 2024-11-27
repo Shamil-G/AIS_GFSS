@@ -223,7 +223,7 @@ def do_report(file_name: str, date_first: str):
 
 			workbook.close()
 			set_status_report(file_name, 2)
-			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {now}, Загруено {all_cnt} записей')
+			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {now}, Загружено {all_cnt} записей')
 
 
 def thread_report(file_name: str, date_first: str):
