@@ -92,7 +92,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	`
+
 	start_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
 	
 	config = ConfigParser()
