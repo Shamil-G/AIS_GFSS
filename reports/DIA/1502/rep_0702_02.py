@@ -220,7 +220,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				cursor.execute(active_stmt, date_first=date_first, date_second=date_second)
 			except oracledb.DatabaseError as e:
 				error, = e.args
-				log.error(f"ERROR. REPORT {report_code}. error_code: {error.code}, error: {error.message}\n{stmt_report}")
+				log.error(f"ERROR. REPORT {report_code}. error_code: {error.code}, error: {error.message}\n{active_stmt}")
 				set_status_report(file_name, 3)
 				return
 			finally:
@@ -255,10 +255,11 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			# SUMMARY
 			# worksheet.write(row_cnt + shift_row, 10, m_val[0], money_format)
 
-			worksheet.write(1, 15, f'Дата отчета: {begin_report} - {finish_report}', date_format_it)
+			stop_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
+			worksheet.write(1, 15, f'Дата отчета: {start_time} - {stop_time}', date_format_it)
 
 			workbook.close()
-			log.info(f'Формирование отчета {report_code} завершено, время создания: {start_time} - {now.strftime("%d-%m-%Y %H:%M:%S")}, файл: {file_name}')
+			log.info(f'Формирование отчета {report_code} завершено, время создания: {start_time} - {stop_time}, файл: {file_name}')
 			set_status_report(file_name, 2)
 			return file_name
 
