@@ -13,9 +13,9 @@ report_code = 'minCO.03'
 stmt_report = """
 with 
 dm as(
-  select to_date('01.'||lpad((n_q-1)*3,2,'0')||'.'||n_year,'dd.mm.yyyy') as f_month,
-         to_date('01.'||lpad((n_q-1)*3+1,2,'0')||'.'||n_year,'dd.mm.yyyy') as s_month,
-         to_date('01.'||lpad((n_q-1)*3+2,2,'0')||'.'||n_year,'dd.mm.yyyy') as t_month,
+  select to_date('01.'||lpad((n_q)*3-2,2,'0')||'.'||n_year,'dd.mm.yyyy') as f_month,
+         to_date('01.'||lpad((n_q)*3-1,2,'0')||'.'||n_year,'dd.mm.yyyy') as s_month,
+         to_date('01.'||lpad((n_q)*3,2,'0')||'.'||n_year,'dd.mm.yyyy') as t_month,
          n_year
   from (
         select
