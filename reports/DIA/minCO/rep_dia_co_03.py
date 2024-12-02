@@ -27,10 +27,10 @@ dm as(
 , aq as 
 (
     SELECT /*+PARALLEL (4)*/ 
-           trunc(pay_date, 'MM') pay_mnth, 
+           trunc(pay_date, 'MM') pay_month, 
            sicid, 
            p_rnn, 
-           pay_month, 
+           -- pay_month, 
            SUM(cnt_mzp) sum_mzp, 
            SUM(sum_pay) sum_pay 
     FROM si_member_2, dm
@@ -40,7 +40,7 @@ dm as(
     AND pay_month >= to_date('2013-02-01','yyyy-mm-dd')  -- 1 МЗП с февраля 2013 года
     AND knp in ('012')
     AND p_rnn !='160440007161'
-    GROUP BY trunc(pay_date, 'MM'), sicid, p_rnn, pay_month
+    GROUP BY trunc(pay_date, 'MM'), sicid, p_rnn --, pay_month
     HAVING SUM(cnt_mzp) < 1
 ) 
 SELECT
