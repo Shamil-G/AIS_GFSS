@@ -24,25 +24,35 @@ dm as(
         from dual
        )
 )
-, aq as 
-(
+, aq_src as (
     SELECT /*+PARALLEL (4)*/ 
-           trunc(pay_date, 'MM') pay_month, 
+           trunc(pay_date, 'MM') pd, 
            sicid, 
            p_rnn, 
-           -- pay_month, 
+           pay_month, 
            SUM(cnt_mzp) sum_mzp, 
-           SUM(sum_pay) sum_pay 
+           SUM(sum_pay) sp 
     FROM si_member_2, dm
     WHERE pay_date >= dm.f_month
-    AND pay_date < add_months(dm.f_month,3) 
+    AND pay_date < add_months(dm.f_month,4) 
     AND pay_month < add_months(dm.f_month,3)
     AND pay_month >= to_date('2013-02-01','yyyy-mm-dd')  -- 1 МЗП с февраля 2013 года
     AND knp in ('012')
     AND p_rnn !='160440007161'
-    GROUP BY trunc(pay_date, 'MM'), sicid, p_rnn --, pay_month
+--     and p_rnn in ('670917400882') --, '760628350355')
+--    and p_rnn in ('760628350355')
+    GROUP BY trunc(pay_date, 'MM'), sicid, p_rnn, pay_month
     HAVING SUM(cnt_mzp) < 1
 ) 
+, aq as (
+        SELECT /*+parallel(4)*/ m.pd, m.sicid, m.p_rnn, s.pay_month, SUM(cnt_mzp) mzp  
+        FROM aq_src m, si_member_2 s
+        WHERE m.p_rnn = s.p_rnn
+        AND s.sicid = m.sicid
+        AND s.pay_month = m.pay_month
+        AND s.knp in ('012')
+        GROUP BY m.sicid, m.p_rnn, s.pay_month, m.pd
+)
 SELECT
       m7.obc,
       m7.obn,
@@ -70,20 +80,20 @@ FROM
   LEFT JOIN rfbn_branch_site rb1 ON rb1.RFBN_ID = r.rfrg_id || '00'
   , dm
   where   m.sum_mzp < 1
-  AND   m.pay_month = dm.f_month
+  AND   m.pd = dm.f_month
   GROUP BY p_rnn
         , nvl(n.name_ip, n.fio), rb1.rfbn_id, rb1.name, rb.rfbn_id, rb.name
   ) m7,
   ( SELECT p_rnn, COUNT(DISTINCT sicid) c
     FROM aq m, dm
     WHERE sum_mzp < 1
-    AND m.pay_month = dm.s_month
+    AND m.pd = dm.s_month
     GROUP BY p_rnn
   ) m8,
   ( SELECT p_rnn, COUNT(DISTINCT sicid) c
     FROM aq m, dm
     WHERE sum_mzp < 1
-    AND m.pay_month = dm.t_month
+    AND m.pd = dm.t_month
     GROUP BY p_rnn
   ) m9
 WHERE m7.p_rnn = m8.p_rnn 

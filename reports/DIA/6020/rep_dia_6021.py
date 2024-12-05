@@ -16,7 +16,8 @@ stmt_1 = """
 SELECT 
           sfa.rfbn_id code_region, --"Код региона",
           sfa.rfpm_id rfpm, --"Код выплаты",
-          p.iin rnn, --"ИИН",
+          --p.iin rnn, --"ИИН",
+		  p.rnn,
           p.lastname || ' ' || p.firstname || ' ' || p.middlename fio,--"ФИО",
           case when p.sex=0 then 'ж' else 'м' end sx,--"Пол",
           sfa.birthdate,
@@ -38,8 +39,42 @@ SELECT
         order by rfbn_id, p.lastname
 """
 
-active_stmt = stmt_1
+stmt_2 = """
+SELECT 
+          sfa.rfbn_id code_region, --"Код региона",
+          sfa.rfpm_id rfpm, --"Код выплаты",
+          p.iin rnn, --"ИИН",
+		  --p.rnn,
+          p.lastname || ' ' || p.firstname || ' ' || p.middlename fio,--"ФИО",
+          case when p.sex=0 then 'ж' else 'м' end sx,--"Пол",
+          sfa.birthdate,
+          sfa.risk_date risk,--"Дата риска",
+		  sfa.date_approve d_resh, --"Дата решения",
+          sfa.sum_avg sumavg,--"СМД, тенге",
+          sfa.ksu sfa_ksu, --"КСУ",
+          sfa.kzd sfa_kzd,--"КЗД",
+          sfa.kut sfa_kut, --"КУТ",
+          sfa.mrzp sfa_mrzp,--"МЗП",
+          sfa.count_donation donation,--"Количество месяцев",
+          sfa.sum_all sfa_all, --"Назначенный размер, тенге"
+          case when p.status in (4,2) then 'Умерший' else 'Получатель' end status
+        FROM sswh.sipr_maket_first_approve_2 sfa, sswh.person p
+        WHERE sfa.sicp_id = p.sicid
+        AND substr(sfa.rfpm_id,1,4) = '0701'
+        and sfa.date_approve >= to_date(:d1,'yyyy-mm-dd') 
+		and sfa.date_approve < to_date(:d2,'yyyy-mm-dd') + 1
+        order by rfbn_id, p.lastname
+"""
 
+
+db_ora_config = 'rep_db_12'
+
+if db_ora_config=='rep_db_12':
+	active_stmt = stmt_1
+if db_ora_config=='rep_db_60':
+	active_stmt = stmt_2
+
+	
 def format_worksheet(worksheet, common_format):
 	worksheet.set_row(0, 24)
 	worksheet.set_row(1, 24)
@@ -91,7 +126,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 	config = configparser.ConfigParser()
 	config.read('db_config.ini')
 	
-	ora_config = config['rep_db_12']
+	ora_config = config[db_ora_config]
 	db_user=ora_config['db_user']
 	db_password=ora_config['db_password']
 	db_dsn=ora_config['db_dsn']
