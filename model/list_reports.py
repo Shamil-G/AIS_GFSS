@@ -419,20 +419,20 @@ dict_reports = {
         },
         {
             "grp_name": "Консолидированные отчеты", 
-            "module_dir": f"{REPORT_MODULE_PATH}.DIA.320",
+            "module_dir": f"{REPORT_MODULE_PATH}.DIA.consolidated",
             "live_time": "0",
             "list": 
             [
                 {
                     "name": "Количество участников и суммы взносов по частоте участия за период",
                     "num_rep": "01",
-                    "proc": "rep_dia_freq_co",
-                    "data_approve": "14.07.2024",
+                    "proc": "rep_dia_freq_so_01",
+                    "data_approve": "28.01.2025",
                     "author": "Гусейнов Ш.А.",
                     "params": {"date_first": "С", "date_second": "по"},
-                }
+                },
             ]
-        }
+        },
     ]
     ,
     "ДСР":
