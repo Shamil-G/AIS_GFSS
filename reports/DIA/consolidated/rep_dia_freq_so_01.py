@@ -26,6 +26,7 @@ with src as (
   and   si.pay_date<to_date(:d2,'yyyy-mm-dd')+1
   and   si.knp='012'
   and   si.sicid=p.sicid
+  and	1!=2
 )
 , hired_ul as(
   select /*+parallel(4)*/ 
@@ -192,22 +193,24 @@ def format_worksheet(worksheet, common_format):
 
 	worksheet.set_column(0, 0, 28)
 	worksheet.set_column(1, 1, 12)
-	worksheet.set_column(13, 13, 18)
-	worksheet.set_column(25, 25, 18)
 
-	for num in range(2,13):	# Money
+	for num in range(2,15):	# Money
 		worksheet.set_column(num, num, 18)
 
-	for num in range(14,25):   # count 
+	for num in range(15,27):   # count 
 		worksheet.set_column(num, num, 14)
+		
+	for num in range(26,28):   # count 
+		worksheet.set_column(num, num, 16)
 
-	for num in range(26):
+	for num in range(28):
 		worksheet.write(4,num, num+1, common_format)
+
 
 	worksheet.merge_range('A3:A4', 'Категория работника', common_format)
 	worksheet.merge_range('B3:B4', 'Всего сотрудников', common_format)
-	worksheet.merge_range('C3:N3', 'Сумма уплаты с частотой уплаты', common_format)
-	worksheet.merge_range('O3:Z3', 'Количество участников с частотой уплаты', common_format)
+	worksheet.merge_range('C3:O3', 'Сумма уплаты с частотой уплаты', common_format)
+	worksheet.merge_range('P3:AB3', 'Количество участников с частотой уплаты', common_format)
 
 	worksheet.write(3,2, '1 месяц', common_format)
 	worksheet.write(3,3, '2 месяца', common_format)
@@ -220,19 +223,21 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(3,10, '9 месяцев', common_format)
 	worksheet.write(3,11, '10 месяцев', common_format)
 	worksheet.write(3,12, '11 месяцев', common_format)
-	worksheet.write(3,13, '12 месяцев и более', common_format)
-	worksheet.write(3,14, '1 месяц', common_format)
-	worksheet.write(3,15, '2 месяца', common_format)
-	worksheet.write(3,16, '3 месяца', common_format)
-	worksheet.write(3,17, '4 месяца', common_format)
-	worksheet.write(3,18, '5 месяцев', common_format)
-	worksheet.write(3,19, '6 месяцев', common_format)
-	worksheet.write(3,20, '7 месяцев', common_format)
-	worksheet.write(3,21, '8 месяцев', common_format)
-	worksheet.write(3,22, '9 месяцев', common_format)
-	worksheet.write(3,23, '10 месяцев', common_format)
-	worksheet.write(3,24, '11 месяцев', common_format)
-	worksheet.write(3,25, '12 месяцев и более', common_format)
+	worksheet.write(3,13, '12 месяцев', common_format)
+	worksheet.write(3,14, 'более 12 месяцев', common_format)
+	worksheet.write(3,15, '1 месяц', common_format)
+	worksheet.write(3,16, '2 месяца', common_format)
+	worksheet.write(3,17, '3 месяца', common_format)
+	worksheet.write(3,18, '4 месяца', common_format)
+	worksheet.write(3,19, '5 месяцев', common_format)
+	worksheet.write(3,20, '6 месяцев', common_format)
+	worksheet.write(3,21, '7 месяцев', common_format)
+	worksheet.write(3,22, '8 месяцев', common_format)
+	worksheet.write(3,23, '9 месяцев', common_format)
+	worksheet.write(3,24, '10 месяцев', common_format)
+	worksheet.write(3,25, '11 месяцев', common_format)
+	worksheet.write(3,26, '12 месяцев', common_format)
+	worksheet.write(3,27, 'более 12 месяцев', common_format)
 	
 
 def do_report(file_name: str, date_first: str, date_second: str):
@@ -283,7 +288,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			category_name_format_4 = workbook.add_format({'align': 'left', 'font_color': 'black'})
 			category_name_format_4.set_bg_color('#EBE6FF')	  #  Светло-голубой
 			category_name_format_5 = workbook.add_format({'align': 'left', 'font_color': 'black'})
-			category_name_format_5.set_bg_color('#FFFFE0')	  # Желтенький
+			category_name_format_5.set_bg_color('#FFFFE0')	  # Слегка желтенький
 			category_name_format_6 = workbook.add_format({'align': 'left', 'font_color': 'black'})
 			category_name_format_6.set_bg_color('#FFE1E1')	  # Розовый
 			category_name_format_7 = workbook.add_format({'align': 'left', 'font_color': 'black'})
@@ -377,9 +382,9 @@ def do_report(file_name: str, date_first: str, date_second: str):
 							case 6: worksheet.write(row_cnt+shift_row, col, list_val, category_name_format_7)
 							case _: worksheet.write(row_cnt+shift_row, col, list_val, category_name_format)
 						num_rec = num_rec+1
-					if col in (2,3,4,5,6,7,8,9,10,11,12,13):
+					if col in (2,3,4,5,6,7,8,9,10,11,12,13,14):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
-					if col in (1,14,15,16,17,18,19,20,21,22,23,24,25):
+					if col in (1,15,16,17,18,19,20,21,22,23,24,25,26,27):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
 					col += 1
 				row_cnt += 1
