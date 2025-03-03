@@ -14,7 +14,7 @@ else:
     pool_inc = 4
     username = 'reports_test'
 
-report_db_dsn = '172.16.17.12:1521/gfss'
+report_db_dsn = '172.31.33.29:1521/gfss'
 report_db_user = 'sswh'
 report_db_password = 'sswh'
 dsn = '192.168.20.60:1521/gfssdb.gfss.kz'
