@@ -38,7 +38,7 @@ stmt_1 = """
 	(
     select sfa.rfbn_id, 
            sfa.rfpm_id, 
-           (select p.rn from person p where p.sicid=s.sicid) R_IIN,
+           (select p.iin from person p where p.sicid=s.sicid) R_IIN,
            ch.rn  CHILD_IIN,
            ch.sex CHILD_SEX,
            sfa.risk_date,

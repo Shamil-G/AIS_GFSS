@@ -17,7 +17,7 @@ from (
       SELECT 
         sfa.rfbn_id code_region,
         sfa.rfpm_id,
-        p.rn rnn,
+        p.iin rnn,
         sfa.sicid,
         p.lastname || ' ' || p.firstname || ' ' || p.middlename fio,
         case when p.sex=0 then 'ж' else 'м' end sx,

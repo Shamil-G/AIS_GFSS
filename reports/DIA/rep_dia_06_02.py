@@ -13,7 +13,7 @@ report_code = 'DIA_06_02'
 
 stmt_1 = """
 select b.sicid,
-       p.rn,
+       p.iin,
 --       last_appoint_date,
        sum(case when num_month = 0 then 1 else 0 end) month_pd0,
        sum(case when num_month = 1 then 1 else 0 end) month_pd1,
