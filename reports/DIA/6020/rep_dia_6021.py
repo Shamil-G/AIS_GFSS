@@ -17,7 +17,7 @@ SELECT
           sfa.rfbn_id code_region, --"Код региона",
           sfa.rfpm_id rfpm, --"Код выплаты",
           --p.iin rnn, --"ИИН",
-		  p.rnn,
+		  p.iin,
           p.lastname || ' ' || p.firstname || ' ' || p.middlename fio,--"ФИО",
           case when p.sex=0 then 'ж' else 'м' end sx,--"Пол",
           sfa.birthdate,

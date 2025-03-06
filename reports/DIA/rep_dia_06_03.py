@@ -14,8 +14,8 @@ report_code = 'DIA_06_03'
 stmt_1 = """
 select unique first_value(pd.rfbn_id) over(partition by pt.pnpt_id order by pd.pncp_date desc) rfbn_id,
     first_value(pd.rfpm_id) over(partition by pt.pnpt_id order by pd.pncp_date desc) rfpm_id,
-    p1.rn R_IIN,
-    p2.rn DEP_IIN,
+    p1.iin R_IIN,
+    p2.iin DEP_IIN,
     pt.appointdate,
     pt.approvedate,
     pt.sum_pay,
