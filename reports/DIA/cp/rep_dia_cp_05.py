@@ -23,13 +23,13 @@ with all_data as (
 ep as (
                select unique sicid
                from   all_data a
-               where  nvl(a.type_payment,'U')='О'
+               where  nvl(a.type_payment,'X')='O'
          )
         ,
 non_ep as (
                select unique sicid
                from   all_data a
-               where  nvl(a.type_payment,'U')!='О' --or type_payer is null
+               where  nvl(a.type_payment,'X')!='O' --or type_payer is null
          )
 select a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd, a.mrzp, a.count_donation, a.sum_all, a.date_approve
 from (

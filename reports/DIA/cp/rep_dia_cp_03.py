@@ -15,7 +15,7 @@ stmt_1 = """
 			count(unique p.sicid) cnt_all, sum(si.sum_pay) sum_pay, rg.rfrg_id
       from  si_member_2 si, person p, rfrg_region rg
             where si.sicid = p.sicid
-            and si.type_payment = 'О'
+            and coalesce(si.type_payment,'X') = 'O'
             and si.knp = '012'
             and si.pay_date_gfss >= to_date(:dt_from, 'yyyy-mm-dd') 
 			and si.pay_date_gfss <  to_date(:dt_to, 'yyyy-mm-dd') + 1
