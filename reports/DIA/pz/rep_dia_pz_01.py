@@ -15,7 +15,7 @@ stmt_1 = """
 		pd.PAY_DATE,
 		pd.sum_pay,
 		case when p.sex=0 then 'ж' else 'м' end sex,
-		rN,
+		iin,
 		pay_month,
 		pd.pay_date_gfss,
 		p.birthdate, 
