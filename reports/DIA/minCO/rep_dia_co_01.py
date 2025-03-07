@@ -16,7 +16,7 @@ stmt_load = "begin sswh.load_min_so_history.make; end;"
 stmt_report = """
 		select /*+ parallel(4) */
 			nvl(k.rfbn_id, 'нет') rfbn_area, --Код района
-			k.name name_area,  --Район
+			k.name_ru name_area,  --Район
 			m.p_rnn,        --БИН/ИИН предприятия
 			nvl(o.nm_ru, 'Неопределено') name_org, --Наименование предприятия
 			m.cnt_worker,     -- Общее количество сотрудников
@@ -33,7 +33,8 @@ stmt_report = """
 		and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -13)
 		and   m.p_rnn = o.bin(+)
 		and   m.sicid = p.sicid
-		and   substr(o.cato,1,4)=substr(k.cato_reg,1,4)		
+		and   substr(o.cato,1,4)=substr(k.reg_code,1,4)		
+		and	  k.lev=1
 		order by 1,3,4
 	"""
 
