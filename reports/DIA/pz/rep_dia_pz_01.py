@@ -21,7 +21,7 @@ stmt_1 = """
 		p.birthdate, 
 		floor(months_between(to_date(:dt_to, 'YYYY-MM-DD'), p.birthdate)/12) age
 	from si_member_2 pd, person p
-	where coalesce(pd.type_payment,'X') = 'P'
+	where pd.type_payment = 'P'
 	and	  pd.knp = '012'
 	and   pd.pay_date_gfss >= to_date(:dt_from, 'YYYY-MM-DD') 
 	and   pd.pay_date_gfss <  to_date(:dt_to, 'YYYY-MM-DD') + 1
