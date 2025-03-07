@@ -25,10 +25,10 @@ stmt_report = """
 			m.sum_pay,
 			sswh.min_so(m.PAY_MONTH) as base_size,
 			sswh.min_so(m.PAY_MONTH) - m.sum_pay as debt
-		from sswh.min_so_history m, 
-			 loader.person p,
-			 loader.rfon_organization o,
-			 loader.rfbn_branch k
+		from min_so_history m, 
+			 person p,
+			 rfon_organization o,
+			 rfbn_branch k
 		where trunc(m.ctrl_date,'MM')=trunc(to_date(:control_month,'YYYY-MM-DD'),'MM')
 		and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -13)
 		and   m.p_rnn = o.bin(+)
