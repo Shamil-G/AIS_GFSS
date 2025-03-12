@@ -177,9 +177,13 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                             module_dir = cur_group['module_dir']
                             module_path = f"{module_dir}.{proc}"
                             log.debug(f'CALL REPORT. MODULE DIR: {module_dir}, MODULE PATH: {module_path}')
-                            # 2. Загрузим модуль по найденнгму пути
+                            # 2. Загрузим модуль по найденному пути
                             loaded_module = importlib.import_module(module_path)
-                            
+
+                            # Найдем в модуле rep_code
+                            if hasattr(loaded_module,'report_code'):
+                                rep_code = getattr(loaded_module,'report_code')
+
                             # Найдем в модуле функцию формирования имени файла, если она есть
                             # 1. Проверяем модуль на наличе функции 'get_file_full_name'
                             # 2. Извлекаем имя с полным путем
@@ -189,12 +193,13 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
                                 file_name = get_file_name(report_part_path, params)
                                 log.info(f'\nCALL REPORT. GET FILE FULL NAME. FILE_NAME {file_name}\nparams:{params}\n')
                             else:
+                                report_part_path = f'{report_part_path}.{rep_code}'
                                 if rfbn_id:
                                     report_part_path = f'{report_part_path}.{rfbn_id}'
                                 if rfpm_id:
                                     report_part_path = f'{report_part_path}.{rfpm_id}'
                                 if date_first and date_second:
-                                    report_part_path = f'{report_part_path}.{date_first}_{date_second}'
+                                    report_part_path = f'{report_part_path}.{date_first}__{date_second}'
                                 elif date_first:
                                     report_part_path = f'{report_part_path}.{date_first}'
 
@@ -225,7 +230,7 @@ def call_report(dep_name: str, group_name: str, code: str, params: dict):
 
                                 log.info(f"\nCALL REPORT. name:\t{f'{group_name}.{code}'}\nlive_time:\t{live_time}\ndate_first:\t{date_first}\ndate_second:\t{date_second}\nrfpm_id:\t{rfpm_id}\nrfbn_id:\t{rfbn_id}")
 
-                                status = init_report(f'{group_name}.{code}', date_first, date_second, rfpm_id, rfbn_id, live_time, file_name)
+                                status = init_report(f'{group_name}.{code}.{rep_code}', date_first, date_second, rfpm_id, rfbn_id, live_time, file_name)
                                 log.debug(f'CALL REPORT. Status: {status}')
                                 if status == 1:
                                     log.info(f'CALL REPORT. REPORT PREPARING. Status: {status}, file_name: {file_name}')

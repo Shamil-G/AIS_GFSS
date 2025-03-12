@@ -193,6 +193,31 @@ dict_reports = {
             ]
         },
         { 
+            "grp_name": "3000", 
+            "module_dir": f"{REPORT_MODULE_PATH}.DIA.3000",
+            "live_time": "0",
+            "list": 
+            [
+                {
+                "name": "СО по категориям МЗП и регионам (3029)",
+                "num_rep": "01",
+                "proc": "rep_dia_3029",
+                "data_approve": "14.03.2025",
+                "author": "Гусейнов Ш.А.",
+                "params": {"date_first": "C", "date_second": "по "},
+                },
+                {
+                "name": "Стаж участия в СОСС (3023)",
+                "num_rep": "02",
+                "proc": "rep_dia_3023",
+                "data_approve": "12.03.2025",
+                "author": "Гусейнов Ш.А.",
+                "params": {"date_first": "C", "date_second": "по "},
+                },
+            ]
+        },
+
+        { 
             "grp_name": "6020", 
             "module_dir": f"{REPORT_MODULE_PATH}.DIA.6020",
             "live_time": "0",
@@ -431,7 +456,34 @@ dict_reports = {
                     "author": "Гусейнов Ш.А.",
                     "params": {"date_first": "С", "date_second": "по"},
                 },
+                {
+                    "name": "СО по КНП, регионам, количеству участников и сумм (5СО)",
+                    "num_rep": "02",
+                    "proc": "rep_dia_5CO",
+                    "data_approve": "28.01.2025",
+                    "author": "Гусейнов Ш.А.",
+                    "params": {"date_first": "С", "date_second": "по"},
+                },
+                {
+                    "name": "Выплаты по регионам и коду выплаты (7CP)",
+                    "num_rep": "03",
+                    "proc": "rep_dia_7CP",
+                    "data_approve": "28.01.2025",
+                    "author": "Гусейнов Ш.А.",
+                    "params": {"date_first": "С", "date_second": "по"},
+                },
+                {
+                    "name": "Выплаты по коду выплаты и регионам (6CB)",
+                    "num_rep": "04",
+                    "proc": "rep_dia_6CB",
+                    "data_approve": "28.01.2025",
+                    "author": "Гусейнов Ш.А.",
+                    "params": {"date_first": "С", "date_second": "по"},
+                },
             ]
+
+
+
         },
     ]
     ,

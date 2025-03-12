@@ -6,8 +6,8 @@ import oracledb
 import os.path
 from   model.manage_reports import set_status_report
 
-report_name = 'Частота уплаты социальных отчислений за период'
-report_code = 'FSO.01'
+report_name = 'Частота уплаты социальных отчислений за период (FSO)'
+report_code = 'FSO'
 
 #document.status:  0 - Документ сформирован на выплату, 1 - Сформирован платеж, 2 - Платеж на выплате
 
