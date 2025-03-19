@@ -32,9 +32,10 @@ stmt_report = """
 		where trunc(m.ctrl_date,'MM')=trunc(to_date(:control_month,'YYYY-MM-DD'),'MM')
 		and   trunc(m.pay_month,'MM') >= add_months(trunc(m.ctrl_date,'MM'), -13)
 		and   m.p_rnn = o.bin(+)
+		-- and	  m.p_rnn!='160440007161'
 		and   m.sicid = p.sicid
-		and   substr(o.cato,1,4)=substr(k.reg_code,1,4)		
-		and	  k.lev=1
+		and   substr(o.cato,1,4)=substr(k.reg_code,1,4)
+		and	  k.lev=2
 		order by 1,3,4
 	"""
 
