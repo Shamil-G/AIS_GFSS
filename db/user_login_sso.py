@@ -57,11 +57,15 @@ def logout():
     req_json = {'ip_addr': f'{ip_addr()}'}
 
     resp = requests.post(url=f'{sso_server}/close', json=req_json)
+
     if resp.status_code != 200:
-        log.info(f'----------------\n\tОшибка {username}/{resp.status_code} соединения с сервером SSO\n----------------')
-    if resp.status_code == 200 and resp['status'] !=200:
-        log.info(f'----------------\n\tОшибка закрытия сессии: {resp['status']}/{session['username']}/{ip_addr()}\n----------------')
-        return render_template('login.html')
+        log.info(f'----------------\n\tОшибка {resp.status_code} соединения {username} с сервером SSO\n----------------')
+        return redirect(url_for('view_root'))
+
+    resp_json = resp.json()
+
+    if 'status' in resp_json and resp_json['status'] !=200:
+        log.info(f'----------------\n\tОшибка закрытия сессии. Статус: {resp_json['status']}/{ip_addr()}\n----------------')
 
     return redirect(url_for('view_root'))
 
