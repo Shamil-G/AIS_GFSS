@@ -32,7 +32,7 @@
             {% block navigate %}{% endblock %}
                 {% if g.user.is_active %}
                     <a class="title2" href="/running-reports">{{ res_value('RUNNING_REPORTS') }}</a>
-                {% if 'Администратор ДИА' in g.user.roles %}
+                {% if 'admin' in g.user.roles %}
                     <a class="title2" id="aux_task" href="/auxiliary-task-dia">{{ res_value('AUXILIARY_TASK') }}</a>
                 {% endif %}
                 <!--<a class="title2" href="/change-passwd">{{ res_value('CHANGE_PASSWORD') }}</a>-->
@@ -54,7 +54,7 @@
               <div class="footer-r">
                   <small style="visibility: hidden">{{ res_value('CREATORS') }}</small>
                   <small style="visibility: hidden">{{ res_value('FOR_DEVELOPERS') }}</small>
-                  <a style="font-size:14px">{% if g.user.is_authenticated %} {{ g.user.username }} {% endif %}</a>
+                  <a style="font-size:14px">{% if g.user and g.user.full_name %} {{g.user.full_name}}/{{g.user.principal_name}}/{{g.user.depname}} {% endif %}</a>
               </div>
         </footer>
     </div>

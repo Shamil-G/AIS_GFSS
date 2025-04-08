@@ -1,8 +1,9 @@
 from os import environ
 
-
+debug = True
 app_name = "REPORTS_GFSS"
 public_name = "Большие отчеты в АО ГФСС"
+SSO_LOGIN = True
 http_ip_context='HTTP_X_FORWARDED_FOR'
 #http_ip_context='HTTP_X_REAL_IP'
 
