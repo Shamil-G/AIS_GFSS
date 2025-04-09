@@ -288,11 +288,11 @@ def thread_report(file_name: str, date_first: str, date_second: str):
 	return {"status": 1, "file_path": file_name}
 
 
-def get_file_full_name(part_name, params):
-	if 'date_first' in params:
-		trunc_date = datetime.datetime.strptime(params['date_first'], '%Y-%m-%d').replace(day=1)
-		str_trunc_date = datetime.datetime.strftime(trunc_date, '%Y-%m-%d')
-		return f'{part_name}.{str_trunc_date}.xlsx'
+# def get_file_full_name(part_name, params):
+# 	if 'date_first' in params:
+# 		trunc_date = datetime.datetime.strptime(params['date_first'], '%Y-%m-%d').replace(day=1)
+# 		str_trunc_date = datetime.datetime.strftime(trunc_date, '%Y-%m-%d')
+# 		return f'{part_name}.{str_trunc_date}.xlsx'
 
 
 if __name__ == "__main__":

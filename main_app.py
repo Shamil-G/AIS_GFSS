@@ -5,7 +5,7 @@ from view.routes import *
 
 from gfss_parameter import SSO_LOGIN
 if SSO_LOGIN:
-    from db.user_login_sso import *
+    from sso.user_login_sso import *
 else:
     from ldap.user_login import *
 

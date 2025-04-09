@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, flash, url_for, g, session
 from flask_login import LoginManager, login_required, logout_user, login_user, current_user
-from db.sso_login import SSO_User
+from sso.sso_login import SSO_User
 from werkzeug.security import check_password_hash, generate_password_hash
 from db.connect import get_connection
 from main_app import app, log
