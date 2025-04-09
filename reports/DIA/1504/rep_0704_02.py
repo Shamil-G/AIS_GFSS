@@ -19,7 +19,7 @@ select  unique rfbn_id, iin,
   ksu, sum_avg, sum_all
 from (              
   SELECT 
-        p.rn as "IIN",
+        p.iin as "IIN",
 		floor( months_between(sipr.risk_date, p.birthdate) / 12 ) age,
 		FIRST_VALUE(pp.rfbn_id) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) rfbn_id,
 		sipr.risk_date,

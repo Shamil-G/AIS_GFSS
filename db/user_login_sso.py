@@ -128,6 +128,9 @@ def login_page():
     if json_user:
         log.info(f'LOGIN. json_user: {json_user}')
         user = SSO_User().get_user_by_name(json_user)
+        if not user:
+            log.info(f'LOGIN_PAGE. ERROR LOGIN. New object user is empty')
+            return render_template('login.html')
 
         login_user(user)
         next_page = request.args.get('next')
