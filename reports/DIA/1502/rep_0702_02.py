@@ -39,7 +39,7 @@ from (
       case when b.pay_month is null then 0 else 1 end all_month	  
     from (
         select unique 
-          a.rfbn_id, a.rfpm_id, p.rn as iin, p.birthdate,
+          a.rfbn_id, a.rfpm_id, p.iin, p.birthdate,
           case when p.sex=0 then 'Ж' else 'M' end as sex, 
           floor( months_between(a.risk_date, p.birthdate) / 12 ) age,
           a.appointdate, a.date_approve, a.stopdate, 

@@ -244,7 +244,7 @@ def do_report(file_name: str, date_first: str):
 			format_worksheet(worksheet=worksheet, common_format=title_format)
 
 			worksheet.write(0, 0, report_name, title_name_report)
-			worksheet.write(1, 0, f'За период: {date_first}', title_name_report)
+			worksheet.write(1, 0, f'На дату: {date_first}', title_name_report)
 
 			row_cnt = 1
 			shift_row = 3
@@ -277,16 +277,13 @@ def do_report(file_name: str, date_first: str):
 					# 	worksheet.write(row_cnt+shift_row, col, list_val, region_name_format)
 					if col in (1,2,3,4):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col in (5,9,10,11,13):
+					if col in (5,9,10,11):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
 					if col in (6,7,8,12):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
 					col += 1
 				row_cnt += 1
 				cnt_part += 1
-				if cnt_part > 9999:
-					log.info(f'{file_name}. LOADED {row_cnt} records.')
-					cnt_part = 0
 
 			# Шифр отчета
 			worksheet.write(0, 11, report_code, title_name_report)
