@@ -68,44 +68,50 @@ stmt_report = """
      and h.p_rnn=L.bin
      and p.sicid=h.sicid
   )
-  select /*+ parallel(8) */
-     src.rfbn_id,
-     sl.bin,
-     src.cnt_worker,
-     sl.iin,
-     src.pay_month,
-     src.sum_pay,
-     sswh.min_so(src.pay_month),
-     (sswh.min_so(src.pay_month)-src.sum_pay) as sum_debt,
-     src.debt_date date_debt,
-     src.check_date,
-     af.ctrl_date,
-     sum(si.sum_pay)
-  from success_list sl
-     , src_list src
-     , after_ctrl af
-     , si_member_2 si
-  where src.p_rnn=sl.bin
-  and   src.pay_month=sl.pay_month
-  and   src.sicid=sl.sicid
-  and   sl.bin=af.bin
+  select a.*,
+		 sum(sum_pay),
+		 date_oplat
+  from (
+	  select /*+ parallel(8) */
+		 src.rfbn_id,
+		 sl.bin,
+		 src.cnt_worker,
+		 sl.iin,
+		 src.pay_month,
+		 src.sum_pay,
+		 sswh.min_so(src.pay_month) as min_so,
+		 (sswh.min_so(src.pay_month)-src.sum_pay) as sum_debt,
+		 src.debt_date date_debt,
+		 src.check_date,
+		 af.ctrl_date,
+		first_value(si.pay_date_gfss) over(partition by sl.iin, sl.bin, src.rfbn_id order by pay_date_gfss) date_oplat
+	  from success_list sl
+		 , src_list src
+		 , after_ctrl af
+		 , si_member_2 si
+	  where src.p_rnn=sl.bin
+	  and   src.pay_month=sl.pay_month
+	  and   src.sicid=sl.sicid
+	  and   sl.bin=af.bin
 
-  and   si.sicid(+)=sl.sicid
-  and   si.pay_date>=src.check_date
-  and   si.pay_month(+)=sl.pay_month
-  and   si.p_rnn(+)=sl.bin
-  group by
-     src.rfbn_id,
-     sl.bin,
-     src.cnt_worker,
-     sl.iin,
-     src.pay_month,
-     src.sum_pay,
-     sswh.min_so(src.pay_month),
-     (sswh.min_so(src.pay_month)-src.sum_pay),
-     src.debt_date,
-     src.check_date,
-     af.ctrl_date
+	  and   si.sicid(+)=sl.sicid
+	  and   si.pay_date>=src.check_date
+	  and   si.pay_month(+)=sl.pay_month
+	  and   si.p_rnn(+)=sl.bin
+  ) a
+	group by
+		rfbn_id,
+		bin,
+		cnt_worker,
+		iin,
+		pay_month,
+		sum_pay,
+		min_so,
+		sum_debt,
+		date_debt,
+		check_date,
+		ctrl_date,
+		date_oplat
   order by bin, iin, pay_month desc
   """
 
@@ -129,6 +135,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(10, 10, 12)
 	worksheet.set_column(11, 11, 12)
 	worksheet.set_column(12, 12, 12)
+	worksheet.set_column(13, 13, 12)
 
 	worksheet.write(2,0, '1', common_format)
 	worksheet.write(2,1, '2', common_format)
@@ -143,6 +150,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2,10, '11', common_format)
 	worksheet.write(2,11, '12', common_format)
 	worksheet.write(2,12, '13', common_format)
+	worksheet.write(2,13, '14', common_format)
 	worksheet.write(3,0, '№', common_format)
 	worksheet.write(3,1, 'Код района', common_format)
 	worksheet.write(3,2, 'БИН/ИИН предприятия', common_format)
@@ -156,6 +164,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(3,10, 'Дата сверки', common_format)
 	worksheet.write(3,11, 'Дата расчета', common_format)
 	worksheet.write(3,12, 'Сумма платежа', common_format)
+	worksheet.write(3,13, 'Дата погашения', common_format)
 	
 
 def do_report(file_name: str, date_first: str):
@@ -268,7 +277,7 @@ def do_report(file_name: str, date_first: str):
 					# 	worksheet.write(row_cnt+shift_row, col, list_val, region_name_format)
 					if col in (1,2,3,4):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col in (5,9,10,11):
+					if col in (5,9,10,11,13):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
 					if col in (6,7,8,12):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
@@ -297,13 +306,6 @@ def thread_report(file_name: str, date_first: str):
 	log.info(f'THREAD REPORT. PARAMS NONE')
 	threading.Thread(target=do_report, args=(file_name, date_first), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
-
-
-def get_file_full_name(part_name, params):
-	if 'date_first' in params:
-		trunc_date = datetime.datetime.strptime(params['date_first'], '%Y-%m-%d').replace(day=1)
-		str_trunc_date = datetime.datetime.strftime(trunc_date, '%Y-%m-%d')
-		return f'{part_name}.{str_trunc_date}.xlsx'
 
 
 if __name__ == "__main__":
