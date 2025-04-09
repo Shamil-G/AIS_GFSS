@@ -129,7 +129,7 @@ def login_page():
         log.info(f'LOGIN. json_user: {json_user}')
         user = SSO_User().get_user_by_name(json_user)
         if not user:
-            log.info(f'LOGIN_PAGE. ERROR LOGIN. New object user is empty')
+            log.info(f"LOGIN_PAGE. ERROR LOGIN. New object user is empty. MAY BE USER'S DEP_NAME in LDAP not in list permit_deps in APP_CONFIG.PY")
             return render_template('login.html')
 
         login_user(user)
