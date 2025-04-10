@@ -38,8 +38,11 @@ class SSO_User:
             if src_user['fio'] in ldap_admins:
                 log.info(f'----------------\n\tUSER {session['username']} are Admin\n----------------')
                 self.roles='admin'
-                session['roles'] = self.roles
-            elif src_user['dep_name'] not in permit_deps:
+            else:
+                self.roles='operator'
+            session['roles'] = self.roles
+            
+            if src_user['dep_name'] not in permit_deps:
                 log.info(f'----------------\n\tUSER {self.full_name} not Registred\n----------------')
                 return None
 
