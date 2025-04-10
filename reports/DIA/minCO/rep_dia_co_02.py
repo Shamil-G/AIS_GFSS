@@ -68,8 +68,11 @@ stmt_report = """
      and h.p_rnn=L.bin
      and p.sicid=h.sicid
   )
-  select a.*,
-		 sum(sum_pay),
+  select a.rfbn_id, bin, cnt_worker, 
+		 iin, pay_month, sum_pay, min_so,
+		 sum_debt, date_debt, check_date,
+		 ctrl_date, 
+		 sum(si_sum_pay) all_si_sum_pay,
 		 date_oplat
   from (
 	  select /*+ parallel(8) */
@@ -84,6 +87,7 @@ stmt_report = """
 		 src.debt_date date_debt,
 		 src.check_date,
 		 af.ctrl_date,
+		 si.sum_pay as si_sum_pay,
 		first_value(si.pay_date_gfss) over(partition by sl.iin, sl.bin, src.rfbn_id order by pay_date_gfss) date_oplat
 	  from success_list sl
 		 , src_list src
@@ -277,7 +281,7 @@ def do_report(file_name: str, date_first: str):
 					# 	worksheet.write(row_cnt+shift_row, col, list_val, region_name_format)
 					if col in (1,2,3,4):
 						worksheet.write(row_cnt+shift_row, col, list_val, digital_format)
-					if col in (5,9,10,11):
+					if col in (5,9,10,11,13):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
 					if col in (6,7,8,12):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
