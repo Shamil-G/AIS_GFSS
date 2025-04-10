@@ -1,4 +1,4 @@
 systemctl stop reports
 systemctl start reports
-sleep 3
+sleep 1
 systemctl status -l reports
