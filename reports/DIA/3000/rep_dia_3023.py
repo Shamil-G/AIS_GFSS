@@ -215,7 +215,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			format_worksheet(worksheet=worksheet[page_num-1], common_format=title_format)
 
 			worksheet[page_num-1].write(0, 0, report_name, title_name_report)
-			worksheet[page_num-1].write(1, 0, f'За период: {date_first}', title_name_report)
+			worksheet[page_num-1].write(1, 0, f'За период: {date_first} - {date_second}', title_name_report)
 
 			row_cnt = 1
 			all_cnt=1
@@ -261,7 +261,6 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					format_worksheet(worksheet=worksheet[page_num-1], common_format=title_format)
 					worksheet[page_num-1].write(0, 0, report_name, title_name_report)
 					worksheet[page_num-1].write(1, 0, f'За период: {date_first} - {date_second}', title_name_report)
-					
 
 				if cnt_part > 250000:
 					log.info(f'{file_name}. LOADED {row_cnt} records.')

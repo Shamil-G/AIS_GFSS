@@ -506,6 +506,26 @@ dict_reports = {
         }
     ]
     ,
+    "АКТУАРИИ":
+    [
+        {
+            "grp_name": "Соц.Выплаты",
+            "live_time": "0",
+            "deps": ['02DARa',],
+            "module_dir": f"{REPORT_MODULE_PATH}.AKTUAR",
+            "list": [
+                {
+                    "name": "Загрузка AKTUAR_DEPENDANT",
+                    "num_rep": "01",
+                    "proc": "upload_aktuar_dependand",
+                    "data_approve": "21.04.2025",
+                    "author": "Гусейнов Ш.",
+                    "params": {"date_first": "Месяц загрузки"},
+                },
+            ]
+        }
+    ]
+    ,
     "ДМЭН":
     [
         {

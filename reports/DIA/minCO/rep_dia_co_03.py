@@ -25,7 +25,7 @@ dm as(
        )
 )
 , aq_src as (
-    SELECT /*+PARALLEL (4)*/ 
+    SELECT /*+PARALLEL (2)*/ 
            trunc(pay_date, 'MM') pd, 
            sicid, 
            p_rnn, 
@@ -34,18 +34,16 @@ dm as(
            SUM(sum_pay) sp 
     FROM si_member_2, dm
     WHERE pay_date >= dm.f_month
-    AND pay_date < add_months(dm.f_month,4) 
+    AND pay_date < add_months(dm.f_month,3) 
     AND pay_month < add_months(dm.f_month,3)
     AND pay_month >= to_date('2013-02-01','yyyy-mm-dd')  -- 1 МЗП с февраля 2013 года
     AND knp in ('012')
     AND p_rnn !='160440007161'
---     and p_rnn in ('670917400882') --, '760628350355')
---    and p_rnn in ('760628350355')
     GROUP BY trunc(pay_date, 'MM'), sicid, p_rnn, pay_month
     HAVING SUM(cnt_mzp) < 1
 ) 
 , aq as (
-        SELECT /*+parallel(4)*/ m.pd, m.sicid, m.p_rnn, s.pay_month, SUM(cnt_mzp) mzp  
+        SELECT /*+parallel(2)*/ m.pd, m.sicid, m.p_rnn, s.pay_month, SUM(cnt_mzp) sum_mzp  
         FROM aq_src m, si_member_2 s
         WHERE m.p_rnn = s.p_rnn
         AND s.sicid = m.sicid
@@ -65,24 +63,31 @@ SELECT
       m9.c
 FROM 
   ( 
-  SELECT
-      p_rnn,
-      rb1.rfbn_id obc,
-      rb1.name obn,
-      rb.rfbn_id rc,
-      rb.name rn,
-      nvl(n.name_ip, n.fio) nm,
-      COUNT(DISTINCT sicid) c
-  FROM aq m
-  LEFT JOIN rfrr_id_region r ON r.id = m.p_rnn AND r.typ = 'I'
-  LEFT JOIN nk_minfin_iin n ON n.iin = m.p_rnn 
-  LEFT JOIN rfbn_branch_site rb ON rb.RFBN_ID = r.rfbn_id
-  LEFT JOIN rfbn_branch_site rb1 ON rb1.RFBN_ID = r.rfrg_id || '00'
-  , dm
-  where   m.sum_mzp < 1
-  AND   m.pd = dm.f_month
-  GROUP BY p_rnn
-        , nvl(n.name_ip, n.fio), rb1.rfbn_id, rb1.name, rb.rfbn_id, rb.name
+	  SELECT
+		  p_rnn,
+		  rb1.rfbn_id obc,
+		  rb1.name obn,
+		  rb.rfbn_id rc,
+		  rb.name rn,
+		  nvl(n.name_ip, n.fio) nm,
+		  COUNT(DISTINCT sicid) c
+	  FROM aq m, rfon_organization o, 
+		   cato_branch cb, 
+		   rfbn_branch_site rb, 
+		   rfbn_branch_site rb1,
+		   dm
+	  where m.p_rnn = o.bin(+)
+	  and   substr(rb.rfbn_id,1,4) = cb.rfbn_id(+)
+	  and   substr(rb1.rfbn_id,1,4) = substr(cb.rfbn_id,1,2)||'00'  
+  
+	--   LEFT JOIN rfrr_id_region r ON r.id = m.p_rnn AND r.typ = 'I'
+	--   LEFT JOIN nk_minfin_iin n ON n.iin = m.p_rnn 
+	--   LEFT JOIN rfbn_branch_site rb ON rb.RFBN_ID = r.rfbn_id
+	--   LEFT JOIN rfbn_branch_site rb1 ON rb1.RFBN_ID = r.rfrg_id || '00'
+	--   , dm
+	  and   m.sum_mzp < 1
+	  AND   m.pd = dm.f_month
+	  GROUP BY p_rnn, o.nm_ru, rb1.rfbn_id, rb1.name, rb.rfbn_id, rb.name
   ) m7,
   ( SELECT p_rnn, COUNT(DISTINCT sicid) c
     FROM aq m, dm
