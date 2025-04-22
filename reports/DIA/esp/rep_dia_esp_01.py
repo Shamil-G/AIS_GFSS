@@ -1,4 +1,4 @@
-from   db_config import report_db_user, report_db_password, report_db_dsn
+from configparser import ConfigParser
 import xlsxwriter
 import datetime
 import os.path
@@ -19,7 +19,7 @@ select a.sicid as "СИК ID",
     p.lastname as "Фамилия", 
 	p.firstname as "Имя", 
 	p.middlename as "Отчество", 
-	p.rn as "ИИН",  
+	p.iin as "ИИН",  
 	pay_month as "Период", 
 	pay_date as "Дата платежа", 
 	sum_pay as "Сумма СО"
@@ -55,7 +55,7 @@ where a.sicid=p.sicid
 and   p.branchid=b.rfbn_id(+)
 group by a.sicid, p.branchid, 
        b.short_name, 
-       p.lastname, p.firstname, p.middlename, p.rn,  pay_month, pay_date, sum_pay
+       p.lastname, p.firstname, p.middlename, p.iin,  pay_month, pay_date, sum_pay
 """
 
 active_stmt = stmt_1
@@ -89,13 +89,25 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2, 10, 'Сумма СО', common_format)
 
 
-
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
+
+	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+
 	log.info(f'DO REPORT. START {report_code}. RFPM_ID: 0701, DATE_FROM: {date_first}, FILE_PATH: {file_name}')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+
+	config = ConfigParser()
+	config.read('db_config.ini')
+	
+	ora_config = config['rep_db_loader']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
+	
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 

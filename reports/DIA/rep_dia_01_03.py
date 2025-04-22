@@ -40,8 +40,8 @@ stmt1 = """
 stmt_2 = """
 select sfa.rfbn_id,
       sfa.rfpm_id,
-      p1.rn R_IIN,
-      p2.rn DEP_IIN,
+      p1.iin R_IIN,
+      p2.iin DEP_IIN,
       case when p1.sex=0 then 'Ж' else 'М' end sex,
       sfa.risk_date,
       sfa.date_approve,

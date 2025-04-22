@@ -1,4 +1,5 @@
-from   db_config import report_db_user, report_db_password, report_db_dsn
+from configparser import ConfigParser
+# from   db_config import report_db_user, report_db_password, report_db_dsn
 import xlsxwriter
 import datetime
 from   os import path
@@ -122,8 +123,21 @@ def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	log.info(f'DO REPORT. START {report_code}. RFPM_ID: 0701, DATE_FROM: {date_first}, FILE_PATH: {file_name}')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+
+	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+
+	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, DATE_TO: {date_second}, FILE_PATH: {file_name}')
+	
+	config = ConfigParser()
+	config.read('db_config.ini')
+	
+	ora_config = config['rep_db_loader']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
+
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
@@ -154,6 +168,10 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			money_format = workbook.add_format({'num_format': '# ### ### ### ##0', 'align': 'right'})
 			money_format.set_border(1)
 			money_format.set_align('vcenter')
+
+			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format_it.set_align('vcenter')
+			date_format_it.set_italic()
 
 			now = datetime.datetime.now()
 			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
@@ -220,15 +238,21 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					log.info(f'{file_name}. LOADED {row_cnt} records.')
 					cnt_part = 0
 				rec_num = rec_num + 1
+
 			#worksheet.write(row_cnt+1, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
+			worksheet.write(0, 3, report_code, title_name_report)
+
+			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(1, 3, f'Дата отчета: {s_date} - {now}', date_format_it)
+
 
 			worksheet.write(rec_num, 2, m_val[1], digital_format)
 			worksheet.write(rec_num, 3, m_val[2], digital_format)
 			worksheet.write(rec_num, 4, m_val[3], money_format)
 			workbook.close()
-			now = datetime.datetime.now()
-			log.info(f'DO REPORT. SUCCESS REPORT. {now.strftime("%d-%m-%Y %H:%M:%S")} : {file_name}')
 			set_status_report(file_name, 2)
+
+			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {s_date} - {now}. Загружено {row_cnt} записей')
 
 
 def get_file_path(file_name: str, date_first: str, date_second: str):

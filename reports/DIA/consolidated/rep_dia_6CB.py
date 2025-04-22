@@ -59,17 +59,18 @@ def format_worksheet(worksheet, common_format):
 
 
 def do_report(file_name: str, date_first: str, date_second: str):
-	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 
 	time_start = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+
+	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 	
 	config = ConfigParser()
 	config.read('db_config.ini')
 	
-	ora_config = config['rep_db_12']
+	ora_config = config['rep_db_loader']
 	db_user=ora_config['db_user']
 	db_password=ora_config['db_password']
 	db_dsn=ora_config['db_dsn']

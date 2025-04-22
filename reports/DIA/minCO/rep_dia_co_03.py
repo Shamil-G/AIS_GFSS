@@ -150,12 +150,15 @@ def do_report(file_name: str, date_first: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}: {date_first}')
 		return file_name
+
+	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 
 	config = ConfigParser()
 	config.read('db_config.ini')
 	
-	ora_config = config['rep_db_12']
+	ora_config = config['rep_db_loader']
 	db_user=ora_config['db_user']
 	db_password=ora_config['db_password']
 	db_dsn=ora_config['db_dsn']
@@ -204,7 +207,6 @@ def do_report(file_name: str, date_first: str):
 			money_format.set_align('vcenter')
 
 			now = datetime.datetime.now()
-			start_time = now.strftime("%H:%M:%S")
 			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
 			worksheet = workbook.add_worksheet('Список')
 			sql_sheet = workbook.add_worksheet('SQL')
@@ -263,15 +265,13 @@ def do_report(file_name: str, date_first: str):
 					cnt_part = 0
 
 			# Шифр отчета
-			worksheet.write(0, 11, report_code, title_name_report)
-			now = datetime.datetime.now()
-			stop_time = now.strftime("%H:%M:%S")
-
-			worksheet.write(1, 6, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({start_time} - {stop_time})', date_format_italic)
+			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(0, 9, report_code, title_name_report)
+			worksheet.write(1, 6, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {now})', date_format_italic)
 
 			workbook.close()
 			set_status_report(file_name, 2)
-			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {now}')
+			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {s_date} - {now}')
 
 
 def thread_report(file_name: str, date_first: str):
@@ -280,13 +280,6 @@ def thread_report(file_name: str, date_first: str):
 	log.info(f'THREAD REPORT. PARAMS NONE')
 	threading.Thread(target=do_report, args=(file_name, date_first), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
-
-
-def get_file_full_name(part_name, params):
-	if 'date_first' in params:
-		trunc_date = datetime.datetime.strptime(params['date_first'], '%Y-%m-%d').replace(day=1)
-		str_trunc_date = datetime.datetime.strftime(trunc_date, '%Y-%m-%d')
-		return f'{part_name}.{str_trunc_date}.xlsx'
 
 
 if __name__ == "__main__":

@@ -1,9 +1,10 @@
+from configparser import ConfigParser
+# from   db_config import report_db_user, report_db_password, report_db_dsn
 import xlsxwriter
 import datetime
 import os.path
 from   util.logger import log
 import oracledb
-from   db_config import report_db_user, report_db_password, report_db_dsn
 from   model.call_report import set_status_report
 
 # from cx_Oracle import SessionPool
@@ -132,8 +133,21 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
+
+	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+
+	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, DATE_TO: {date_second}, FILE_PATH: {file_name}')
 	
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn, encoding="UTF-8") as connection:
+	config = ConfigParser()
+	config.read('db_config.ini')
+	
+	ora_config = config['rep_db_loader']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
+
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
@@ -162,8 +176,6 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
-
-
 
 			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
 			date_format_it.set_align('vcenter')
@@ -219,14 +231,16 @@ def do_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):
 			worksheet.write(row_cnt+2, 7, "=SUM(H4:H"+str(row_cnt+2)+")", digital_format)
 			worksheet.write(row_cnt+2, 8, "=SUM(I4:I"+str(row_cnt+2)+")", digital_format)
 
+			#
+			worksheet.write(0, 7, report_code, title_name_report)
+			
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 7, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 6, f'Дата формирования: {now}', date_format_it)
 
 			workbook.close()
-			now = datetime.datetime.now()
-			log.info(f'Формирование отчета {file_name} завершено: {now.strftime("%d-%m-%Y %H:%M:%S")}')
 			set_status_report(file_name, 2)
-			return file_name
+			
+			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {s_date} - {now}, Загружено {row_cnt} записей')
 
 
 def thread_report(file_name: str, srfpm_id: str, date_first: str, date_second: str):

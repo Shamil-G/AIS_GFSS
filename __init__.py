@@ -1,14 +1,33 @@
-from gfss_parameter import app_name
-
+from gfss_parameter import app_name, platform
+from flask_login import LoginManager
 from flask import Flask
+from flask_session import Session
+from redis import from_url
 from util.logger import log
 
+app = Flask(__name__, template_folder='templates', static_folder='static')
 
-app = Flask(__name__)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login_page'
+login_manager.login_message = "Необходимо зарегистрироваться в системе"
+login_manager.login_message_category = "warning"
 
-app.secret_key = 'IAS GFSS Delivery secret key: 232lk;lf09ut;ih;gs'
+app.secret_key = 'GFSS!secret_key_232lk;lf09ut;ih;gs'
+
+app.config['SESSION_PERMANENT'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = 36000
+
+if platform!='unix':
+    # app.config['SESSION_TYPE']  = 'filesystem'
+    app.config['SESSION_TYPE'] = 'redis'
+    app.config['SESSION_REDIS'] = from_url('redis://@192.168.20.33:6379')
+else:
+    # app.config['SESSION_TYPE']  = 'filesystem'
+    app.config['SESSION_TYPE'] = 'redis'
+    app.config['SESSION_REDIS'] = from_url('redis://@192.168.20.33:6379')
+
+#Автоматическая регистрация точки входа
 #app.add_url_rule('/login', 'login', ldap.login, methods=['GET', 'POST'])
 
-log.info(f"__INIT MAIN APP for {app_name} started")
-print("__INIT MAIN APP__ started")
+log.info(f"__INIT__ for {app_name} started")
 

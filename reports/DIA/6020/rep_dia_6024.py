@@ -1,4 +1,5 @@
-from   db_config import report_db_user, report_db_password, report_db_dsn
+from configparser import ConfigParser
+# from   db_config import report_db_user, report_db_password, report_db_dsn
 import xlsxwriter
 import datetime
 import os.path
@@ -75,17 +76,27 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2, 13, 'Количество месяцев', common_format)
 	worksheet.write(2, 14, 'Назначенный размер', common_format)
 	worksheet.write(2, 15, 'Статус', common_format)
-	
-
-
 
 
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	log.info(f'DO REPORT. START {report_code}. RFPM_ID: 0701, DATE_FROM: {date_first}, FILE_PATH: {file_name}')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+
+	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+
+	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, DATE_TO: {date_second}, FILE_PATH: {file_name}')
+	
+	config = ConfigParser()
+	config.read('db_config.ini')
+	
+	ora_config = config['rep_db_loader']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
+
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
@@ -177,12 +188,12 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			worksheet.write(0, 12, report_code, title_name_report)
 			
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 12, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 11, f'Дата формирования: {s_date}-{now}', date_format_it)
 
 			workbook.close()
-			now = datetime.datetime.now()
-			log.info(f'Формирование отчета {file_name} завершено: {now.strftime("%d-%m-%Y %H:%M:%S")}')
 			set_status_report(file_name, 2)
+
+			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {s_date} - {now}, Загружено {row_cnt} записей')
 
 
 def thread_report(file_name: str, date_first: str, date_second: str):

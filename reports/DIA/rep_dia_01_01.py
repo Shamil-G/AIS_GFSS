@@ -40,8 +40,8 @@ stmt_1 = """
 stmt_2 = """
     select unique first_value(doc.rfbn_id) over(partition by pt.pnpt_id order by doc.pncp_date desc) rfbn_id,
             first_value(doc.rfpm_id) over(partition by pt.pnpt_id order by doc.pncp_date desc) rfpm_id,
-            p1.rn R_IIN,
-            p2.rn DEP_IIN,
+            p1.iin R_IIN,
+            p2.iin DEP_IIN,
             sfa.appointdate,
             sfa.approvedate,
             pt.sum_pay,
@@ -66,8 +66,8 @@ stmt_2 = """
 stmt_3 = """
     select	sfa.rfbn_id,
             sfa.rfpm_id,
-            p1.rn R_IIN,
-            p2.rn DEP_IIN,
+            p1.iin R_IIN,
+            p2.iin DEP_IIN,
             sfa.risk_date,
             sfa.date_approve,
             sfa.sum_all,

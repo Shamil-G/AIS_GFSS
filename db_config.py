@@ -1,7 +1,6 @@
 from gfss_parameter import platform, ORACLE_HOME
 from util.logger import log
-from redis import from_url
-# import redis
+
 
 if platform == 'unix':
     pool_min = 1
@@ -14,9 +13,9 @@ else:
     pool_inc = 4
     username = 'reports_test'
 
-report_db_dsn = '172.31.33.29:1521/gfss'
-report_db_user = 'sswh'
-report_db_password = 'sswh'
+# report_db_dsn = '172.31.33.29:1521/gfss'
+# report_db_user = 'sswh'
+# report_db_password = 'sswh'
 dsn = '192.168.20.60:1521/gfssdb.gfss.kz'
 password = 'reports'
 
@@ -32,25 +31,3 @@ Debug = True
 
 log.info(f"=====> DB CONFIG. platform: {platform}, ORACLE_HOME: {ORACLE_HOME}, DSN: {dsn}")
 
-# if using != 'DEV_WIN_HOME':
-#     db_redis = redis.from_url('redis://@10.15.15.11:6379')
-#     log.info(f"=====> REDIS CREATED. using url: redis://@10.15.15.11:6379")
-
-class SessionConfig:
-    # secret_key = 'this is secret key qer:ekjf;keriutype2tO287'
-    SECRET_KEY = 'this is secret key 12345 -'
-    if platform!='unix':
-        #SESSION_TYPE = "filesystem"
-        SESSION_TYPE = 'redis'
-        SESSION_REDIS = from_url('redis://@192.168.20.33:6379')
-    else:
-        #SESSION_TYPE = "filesystem"
-        SESSION_TYPE = 'redis'
-        SESSION_REDIS = from_url('redis://@192.168.20.33:6379')
-    SESSION_USE_SIGNER = True
-    # SESSION_REDIS = Redis(host='10.15.15.11', port='6379')
-    # SESSION_PERMANENT = False
-    PERMANENT_SESSION_LIFETIME = 3000
-    # SQLALCHEMY_DATABASE_URI = f'oracle+cx_oracle://{username}:{password}@{dsn}'
-    # SQLALCHEMY_TRACK_MODIFICATIONS = False
-    print(f"----------> TYPE SESSION: {SESSION_TYPE}")

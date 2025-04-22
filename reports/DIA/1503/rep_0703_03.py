@@ -22,7 +22,7 @@ select 	unique rfbn_id, rfpm_id, iin,
 	knp
 from (              
 	SELECT 
-			 p.rn as "IIN",
+			 p.iin as "IIN",
 			 p.sex,
 			 floor( months_between(sipr.risk_date, p.birthdate) / 12 ) age,
 			 FIRST_VALUE(pp.rfbn_id) OVER(PARTITION BY D.PNCD_ID ORDER BY D.PNCP_DATE DESC) rfbn_id,
@@ -93,12 +93,12 @@ def do_report(file_name: str, date_first: str, date_second: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 
-	start_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
+	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 	
 	config = ConfigParser()
 	config.read('db_config.ini')
 	
-	ora_config = config['rep_db_12']
+	ora_config = config['rep_db_loader']
 	db_user=ora_config['db_user']
 	db_password=ora_config['db_password']
 	db_dsn=ora_config['db_dsn']
@@ -203,19 +203,21 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					cnt_part = 0
 				row_cnt += 1
 
-			stop_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
-			worksheet.write(1, 11, f'Дата формирования: {stop_time}', date_format_it)
+			#
+			worksheet.write(0, 13, report_code, title_name_report)
+			
+			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(1, 12, f'Дата формирования:{s_date}-{now}', date_format_it)
 
 			workbook.close()
-
-			log.info(f'Формирование отчета {report_code} завершено, время создания: {start_time} - {stop_time}, файл: {file_name}')
 			set_status_report(file_name, 2)
-			return file_name
+
+			log.info(f'Формирование отчета {file_name} завершено: {s_date} - {now}. Загружено {row_cnt} записей')
 
 
-def get_file_path(file_name: str, date_first: str, date_second: str):
-	full_file_name = f'{file_name}.{report_code}.{date_first}-{date_second}.xlsx'
-	return full_file_name
+# def get_file_path(file_name: str, date_first: str, date_second: str):
+# 	full_file_name = f'{file_name}.{report_code}.{date_first}-{date_second}.xlsx'
+# 	return full_file_name
 
 
 def thread_report(file_name: str, date_first: str, date_second: str):

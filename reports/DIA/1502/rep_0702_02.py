@@ -4,7 +4,6 @@ import datetime
 import os.path
 import oracledb
 from   util.logger import log
-from   db_config import report_db_user, report_db_password, report_db_dsn
 from   model.call_report import set_status_report
 
 
@@ -137,16 +136,18 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('Q3:Q4', 'Периодов в выбранном диапазоне', common_format)
 	worksheet.merge_range('R3:R4', 'Всего периодов', common_format)
 
+
 def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	start_time = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+
+	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 
 	config = ConfigParser()
 	config.read('db_config.ini')
 
-	ora_config = config['rep_db_12']
+	ora_config = config['rep_db_loader']
 	db_user=ora_config['db_user']
 	db_password=ora_config['db_password']
 	db_dsn=ora_config['db_dsn']
@@ -254,19 +255,15 @@ def do_report(file_name: str, date_first: str, date_second: str):
 
 			# SUMMARY
 			# worksheet.write(row_cnt + shift_row, 10, m_val[0], money_format)
+			worksheet.write(0, 11, report_code, title_name_report)
 
-			stop_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
-			worksheet.write(1, 15, f'Дата отчета: {start_time} - {stop_time}', date_format_it)
+			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(1, 15, f'Дата отчета: {s_date} - {now}', date_format_it)
 
 			workbook.close()
-			log.info(f'Формирование отчета {report_code} завершено, время создания: {start_time} - {stop_time}, файл: {file_name}')
 			set_status_report(file_name, 2)
-			return file_name
 
-
-def get_file_path(file_name: str, date_first: str, date_second: str):
-	full_file_name = f'{file_name}.{report_code}.{date_first}-{date_second}.xlsx'
-	return full_file_name
+			log.info(f'Формирование отчета {file_name} завершено: {s_date} - {now}. Загружено {row_cnt} записей')
 
 
 def thread_report(file_name: str, date_first: str, date_second: str):

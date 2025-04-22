@@ -158,7 +158,7 @@ select /*+ Parallel(8) */
        ph.rfbn_id, 
        sfa.rfpm_id, 
        --sfa.iin, 
-       p.rn,
+       p.iin,
        case when sfa.sex = 0 then 'Ж' else 'М' end sex, 
        sfa.risk_date, 
        sfa.date_approve,
@@ -242,12 +242,12 @@ def do_report(file_name: str, date_first: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 
-	start_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
+	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
 	
 	config = ConfigParser()
 	config.read('db_config.ini')
 	
-	ora_config = config['rep_db_12']
+	ora_config = config['rep_db_loader']
 	db_user=ora_config['db_user']
 	db_password=ora_config['db_password']
 	db_dsn=ora_config['db_dsn']
@@ -353,22 +353,23 @@ def do_report(file_name: str, date_first: str):
 					log.info(f'В отчет {report_code} загружено {row_cnt} записей')
 					cnt_part = 0
 				row_cnt += 1
-			#worksheet.write(row_cnt+shift_row, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
 
 			worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
+			#worksheet.write(row_cnt+shift_row, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
+			worksheet.write(0, 11, report_code, title_name_report)
 
-			stop_time = datetime.datetime.now().strftime("%Y-%m-%d (%H:%M:%S)")
-			worksheet.write(1, 12, f'Дата формирования: {stop_time}', date_format_it)
+			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			worksheet.write(1, 10, f'Дата отчета: {s_date} - {stop_time}', date_format_it)
 
 			workbook.close()
-			log.info(f'Формирование отчета {report_code} завершено, время создания: {start_time} - {stop_time}, файл: {file_name}')
 			set_status_report(file_name, 2)
-			return file_name
+
+			log.info(f'Формирование отчета {file_name} завершено: {s_date} - {now}. Загружено {row_cnt} записей')
 
 
-def get_file_path(file_name: str, date_first: str):
-	full_file_name = f'{file_name}.0702_01.{date_first}.xlsx'
-	return full_file_name
+# def get_file_path(file_name: str, date_first: str):
+# 	full_file_name = f'{file_name}.0702_01.{date_first}.xlsx'
+# 	return full_file_name
 
 
 def thread_report(file_name: str, date_first: str):

@@ -47,7 +47,7 @@ from (
   and   si.pay_date <= last_pncp_date
 ) b, person p
 where b.sicid=p.sicid
-group by b.sicid, p.rn
+group by b.sicid, p.iin
 """
 
 active_stmt = stmt_1

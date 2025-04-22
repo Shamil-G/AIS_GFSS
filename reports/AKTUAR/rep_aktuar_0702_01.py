@@ -1,14 +1,13 @@
-from   db_config import report_db_user, report_db_password, report_db_dsn
+from configparser import ConfigParser
 import xlsxwriter
 import datetime
 import os.path
-from logger import log
 import oracledb
+from   util.logger import log
 
-# from cx_Oracle import SessionPool
-# con = cx_Oracle.connect(cfg.username, cfg.password, cfg.dsn, encoding=cfg.encoding)
 
 report_name = 'Получатели СВут 0702 за период:'
+report_code = f'AK_01'
 
 stmt_1 = """
 with sum_calc  as(
@@ -22,7 +21,7 @@ select /*+ Parallel(4) */
        ph.rfbn_id, 
        sfa.rfpm_id, 
        --sfa.iin, 
-       p.rn,
+       p.iin,
        case when sfa.sex = 0 then 'Ж' else 'М' end sex, 
        to_char(p.birthdate,'dd.mm.yyyy'),
        sfa.risk_date, 
@@ -82,21 +81,27 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2, 14, 'Размер СВ  (расчет)', common_format)
 
 
-def make_report(rfpm_id: str, date_from: str):
-	report_code = f'AKTUAR_{rfpm_id}_01'
-
-	file_name = f'{report_code}_{date_from}.xlsx'
-	file_path = f'{file_name}'
-
+def do_report(file_name: str, srfpm_id: str, date_first: str):
 	print(f'MAKE REPORT started...')
-	if os.path.isfile(file_path):
+	if os.path.isfile(file_name):
 		print(f'Отчет уже существует {file_name}')
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	else:
-		with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+
+	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
+
+	config = ConfigParser()
+	config.read('db_config.ini')
+	
+	ora_config = config['rep_db_loader']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
+	
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 			with connection.cursor() as cursor:
-				workbook = xlsxwriter.Workbook(file_path)
+				workbook = xlsxwriter.Workbook(file_name)
 
 				title_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'font_color': 'black'})
 				title_format.set_align('vcenter')
@@ -144,7 +149,7 @@ def make_report(rfpm_id: str, date_from: str):
 				format_worksheet(worksheet=worksheet, common_format=title_format)
 
 				worksheet.write(0, 0, report_name, title_name_report)
-				worksheet.write(1, 0, f'За период: {date_from}', title_name_report)
+				worksheet.write(1, 0, f'За период: {date_first}', title_name_report)
 
 				row_cnt = 1
 				shift_row = 2
@@ -152,8 +157,8 @@ def make_report(rfpm_id: str, date_from: str):
 				m_val = [0]
 
 				cursor = connection.cursor()
-				log.info(f'{file_name}. Загружаем данные за период {date_from}')
-				cursor.execute(active_stmt, [date_from])
+				log.info(f'{file_name}. Загружаем данные за период {date_first}')
+				cursor.execute(active_stmt, [date_first])
 
 				records = cursor.fetchall()
 			
@@ -185,7 +190,9 @@ def make_report(rfpm_id: str, date_from: str):
 				return file_name
 
 
-if __name__ == "__main__":
-    log.info(f'Запускается отчет ...')
-    #make_report('0701', '01.10.2022','31.10.2022')
-    make_report('0702', '01.01.2023')
+def thread_report(file_name: str, srfpm_id: str, date_first: str):
+	import threading
+	log.info(f'THREAD REPORT. {datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")} -> {file_name}')
+	log.info(f'THREAD REPORT. PARAMS: date_from: {date_first}')
+	threading.Thread(target=do_report, args=(file_name, srfpm_id, date_first), daemon=True).start()
+	return {"status": 1, "file_path": file_name}

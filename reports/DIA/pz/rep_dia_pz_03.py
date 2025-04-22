@@ -1,9 +1,10 @@
+from configparser import ConfigParser
 import xlsxwriter
 import datetime
 import os.path
 import oracledb
 from   util.logger import log
-from   db_config import report_db_user, report_db_password, report_db_dsn
+
 from   model.manage_reports import set_status_report
 
 
@@ -50,9 +51,21 @@ def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	#cx_Oracle.init_oracle_client(lib_dir='c:/instantclient_21_3')
-	#cx_Oracle.init_oracle_client(lib_dir='/home/aktuar/instantclient_21_8')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+
+	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+
+	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, DATE_TO: {date_second}, FILE_PATH: {file_name}')
+	
+	config = ConfigParser()
+	config.read('db_config.ini')
+	
+	ora_config = config['rep_db_loader']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
+
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
@@ -148,11 +161,11 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			# Шифр отчета
 			worksheet.write(0, 3, report_code, title_name_report)
 			# 
-			worksheet.write(1, 3, f'Дата формирования: {now}', date_format_it)
+			worksheet.write(1, 3, f'Дата формирования: {s_date}-{now}', date_format_it)
 
 			workbook.close()
 			now = datetime.datetime.now()
-			log.info(f'Формирование отчета {file_name} завершено: {now.strftime("%d-%m-%Y %H:%M:%S")}')
+			log.info(f'Формирование отчета {file_name} завершено: {s_date} - {now}')
 			set_status_report(file_name, 2)
 			return file_name
 

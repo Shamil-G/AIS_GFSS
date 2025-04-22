@@ -28,7 +28,7 @@ group by pd.source_id
 )
 select sfa.rfbn_id,
        sfa.rfpm_id,
-       p1.rn R_IIN,
+       p1.iin R_IIN,
        sfa.risk_date,
        sfa.date_approve,
        sfa.sum_all,
@@ -63,7 +63,7 @@ group by pd.source_id
 )
 select sfa.rfbn_id,
        sfa.rfpm_id,
-       p1.rn R_IIN,
+       p1.iin R_IIN,
        sfa.risk_date,
        sfa.date_approve,
        sfa.sum_all,

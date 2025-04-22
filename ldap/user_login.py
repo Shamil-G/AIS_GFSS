@@ -4,18 +4,11 @@ from os import environ
 
 from ldap.ldap_login import LDAP_User
 # from db.connect import get_connection
-from main_app import app, log
+from main_app import app, log, login_manager
 from app_config import styles
 # from gfss_parameter import public_name
 from util.ip_addr import ip_addr
 
-
-login_manager = LoginManager(app)
-login_manager.login_view = 'login_page'
-login_manager.login_message = "Необходимо зарегистрироваться в системе"
-login_manager.login_message_category = "warning"
-
-log.debug("user_login стартовал...")
 
 @login_manager.user_loader
 def loader_user(id_user):
@@ -42,13 +35,13 @@ def logout():
     log.info(f"LM. LOGOUT. USERNAME: {session['username']}, ip_addr: {ip_addr()}")
     logout_user()
     if 'username' in session:
-        session.pop('username')
+        session.pop('username',None)
     if 'password' in session:
-        session.pop('password')
+        session.pop('password',None)
     if 'info' in session:
-        session.pop('info')
+        session.pop('info',None)
     if 'list_bd' in session:
-        session.pop('list_bd')
+        session.pop('list_bd',None)
     if '_flashes' in session:
         session['_flashes'].clear()
     return redirect(url_for('login_page'))

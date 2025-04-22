@@ -1,4 +1,5 @@
-from   db_config import report_db_user, report_db_password, report_db_dsn
+from configparser import ConfigParser
+# from   db_config import report_db_user, report_db_password, report_db_dsn
 import xlsxwriter
 import datetime
 import oracledb
@@ -13,6 +14,7 @@ report_code = '300.09'
 #document.ridt_id: 6 - Выплаты из ГФСС, 7 - 10% удержания, 8 - удержания из соц.выплат
 #document.status:  0 - Документ сформирован на выплату, 1 - Сформирован платеж, 2 - Платеж на выплате
 stmt_drop = "begin execute immediate 'drop table tmp_dia_9v'; exception when others then null; end;"
+
 def get_stmt_1(date_first, date_second):
 	return f"""
   create table tmp_dia_9v as 
@@ -136,8 +138,21 @@ def do_report(file_name: str, date_first: str, date_second: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
-	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
-	with oracledb.connect(user=report_db_user, password=report_db_password, dsn=report_db_dsn) as connection:
+
+	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+
+	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, DATE_TO: {date_second}, FILE_PATH: {file_name}')
+	
+	config = ConfigParser()
+	config.read('db_config.ini')
+	
+	ora_config = config['rep_db_loader']
+	db_user=ora_config['db_user']
+	db_password=ora_config['db_password']
+	db_dsn=ora_config['db_dsn']
+	log.info(f'{report_code}. db_user: {db_user}, db_dsn: {db_dsn}')
+
+	with oracledb.connect(user=db_user, password=db_password, dsn=db_dsn) as connection:
 		with connection.cursor() as cursor:
 			workbook = xlsxwriter.Workbook(file_name)
 
@@ -173,6 +188,10 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			money_format = workbook.add_format({'num_format': '# ### ### ##0', 'align': 'right'})
 			money_format.set_border(1)
 			money_format.set_align('vcenter')
+
+			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
+			date_format_it.set_align('vcenter')
+			date_format_it.set_italic()
 
 			now = datetime.datetime.now()
 			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
@@ -232,14 +251,14 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			log.info(f'REPORT: {report_code}. Удаляем промежуточную таблицу')
 			cursor.execute(stmt_drop)
 
+			worksheet.write(0, 12, report_code, title_name_report)
+
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			date_format.set_border(0)
-			date_format.set_italic()
-			worksheet.write(1, 12, f'Дата формирования: {now}', date_format)
+			worksheet.write(1, 12, f'Дата отчета: {s_date} - {now}', date_format_it)
 
 			workbook.close()
 			set_status_report(file_name, 2)
-			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {now}')
+			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {s_date} - {now}')
 
 
 def thread_report(file_name: str, date_first: str, date_second: str):

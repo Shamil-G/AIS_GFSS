@@ -1,20 +1,12 @@
 from flask import render_template, request, redirect, flash, url_for, g, session
-from flask_login import LoginManager, login_required, logout_user, login_user, current_user
+from flask_login import login_required, logout_user, login_user, current_user
 from sso.sso_login import SSO_User
-from werkzeug.security import check_password_hash, generate_password_hash
-from db.connect import get_connection
-from main_app import app, log
+from main_app import app, log, login_manager
 from app_config import sso_server
-from gfss_parameter import public_name, debug
 from util.ip_addr import ip_addr
 from os import environ
 import requests 
-import json
-
-login_manager = LoginManager(app)
-login_manager.login_view = 'login_page'
-login_manager.login_message = "Необходимо зарегистрироваться в системе"
-login_manager.login_message_category = "warning"
+# import json
 
 log.info("user_login_sso стартовал...")
 
@@ -44,13 +36,13 @@ def logout():
     logout_user()
     username = session['username']
     if 'username' in session:
-        session.pop('username')
+        session.pop('username', None)
     if 'password' in session:
-        session.pop('password')
+        session.pop('password', None)
     if 'info' in session:
-        session.pop('info')
+        session.pop('info', None)
     if 'list_bd' in session:
-        session.pop('list_bd')
+        session.pop('list_bd', None)
     if '_flashes' in session:
         session['_flashes'].clear()
 

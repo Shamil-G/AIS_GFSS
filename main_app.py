@@ -1,4 +1,4 @@
-from __init__ import app, log
+from __init__ import app, log, login_manager
 import app_config as cfg
 #from db.user_login import * 
 from view.routes import *
