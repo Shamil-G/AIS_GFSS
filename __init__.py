@@ -1,7 +1,7 @@
 from gfss_parameter import app_name, platform
 from flask_login import LoginManager
 from flask import Flask
-from flask_session import Session
+# from flask_session import Session
 from redis import from_url
 from util.logger import log
 
