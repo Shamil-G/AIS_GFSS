@@ -1,6 +1,3 @@
-# from concurrent.futures.thread import BrokenThreadPool
-# from gc import enable
-# from socket import close
 import db_config as cfg
 from gfss_parameter import LD_LIBRARY_PATH, platform
 from util.logger import log

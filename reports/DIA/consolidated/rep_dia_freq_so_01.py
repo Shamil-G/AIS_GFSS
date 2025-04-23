@@ -19,7 +19,7 @@ with src as (
        p.iin,
        trunc(si.pay_date,'MM') pay_month, 
        si.sum_pay, si.type_payer, si.type_payment  
-  from loader.si_member_2 si, loader.person p
+  from si_member_2 si, person p
   where si.pay_date_gfss>=to_date(:d1,'yyyy-mm-dd')
   and   si.pay_date_gfss<to_date(:d2,'yyyy-mm-dd')+1
   and   si.pay_date>=to_date(:d1,'yyyy-mm-dd')-30
@@ -32,57 +32,57 @@ with src as (
   select /*+parallel(4)*/ 
          unique sicid 
   from src s 
-  where type_payer in ('Ю','Н')
-  and nvl(type_payment,'N') not in ('О','П')
+  where type_payer in ('U','N')
+  and nvl(type_payment,'X') not in ('O','P')
   minus
   select /*+parallel(4)*/ 
          unique sicid 
   from src s 
-  where type_payer not in ('Ю','Н')
-  or nvl(type_payment,'N') in ('О','П')
+  where type_payer not in ('U','N')
+  or nvl(type_payment,'X') in ('O','P')
 )
 , comb_payment as(
   select /*+parallel(4)*/ 
          unique sicid
   from src s 
-  where type_payment='О'
+  where type_payment='O'
   minus
   select /*+parallel(4)*/ sicid 
   from src s 
-  where nvl(type_payment,'N')!='О'
+  where nvl(type_payment,'X')!='O'
 )
 , ppz_payment as(
   select /*+parallel(4)*/ 
          unique sicid
   from src s 
-  where type_payment='П'
+  where type_payment='P'
   minus
   select /*+parallel(4)*/ 
          unique sicid
   from src s 
-  where nvl(type_payment,'N')!='П'
+  where nvl(type_payment,'X')!='P'
 ) 
 , boss_ip as (
   select /*+parallel(4)*/ unique sicid
   from src s 
   where s.p_rnn=s.iin
-  and   type_payer='И'
+  and   type_payer='I'
   minus
   select /*+parallel(4)*/ unique sicid 
   from src s 
-  where type_payer!='И'
+  where type_payer!='I'
   or    s.p_rnn!=s.iin
 )
 , hired_ip as (
   select /*+parallel(4)*/ 
          unique sicid 
   from src s 
-  where type_payer='И'
+  where type_payer='I'
   or    s.p_rnn!=s.iin
   minus
   select /*+parallel(4)*/ unique sicid 
   from src s 
-  where type_payer not in ('И')
+  where type_payer not in ('I')
   or    s.p_rnn=s.iin  
 )
 , mesh_emp as 
@@ -91,17 +91,17 @@ with src as (
   from (
     select sicid -- 
     from (
-      select sicid, count(unique decode(si.type_payer,'Н','Ю',si.type_payer)), count(unique nvl(si.type_payment,'N'))
+      select sicid, count(unique decode(si.type_payer,'N','U',si.type_payer)), count(unique nvl(si.type_payment,'X'))
       from src si
       group by si.sicid
-      having count(unique decode(si.type_payer,'Н','Ю',si.type_payer))>1 or count(unique nvl(si.type_payment,'N'))>1
+      having count(unique decode(si.type_payer,'N','U',si.type_payer))>1 or count(unique nvl(si.type_payment,'X'))>1
     )
     union
     select sicid -- Для индивидуальных предпринимателей
     from (
       select sicid
       from src si
-      where type_payer = 'И'
+      where type_payer = 'I'
       minus
       select sicid
       from boss_ip
@@ -115,12 +115,12 @@ with src as (
   select /*+parallel(4)*/ 
          sicid 
   from src s 
-  where type_payer='Е'
+  where type_payer='E'
   minus 
   select /*+parallel(4)*/ 
          sicid 
   from src s 
-  where type_payer!='Е'
+  where type_payer!='E'
 ),
 people_cat as (
   select /*+parallel(4)*/ a.cat, a.sicid, count(unique src.pay_month) cnt_month, sum(sum_pay ) as all_sum_pay
