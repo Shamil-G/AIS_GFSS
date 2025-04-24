@@ -148,7 +148,15 @@ dict_reports = {
                     "data_approve": "28.09.2023",
                     "author": "Гусейнов Ш.",
                     "params": {"date_first": "C", "date_second": "по"},
-                }
+                },
+                {
+                    "name": "Получатели СВбр с назначенными выплатами более 3 млн.",
+                    "num_rep": "05",
+                    "proc": "rep_0704_05",
+                    "data_approve": "24.04.2025",
+                    "author": "Гусейнов Ш.",
+                    "params": {"date_first": "Выберите начальную дату:"},
+                },
                 
             ]
         },
@@ -479,6 +487,14 @@ dict_reports = {
                     "data_approve": "28.01.2025",
                     "author": "Гусейнов Ш.А.",
                     "params": {"date_first": "С", "date_second": "по"},
+                },
+                {
+                    "name": "Сведения о СВбр, назначенный размер которых составил 3 млн. тенге и более в разрезе регионов",
+                    "num_rep": "05",
+                    "proc": "rep_dia_3m",
+                    "data_approve": "24.02.2025",
+                    "author": "Гусейнов Ш.А.",
+                    "params": {"date_first": "Первый год:"},
                 },
             ]
 

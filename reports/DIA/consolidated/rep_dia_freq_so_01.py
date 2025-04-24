@@ -245,7 +245,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 		log.info(f'Отчет уже существует {file_name}: {date_first}')
 		return file_name
 
-	start_time = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+	start_time = now.strftime("%H:%M:%S")
 
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 
@@ -329,7 +329,6 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			money_format.set_align('vcenter')
 
 			now = datetime.datetime.now()
-			start_time = now.strftime("%H:%M:%S")
 			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
 			worksheet = workbook.add_worksheet('Список')
 			sql_sheet = workbook.add_worksheet('SQL')

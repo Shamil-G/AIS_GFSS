@@ -63,7 +63,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 
-	time_start = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+	start_time = now.strftime("%H:%M:%S")
 
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 	
@@ -197,10 +197,12 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					cnt_part = 0
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			stop_time = now.strftime("%H:%M:%S")
+
 			for i in range(page_num):
 				# Шифр отчета
 				worksheet[i].write(0, 0, report_code, title_name_report)
-				worksheet[i].write(0, 3, f'Дата формирования: {time_start}-{now}', date_format_italic)
+				worksheet[i].write(0, 3, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({start_time} - {stop_time})', date_format_italic)
 
 			workbook.close()
 			set_status_report(file_name, 2)
