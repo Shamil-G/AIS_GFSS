@@ -203,7 +203,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 
 			for i in range(page_num):
 				# Шифр отчета
-				worksheet[i].write(0, 0, report_code, title_name_report)
+				worksheet[i].write(0, 0, report_code, title_report_code)
 				worksheet[i].write(0, 3, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
 
 			workbook.close()

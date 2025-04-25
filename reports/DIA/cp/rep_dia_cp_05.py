@@ -106,6 +106,9 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			title_name_report .set_align('vcenter')
 			title_name_report .set_bold()
 
+			title_report_code = workbook.add_format({'align': 'right', 'font_size': '14'})
+			title_report_code.set_align('vcenter')
+
 			title_format_it = workbook.add_format({'align': 'right'})
 			title_format_it.set_align('vcenter')
 			title_format_it.set_italic()
@@ -181,7 +184,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 					cnt_part = 0
 
 			# Шифр отчета
-			worksheet.write(0, 11, report_code, title_name_report)
+			worksheet.write(0, 11, report_code, title_report_code)
 
 			now = datetime.datetime.now()
 			stop_time = now.strftime("%H:%M:%S")
@@ -193,7 +196,6 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			
 			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Загружено {row_cnt-1} записей')
 
-			return file_name
 
 
 def thread_report(file_name: str, date_first: str, date_second: str):

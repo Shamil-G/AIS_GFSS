@@ -120,7 +120,7 @@ def format_worksheet(worksheet, common_format, first_year: int):
 		worksheet.write(3,(num_year-1)*step + first_col + 3, 'общая сумма выплат (тенге)', common_format)
 
 		worksheet.set_column((num_year-1)*step + first_col + 4, (num_year-1)*step + first_col + 4, 12)
-		worksheet.write(3,(num_year-1)*step + first_col + 4, 'доля получателей выплат с с назначением более 3 млн (процент)', common_format)
+		worksheet.write(3,(num_year-1)*step + first_col + 4, 'доля получателей выплат с назначением более 3 млн (процент)', common_format)
 
 		worksheet.set_column((num_year-1)*step + first_col + 5, (num_year-1)*step + first_col + 5, 12)
 		worksheet.write(3,(num_year-1)*step + first_col + 5, 'доля выплат на получателей с назначением более 3 млн (процент)', common_format)
@@ -130,7 +130,6 @@ def format_worksheet(worksheet, common_format, first_year: int):
 
 		worksheet.set_column((num_year-1)*step + first_col + 7, (num_year-1)*step + first_col + 7, 16)
 		worksheet.write(3,(num_year-1)*step + first_col + 7, 'средняя выплата на на всех', common_format)
-
 	
 
 def do_report(file_name: str, date_first: str):
@@ -169,6 +168,9 @@ def do_report(file_name: str, date_first: str):
 			title_format_it = workbook.add_format({'align': 'right'})
 			title_format_it.set_align('vcenter')
 			title_format_it.set_italic()
+
+			title_report_code = workbook.add_format({'align': 'right', 'font_size': '14'})
+			title_report_code.set_align('vcenter')
 
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')
@@ -299,12 +301,13 @@ def do_report(file_name: str, date_first: str):
 				row_cnt += 1
 
 			# Шифр отчета
-			worksheet.write(0, 13, report_code, title_name_report)
+			worksheet.write(0, 13, report_code, title_report_code)
+			
 			now = datetime.datetime.now()
 			stop_time = now.strftime("%H:%M:%S")
 
 			worksheet.write(1, 13, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
-
+			#
 			workbook.close()
 			set_status_report(file_name, 2)
 			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Строк в отчете: {row_cnt-1}')

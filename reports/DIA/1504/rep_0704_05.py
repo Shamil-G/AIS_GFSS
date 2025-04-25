@@ -99,21 +99,20 @@ def do_report(file_name: str, date_first: str):
 			title_name_report .set_align('vcenter')
 			title_name_report .set_bold()
 
-			name_format = workbook.add_format({'align': 'left', 'font_color': 'black'})
-			name_format.set_align('vcenter')
-			name_format.set_border(1)
-
-			name_format_r = workbook.add_format({'align': 'right', 'font_color': 'black'})
-			name_format_r.set_align('vcenter')
-			name_format_r.set_bold()
-
 			title_format_it = workbook.add_format({'align': 'right'})
 			title_format_it.set_align('vcenter')
 			title_format_it.set_italic()
 
+			title_report_code = workbook.add_format({'align': 'right', 'font_size': '14'})
+			title_report_code.set_align('vcenter')
+
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')
 			common_format.set_border(1)
+
+			name_format = workbook.add_format({'align': 'left', 'font_color': 'black'})
+			name_format.set_align('vcenter')
+			name_format.set_border(1)
 
 			sum_pay_format = workbook.add_format({'num_format': '#,###,##0.00', 'font_color': 'black', 'align': 'vcenter'})
 			sum_pay_format.set_border(1)
@@ -180,7 +179,7 @@ def do_report(file_name: str, date_first: str):
 				cnt_part += 1
 				row_cnt += 1
 			#
-			worksheet.write(0, 6, report_code, name_format_r)
+			worksheet.write(0, 6, report_code, title_report_code)
 
 			now = datetime.datetime.now()
 			stop_time = now.strftime("%H:%M:%S")

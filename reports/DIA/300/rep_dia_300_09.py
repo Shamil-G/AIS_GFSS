@@ -170,6 +170,9 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			title_format_it.set_align('vcenter')
 			title_format_it.set_italic()
 
+			title_report_code = workbook.add_format({'align': 'right', 'font_size': '14'})
+			title_report_code.set_align('vcenter')
+
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')
 			common_format.set_border(1)
@@ -252,7 +255,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			cursor.execute(stmt_drop)
 
 			#
-			worksheet.write(0, 12, report_code, title_name_report)
+			worksheet.write(0, 12, report_code, title_report_code)
 
 			now = datetime.datetime.now()
 			stop_time = now.strftime("%H:%M:%S")
@@ -263,7 +266,6 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			set_status_report(file_name, 2)
 			
 			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Загружено {row_cnt-1} записей')
-
 
 
 def thread_report(file_name: str, date_first: str, date_second: str):
