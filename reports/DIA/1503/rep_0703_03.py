@@ -12,7 +12,7 @@ from   model.call_report import set_status_report
 report_name = 'Получатели СВпр (0703)'
 report_code = '1503.03'
 
-stmt_create = """
+stmt_report = """
 select 	unique rfbn_id, rfpm_id, iin, 
 	case when sex=0 then 'Ж' else 'M' end as sex, 
 	age,
@@ -50,7 +50,7 @@ from (
 order by rfbn_id, rfpm_id, iin
 """
 
-active_stmt = stmt_create
+active_stmt = stmt_report
 
 def format_worksheet(worksheet, common_format):
 	worksheet.set_row(0, 28)
@@ -93,7 +93,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 
-	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+	s_date = datetime.datetime.now().strftime("%H:%M:%S")
 	
 	config = ConfigParser()
 	config.read('db_config.ini')
@@ -119,6 +119,10 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			title_name_report .set_align('vcenter')
 			title_name_report .set_bold()
 
+			title_format_it = workbook.add_format({'align': 'right'})
+			title_format_it.set_align('vcenter')
+			title_format_it.set_italic()
+
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')
 			common_format.set_border(1)
@@ -129,10 +133,6 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
-
-			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
-			date_format_it.set_align('vcenter')
-			date_format_it.set_italic()
 
 			digital_format = workbook.add_format({'num_format': '# ### ##0', 'align': 'center'})
 			digital_format.set_border(1)
@@ -204,15 +204,17 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				row_cnt += 1
 
 			#
-			worksheet.write(0, 13, report_code, title_name_report)
+			worksheet.write(0, 12, report_code, title_name_report)
 			
-			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 12, f'Дата формирования:{s_date}-{now}', date_format_it)
+			now = datetime.datetime.now()
+			stop_time = now.strftime("%H:%M:%S")
 
+			worksheet.write(1, 12, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
+			#
 			workbook.close()
 			set_status_report(file_name, 2)
-
-			log.info(f'Формирование отчета {file_name} завершено: {s_date} - {now}. Загружено {row_cnt} записей')
+			
+			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Загружено {row_cnt-1} записей')
 
 
 # def get_file_path(file_name: str, date_first: str, date_second: str):

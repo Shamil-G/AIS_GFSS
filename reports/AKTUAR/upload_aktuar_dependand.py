@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from   os import path, stat, remove
+from   os import path
 import xlsxwriter
 import datetime
 
@@ -70,7 +70,7 @@ def do_report(file_name: str, date_first: str):
 		return file_name
 
 	first_d=first_day(date_first)
-	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+	s_date = datetime.datetime.now().strftime("%H:%M:%S")
 
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 
@@ -97,6 +97,10 @@ def do_report(file_name: str, date_first: str):
 			title_name_report .set_align('vcenter')
 			title_name_report .set_bold()
 
+			title_format_it = workbook.add_format({'align': 'right'})
+			title_format_it.set_align('vcenter')
+			title_format_it.set_italic()
+
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')
 			common_format.set_border(1)
@@ -108,10 +112,6 @@ def do_report(file_name: str, date_first: str):
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
 
-			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'left'})
-			date_format_it.set_align('vcenter')
-			date_format_it.set_italic()
-
 			digital_format = workbook.add_format({'num_format': '######0', 'align': 'center'})
 			digital_format.set_border(1)
 			digital_format.set_align('vcenter')
@@ -119,9 +119,6 @@ def do_report(file_name: str, date_first: str):
 			money_format = workbook.add_format({'num_format': '# ### ### ### ##0.00', 'align': 'right'})
 			money_format.set_border(1)
 			money_format.set_align('vcenter')
-
-			date_format_italic = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
-			date_format_italic.set_italic()
 
 			now = datetime.datetime.now()
 			log.info(f'Начало формирования {file_name}: {now.strftime("%d-%m-%Y %H:%M:%S")}')
@@ -147,7 +144,7 @@ def do_report(file_name: str, date_first: str):
 			# worksheet[page_num-1].write(1, 0, f'Выгрузка за месяц: {first_d}', title_name_report)
 
 			row_cnt = 1
-			all_cnt=1
+			all_cnt=0
 			shift_row = 3
 			cnt_part = 0
 
@@ -194,7 +191,9 @@ def do_report(file_name: str, date_first: str):
 					cnt_part = 0
 
 			#
-			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			now = datetime.datetime.now()
+			stop_time = now.strftime("%H:%M:%S")
+
 			for i in range(page_num):
 				# ADD HEADERS
 				format_worksheet(worksheet=worksheet[page_num-1], common_format=title_format)
@@ -202,7 +201,8 @@ def do_report(file_name: str, date_first: str):
 				worksheet[page_num-1].write(1, 0, f'Выгрузка за месяц: {first_d}', title_name_report)
 				# Шифр отчета
 				worksheet[i].write(0, 14, report_code, title_name_report)
-				worksheet[i].write(1, 12, f'Дата формирования: {s_date} - {now}', date_format_italic)
+
+				worksheet[i].write(1, 14, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
 
 
 			workbook.close()
