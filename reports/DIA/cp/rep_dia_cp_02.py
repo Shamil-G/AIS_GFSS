@@ -68,7 +68,7 @@ def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 
-	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+	s_date = datetime.datetime.now().strftime("%H:%M:%S")
 
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, DATE_TO: {date_second}, FILE_PATH: {file_name}')
 	
@@ -95,6 +95,10 @@ def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 			title_name_report .set_align('vcenter')
 			title_name_report .set_bold()
 
+			title_format_it = workbook.add_format({'align': 'right'})
+			title_format_it.set_align('vcenter')
+			title_format_it.set_italic()
+
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')
 			common_format.set_border(1)
@@ -105,10 +109,6 @@ def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
-
-			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'left'})
-			date_format_it.set_align('vcenter')
-			date_format_it.set_italic()
 
 			digital_format = workbook.add_format({'num_format': '# ### ##0', 'align': 'center'})
 			digital_format.set_border(1)
@@ -167,14 +167,16 @@ def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 			#worksheet.write(row_cnt+shift_row, 3, "=SUM(D2:D"+str(row_cnt+1)+")", sum_pay_format)
 			#worksheet.write(row_cnt + shift_row, 8, m_val[0], money_format)
 			# Шифр отчета
-			worksheet.write(0, 4, report_code, title_name_report)
+			worksheet.write(0, 5, report_code, title_name_report)
 
 			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 4, f'Дата формирования: {s_date}-{now}', date_format_it)
+			stop_time = now.strftime("%H:%M:%S")
+			worksheet.write(1, 5, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
 
+			#
 			workbook.close()
-			now = datetime.datetime.now()
-			log.info(f'Формирование отчета {file_name} завершено: {s_date} - {now}')
+
+			log.info(f'Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Загружено {row_cnt-1} записей')
 			set_status_report(file_name, 2)
 			return file_name
 

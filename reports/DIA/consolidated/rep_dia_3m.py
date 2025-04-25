@@ -29,29 +29,28 @@ select substr(a.rfbn_id,1,2),
        sum_fy_thr,
        cnt_fy_all,
        sum_fy_all,
-       round(cnt_fy_thr*100/cnt_fy_all,2) cnt_proc_fy,
-       round(sum_fy_thr*100/sum_fy_all,2) sum_proc_fy,
-       
-       round(sum_fy_thr*100/cnt_fy_thr,2) sum_fy_thr_avg,
-       round(sum_fy_all*100/cnt_fy_all,2) sum_fy_avg,
+       case when cnt_fy_all is not null then round(cnt_fy_thr*100/cnt_fy_all,2) else 0 end cnt_proc_fy,
+       case when sum_fy_all is not null then round(sum_fy_thr*100/sum_fy_all,2) else 0 end sum_proc_fy,
+       case when cnt_fy_thr !=0 then round(sum_fy_thr*100/cnt_fy_thr,2) else 0 end sum_fy_thr_avg,
+       case when cnt_fy_all !=0 then round(sum_fy_all*100/cnt_fy_all,2) else 0 end sum_fy_avg,
 
        cnt_sy_thr,
        sum_sy_thr,
        cnt_sy_all,
        sum_sy_all,
-       round(cnt_sy_thr*100/cnt_sy_all,2) cnt_proc_sy,
-       round(sum_sy_thr*100/sum_sy_all,2) sum_proc_sy,
-       round(sum_sy_thr*100/cnt_sy_thr,2) sum_sy_thr_avg,
-       round(sum_sy_all*100/cnt_sy_all,2) sum_sy_avg,
+       case when cnt_sy_all !=0 then round(cnt_sy_thr*100/cnt_sy_all,2) else 0 end cnt_proc_sy,
+       case when sum_sy_all !=0 then round(sum_sy_thr*100/sum_sy_all,2) else 0 end sum_proc_sy,
+       case when cnt_sy_thr !=0 then round(sum_sy_thr*100/cnt_sy_thr,2) else 0 end sum_sy_thr_avg,
+       case when cnt_sy_all !=0 then round(sum_sy_all*100/cnt_sy_all,2) else 0 end sum_sy_avg,
 
        cnt_ty_thr,
        sum_ty_thr,
        cnt_ty_all,
        sum_ty_all,
-       round(cnt_ty_thr*100/cnt_ty_all,2) cnt_proc_ty,
-       round(sum_ty_thr*100/sum_ty_all,2) sum_proc_ty,
-       round(sum_ty_thr*100/cnt_ty_thr,2) sum_ty_thr_avg,
-       round(sum_ty_all*100/cnt_ty_all,2) sum_ty_avg
+       case when cnt_ty_all !=0 then round(cnt_ty_thr*100/cnt_ty_all,2) else 0 end cnt_proc_ty,
+       case when sum_ty_all !=0 then round(sum_ty_thr*100/sum_ty_all,2) else 0 end sum_proc_ty,
+       case when cnt_ty_thr !=0 then round(sum_ty_thr*100/cnt_ty_thr,2) else 0 end sum_ty_thr_avg,
+       case when cnt_ty_all !=0 then round(sum_ty_all*100/cnt_ty_all,2) else 0 end sum_ty_avg
 	   
 	   --, ld.f_date,
        --ld.s_date,
@@ -139,7 +138,7 @@ def do_report(file_name: str, date_first: str):
 		log.info(f'Отчет уже существует {file_name}: {date_first}')
 		return file_name
 
-	start_time = now.strftime("%H:%M:%S")
+	s_date = datetime.datetime.now().strftime("%H:%M:%S")
 
 	log.info(f'DO REPORT. START {report_code}. DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 
@@ -166,6 +165,10 @@ def do_report(file_name: str, date_first: str):
 			title_name_report = workbook.add_format({'align': 'left', 'font_color': 'black', 'font_size': '14'})
 			title_name_report .set_align('vcenter')
 			title_name_report .set_bold()
+
+			title_format_it = workbook.add_format({'align': 'right'})
+			title_format_it.set_align('vcenter')
+			title_format_it.set_italic()
 
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')
@@ -208,11 +211,6 @@ def do_report(file_name: str, date_first: str):
 			date_format = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'center'})
 			date_format.set_border(1)
 			date_format.set_align('vcenter')
-
-			date_format_italic = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'left'})
-			date_format_italic.set_align('vcenter')
-			date_format_italic.set_italic()
-			#date_format_italic.set_border(0)
 
 			number_format = workbook.add_format({'num_format': '# ### ### ##0', 'align': 'center'})
 			number_format.set_border(1)
@@ -301,15 +299,15 @@ def do_report(file_name: str, date_first: str):
 				row_cnt += 1
 
 			# Шифр отчета
-			worksheet.write(0, 9, report_code, title_name_report)
+			worksheet.write(0, 13, report_code, title_name_report)
 			now = datetime.datetime.now()
 			stop_time = now.strftime("%H:%M:%S")
 
-			worksheet.write(1, 9, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({start_time} - {stop_time})', date_format_italic)
+			worksheet.write(1, 13, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
 
 			workbook.close()
 			set_status_report(file_name, 2)
-			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {now}. Строк в отчете: {row_cnt}')
+			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Строк в отчете: {row_cnt-1}')
 
 
 def thread_report(file_name: str, date_first: str):

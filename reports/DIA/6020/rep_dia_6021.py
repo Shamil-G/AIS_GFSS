@@ -115,7 +115,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
 	
-	s_date = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+	s_date = datetime.datetime.now().strftime("%H:%M:%S")
 
 	log.info(f'DO REPORT. START {report_code}. RFPM_ID: 0701, DATE_FROM: {date_first}, FILE_PATH: {file_name}')
 	
@@ -142,13 +142,13 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			title_name_report .set_align('vcenter')
 			title_name_report .set_bold()
 
+			title_format_it = workbook.add_format({'align': 'right'})
+			title_format_it.set_align('vcenter')
+			title_format_it.set_italic()
+
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')
 			common_format.set_border(1)
-
-			date_format_it = workbook.add_format({'num_format': 'dd.mm.yyyy', 'align': 'left'})
-			date_format_it.set_align('vcenter')
-			date_format_it.set_italic()
 			
 			name_format = workbook.add_format({'align': 'left', 'font_color': 'black'})
 			name_format.set_align('vcenter')
@@ -219,13 +219,15 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			# Шифр отчета
 			worksheet.write(0, 12, report_code, title_name_report)
 			
-			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
-			worksheet.write(1, 11,  f'Дата формирования: {s_date} - {now}', date_format_it)
+			now = datetime.datetime.now()
+			stop_time = now.strftime("%H:%M:%S")
 
+			worksheet.write(1, 12, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
+			#
 			workbook.close()
 			set_status_report(file_name, 2)
-
-			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено: {s_date} - {now}, Загружено {row_cnt} записей')
+			
+			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Загружено {row_cnt-1} записей')
 
 
 def thread_report(file_name: str, date_first: str, date_second: str):
