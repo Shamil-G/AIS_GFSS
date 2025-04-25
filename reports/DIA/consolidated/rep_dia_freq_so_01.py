@@ -279,6 +279,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 
 			title_report_code = workbook.add_format({'align': 'right', 'font_size': '14'})
 			title_report_code.set_align('vcenter')
+			title_report_code.set_bold()
 
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')

@@ -98,8 +98,8 @@ def do_report(file_name: str, date_first: str, date_second: str, srfpm_id: str):
 			title_format.set_bold()
 
 			title_name_report = workbook.add_format({'align': 'left', 'font_color': 'black', 'font_size': '14'})
-			title_name_report .set_align('vcenter')
-			title_name_report .set_bold()
+			title_name_report.set_align('vcenter')
+			title_name_report.set_bold()
 
 			title_format_it = workbook.add_format({'align': 'right'})
 			title_format_it.set_align('vcenter')
@@ -107,6 +107,7 @@ def do_report(file_name: str, date_first: str, date_second: str, srfpm_id: str):
 
 			title_report_code = workbook.add_format({'align': 'right', 'font_size': '14'})
 			title_report_code.set_align('vcenter')
+			title_report_code.set_bold()
 
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black'})
 			common_format.set_align('vcenter')
