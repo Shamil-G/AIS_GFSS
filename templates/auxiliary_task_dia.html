@@ -9,12 +9,12 @@
 {% endblock %}
 
 {% block navigate %}
-<a href="/">{{ res_value('RETURN') }}</a>
+<a class="nav_button" href="/">{{ res_value('RETURN') }}</a>
 {% endblock %}
 
 {% block body %}
 <form action="/load_minso_dia" class="form_aux" style="padding-left: 1%" method="POST" id="form_input" enctype="multipart/form-data">
-    <a style="color: #ddd; text-decoration: none; padding: 2px 0px">01. {{ res_value('LOAD_LIST_ORG_MINSO') }}</a>
+    <a class="nm_load_minso">01. {{ res_value('LOAD_LIST_ORG_MINSO') }}</a>
     <br>
     <label class="upload-file__label" for="file" id="label_file_input">
 
@@ -28,7 +28,7 @@
                id="file">
 
     </label>
-    <button class="bt bt_r" style="margin: 8px 2px" type="submit">{{ res_value('LOAD_FILE') }}</button>
+    <button class="bt_r" style="margin: 8px 2px" type="submit">{{ res_value('LOAD_FILE') }}</button>
     <div>
         <span id="id_mess" style="color: #ff54dc; text-decoration: none; padding: 2px 0px; margin: 4px 0px 0px 3px ">{{ info }}</span>
     </div>

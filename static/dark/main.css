@@ -49,21 +49,25 @@ footer {
   grid-template-columns: 1fr 6fr;
   grid-area: footer;  /* задаем имя элемента */
 }
-.footer-l {
+footer > .footer-l, header > .header-l {
     margin-left: 10px;
-    /*color: #307080;*/
     font-weight: bold;
+    display: flex;
+    align-items: center;
 }
 footer > .footer-r, header > .header-r {
     /*margin-left: 15px;*/
     margin-right: 10px;
     text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 nav {
     margin: 0;
     padding: 2px;
     display: grid;
-    grid-template-rows: repeat(7,minmax(20px, 10%));
+    grid-template-rows: repeat(12,minmax(28px, 20%));
     grid-template-columns: 100%;
     grid-row-gap: 3px;
     grid-area: nav;  /* задаем имя элемента */
@@ -90,8 +94,6 @@ article {
   display: flex; /*Для выравнивания заголовка по центру*/
   align-items: center; /*Для выравнивания заголовка по центру*/
   grid-area: article_title;  /* задаем имя элемента */
-  font-size: 20px;
-  color: #fff;
 }
 
 .article_title > a {
@@ -161,7 +163,6 @@ nav > a:hover, .header-r > a:hover {
 }
 .image-2 {
     display: flex;
-    width: 48px;
-    height: 54px;
-    border-radius: 5px;
+    width: 36px;
+    height: 30px;
 }

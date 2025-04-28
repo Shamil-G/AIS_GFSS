@@ -1,29 +1,42 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<link rel="stylesheet" type="text/css" href="/static/styles/main.css">
-<meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="/static/{{session['style']}}/main.css">
+    {% block set_style %}{% endblock %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
     <div class = "common-container">
         <header class="header">
-            <div><a>{{ res_value('APP_NAME') }}</a></div>
+            <div class="header-l"><img class="img_logo" src="/static/img/logo-g.ico"><a style="font-size:20px">&emsp;{{ res_value('APP_NAME') }}</a> </div>
+
             <div><a></a></div>
             <div class="header-r">
-                   {% if session['language'] == 'ru' %}
-                            <a href="/language/kz">ҚАЗ</a>
-                    {% else %}
-                            <a href="/language/ru">РУС</a>
-                   {% endif %}
-                  {% if g.user.is_anonymous == True %}
-                            <a href="/login">{{ res_value('LOGIN') }}</a>
-                    {% else %}
-                            <a href="/logout">{{ res_value('LOGOUT') }}</a>
-                  {% endif %}
+                {% if 'style' in session and session['style'] == 'color' %}
+                <div>
+                    <a href="/change-style"><img class="img_theme" src="/static/img/icons8-black-white-50.png" style="width: 24px; height: 24px" /></a>
+                </div>
+                {% else %}
+                <div>
+                    <a href="/change-style"><img class="img_theme" src="/static/img/icons8-color-48.png" style="width: 24px; height: 24px" /></a>
+                </div>
+                {% endif %}
+
+                {% if session['language'] == 'ru' %}
+                <a href="/language/kz">ҚАЗ</a>
+                {% else %}
+                <a href="/language/ru">РУС</a>
+                {% endif %}
+                {% if g.user.is_anonymous == True %}
+                <a href="/login">{{ res_value('LOGIN') }}</a>
+                {% else %}
+                <a href="/logout">{{ res_value('LOGOUT') }}</a>
+                {% endif %}
 
             </div>
         </header>
@@ -31,12 +44,12 @@
         <nav class="nav">
             {% block navigate %}{% endblock %}
                 {% if g.user.is_active %}
-                    <a class="title2" href="/running-reports">{{ res_value('RUNNING_REPORTS') }}</a>
+                    <a class="nav_button" href="/running-reports">{{ res_value('RUNNING_REPORTS') }}</a>
                 {% if 'admin' in g.user.roles %}
-                    <a class="title2" id="aux_task" href="/auxiliary-task-dia">{{ res_value('AUXILIARY_TASK') }}</a>
+                    <a class="nav_button" id="aux_task" href="/auxiliary-task-dia">{{ res_value('AUXILIARY_TASK') }}</a>
                 {% endif %}
                 <!--<a class="title2" href="/change-passwd">{{ res_value('CHANGE_PASSWORD') }}</a>-->
-                <a class="title2" href="/logout">{{ res_value('LOGOUT') }}</a>
+                <a class="nav_button" href="/logout">{{ res_value('LOGOUT') }}</a>
             {% endif %}
         </nav>
 

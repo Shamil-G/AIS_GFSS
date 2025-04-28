@@ -1,6 +1,6 @@
 from gfss_parameter import BASE
 
-styles = 'styles'
+styles = ['dark', 'color']
 
 debug=False
 

@@ -13,7 +13,7 @@
 
 
 {% block navigate %}
-    <a class="title2"  href="/{% if 'dep_name' in session %}dep/{{ session['dep_name']}}{% endif %}">{{ res_value('RETURN') }}</a>
+    <a class="nav_button"  href="/{% if 'dep_name' in session %}dep/{{ session['dep_name']}}{% endif %}">{{ res_value('RETURN') }}</a>
 {% endblock %}
 
 {% block body %}

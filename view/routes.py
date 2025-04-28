@@ -4,7 +4,7 @@ from flask_login import  login_required
 from werkzeug.utils import secure_filename
 
 from gfss_parameter import platform
-from app_config import REPORT_PATH, LOG_PATH
+from app_config import REPORT_PATH, LOG_PATH, styles
 from main_app import app, log
 from model.reports_info import get_owner_reports, get_list_groups, get_list_reports
 from model.auxiliary_task import load_minso_dia
@@ -13,6 +13,8 @@ from model.reports import list_reports_by_day
 from model.manage_reports import remove_report
 from datetime import date
 from util.get_i18n import get_i18n_value
+from os import environ
+
 # from model.manage_user import change_passwd
 
 
@@ -35,7 +37,10 @@ empty_call_response = """
 
 @app.context_processor
 def utility_processor():
-    log.info(f"CP. {get_i18n_value('APP_NAME')}")
+    if 'style' not in session:
+        session['style']=styles[0]    
+        log.debug(f'------- CP\n\tSET SESSION STYLE: {session['style']}\n------')
+    log.debug(f"------ CP. \n\tSET SESSION STYLE: {session['style']}\n\t{get_i18n_value('APP_NAME')}")
     return dict(res_value=get_i18n_value)
 
 
@@ -50,6 +55,24 @@ def view_root():
     if 'username' in session:
         log.debug(f"VIEW_ROOT. USERNAME: {session['username']}")
     return render_template("index.html", owner_cursor=owners)
+
+
+@app.route('/change-style')
+def change_style():
+    if 'style' in session:
+        for style in styles:
+            if style!=session['style']:
+                session['style']=style
+                break
+    else: 
+        session['style']=styles[0]
+    # Получим предыдущую страницу, чтобы на неё вернуться
+    current_page = request.referrer
+    log.debug(f"Set style {session['style']}. Next page: {current_page}")
+    if current_page is not None:
+        return redirect(current_page)
+    else:
+        return redirect(url_for('view_root'))
 
 
 @app.route('/dep/<string:dep_name>', methods=['GET','POST'])
