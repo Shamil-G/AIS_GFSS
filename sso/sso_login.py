@@ -2,7 +2,7 @@ from ldap3 import Server, Connection, SUBTREE
 from flask import session
 from util.ip_addr import ip_addr
 from util.logger import log
-from app_config import ldap_admins, permit_deps
+from app_config import ldap_admins, permit_deps, ldap_boss
 
      
 class SSO_User:
@@ -14,8 +14,13 @@ class SSO_User:
 
         if 'password' in session:
             self.password = session['password']
+
         if src_user and 'login_name' in src_user:
             log.info(f'SSO_USER. src_user: {src_user}')
+
+            if 'dep_name' not in src_user or src_user['dep_name'] not in permit_deps:
+                log.info(f'----------------\n\tUSER {self.full_name} not Registred\n----------------')
+                return None
 
             principalName = src_user['principalName']
             self.principal_name = principalName
@@ -35,17 +40,13 @@ class SSO_User:
                 self.depname = src_user['dep_name']
                 session['depname']=self.depname
 
-            if src_user['fio'] in ldap_admins:
+            if src_user['fio'] in ldap_admins or src_user['post'] in ldap_boss:
                 log.info(f'----------------\n\tUSER {session['username']} are Admin\n----------------')
                 self.roles='admin'
             else:
                 self.roles='operator'
             session['roles'] = self.roles
             
-            if src_user['dep_name'] not in permit_deps:
-                log.info(f'----------------\n\tUSER {self.full_name} not Registred\n----------------')
-                return None
-
             if 'roles' in src_user:
                 self.roles = src_user['roles']
                 session['roles']=self.roles
