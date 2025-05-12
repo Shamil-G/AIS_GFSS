@@ -178,7 +178,7 @@ def do_report(file_name: str, date_first: str, date_second: str):
 			worksheet.write(1, 8, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
 			#
 			workbook.close()
-			log.info(f'Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Загружено {row_cnt} записей')
+			log.info(f'Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Загружено {row_cnt-1} записей')
 			set_status_report(file_name, 2)
 
 

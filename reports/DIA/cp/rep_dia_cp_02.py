@@ -173,13 +173,12 @@ def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 			# Шифр отчета
 			worksheet.write(0, 5, report_code, title_report_code)
 
-			now = datetime.datetime.now().strftime("%d.%m.%Y (%H:%M:%S)")
+			now = datetime.datetime.now()
 			stop_time = now.strftime("%H:%M:%S")
-			worksheet.write(1, 5, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
 
+			worksheet.write(1, 5, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
 			#
 			workbook.close()
-
 			log.info(f'Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Загружено {row_cnt-1} записей')
 			set_status_report(file_name, 2)
 
