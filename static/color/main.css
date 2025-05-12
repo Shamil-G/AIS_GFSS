@@ -129,11 +129,10 @@ reports > a {
     border: inherit;
     border-radius: inherit;
     color: #41794e;
+    text-shadow: 1px 2px 3px grey;
+    text-shadow: none;
 }
-reports {
-    color: #ddd;
-    text-align: left; /*Центрируем текст по горизонтали*/
-}
+
 .article_title > a:hover, reports > a:hover,
 .header-r > a:hover {
     background: #117910;
