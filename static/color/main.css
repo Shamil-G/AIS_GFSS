@@ -1,77 +1,42 @@
-/*@import url('clear.css');*/
-@import url('forms.css');
+﻿@import url('forms.css');
 @import url('table_styles.css');
 @import url('button.css');
-/*@import url('elements.css');*/
+@import url('images.css');
+@import url('input_field.css');
+@import url('elements.css');
 
 :root {
     color: green;
-    text-decoration: none;
     text-shadow: 1px 2px 3px grey;
 }
 html, body {
-    width: 99%;
+    padding: 1px;
+    margin: 0px;
     height: 99%;
+    width: 100%;
     text-decoration: none;
     font-family: Calibri;
     background: #c9edcd;
 }
-nav, article {
-    border-radius: 5px;
-    border: 1px solid rgba(142, 142, 142, 0.3);
-    background-image: url('/static/img/bg.jpg'); /* Update this path */
-    background-size: cover;
-    background-position: center;
-}
-header, footer, .article_title, article_body, article_info {
-    border-radius: 3px;
-    border: 1px solid rgba(180, 180, 180, 0.3);
-}
-.article {
-    padding: 6px 0px;
-}
-.common-container {
+common-container {
     min-height: 100%;
     display: grid;
     grid-template-columns: 1fr 7fr;
     grid-template-rows: 0.5fr 0.5fr 7fr 0.3fr;
     grid-gap: 2px;
     grid-template-areas: "header header"
-                 "nav article_title"
-                 "nav article"
-                 "footer footer";
+        "nav article_title"
+        "nav article"
+        "footer footer";
 }
-header {
-    display: grid;
-    padding-left: 16px;
-    grid-template-columns: 4fr 4fr 4fr;
-    align-items: center; /* Выравниваем по вертикали*/
-    grid-area: header;  /* задаем имя элемента */
+nav, article {
+    border-radius: 3px;
+    border: 1px solid rgba(142, 142, 142, 0.3);
+    background-image: url('/static/img/bg.jpg'); /* Update this path */
+    background-size: cover;
+    background-position: center;
 }
-footer {
-  display: grid;
-  padding: 8px 16px;
-  align-items: center; /* Выравниваем по вертикали*/
-  grid-template-columns: 1fr 6fr;
-  grid-area: footer;  /* задаем имя элемента */
-}
-footer > .footer-l, header > .header-l {
-    margin-left: 10px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-}
-
-    footer > .footer-r, header > .header-r {
-        /*margin-left: 15px;*/
-        margin-right: 10px;
-        text-align: right;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-    }
 nav {
-    /*text-shadow: 1px 2px 3px grey;*/
     margin: 0;
     padding: 2px;
     display: grid;
@@ -81,59 +46,68 @@ nav {
     grid-area: nav; /* задаем имя элемента */
     align-content: stretch;
 }
-
 article {
-  margin: 0;
-  grid-area: article;  /* задаем имя элемента */
+    padding: 6px 0px;
+    margin: 0;
+    grid-area: article; /* задаем имя элемента */
 }
-.article_title {
+article_title {
     padding: 2px 16px;
     background: #b5fdbb;
     display: flex; /*Для выравнивания заголовка по центру*/
     align-items: center; /*Для выравнивания заголовка по центру*/
     grid-area: article_title; /* задаем имя элемента */
 }
-.article_title > a {
-    /*background: #198518;*/
-    color: green;
-    padding: 3px 12px 3px 12px;
-    margin: 2px;
-    text-decoration: none;
-    border-radius: 4px;
+header {
+    display: grid;
+    padding-left: 16px;
+    grid-template-columns: 4fr 4fr 4fr;
+    align-items: center; /* Выравниваем по вертикали*/
+    grid-area: header; /* задаем имя элемента */
 }
-
-a[href^='/language'], header a[href^='/log'] {
-    color: green;
-    margin-left:10px;
-    padding: 5px;
-    text-decoration: none;
-    border-radius: 4px;
+footer {
+    display: grid;
+    padding: 8px 16px;
+    align-items: center; /* Выравниваем по вертикали*/
+    grid-template-columns: 1fr 6fr;
+    grid-area: footer; /* задаем имя элемента */
 }
-
-groups > a {
-    padding: 3px;
+header, footer, article_title, article_body, article_info {
+    border-radius: 3px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+footer > .footer-l, header > .header-l {
+    margin-left: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+footer > .footer-r, header > .header-r {
+    /*margin-left: 15px;*/
+    margin-right: 10px;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+nav > a {
     text-decoration: none;
     align-items: center;
-    padding-left: 5px;
+    padding: 9px 12px 9px 12px;
     display: flex;
     border: inherit;
     border-radius: inherit;
-    color: #fff;
+    color: #ddd;
+    font-size: 18px;
 }
-
-reports > a {
+article_title > a {
+    margin: 2px;
+    padding: 9px 12px 9px 12px;
+    color: green;
     text-decoration: none;
-    align-items: center;
-    padding: 5px 5px 5px 10px;
-    display: block;
-    border: inherit;
-    border-radius: inherit;
-    color: #41794e;
-    text-shadow: 1px 2px 3px grey;
-    text-shadow: none;
+    border-radius: 4px;
 }
-
-.article_title > a:hover, reports > a:hover,
+article_title > a:hover, reports > a:hover,
 .header-r > a:hover {
     background: #117910;
     color: wheat;
@@ -141,16 +115,3 @@ reports > a {
     border-radius: 4px;
 }
 
-.image {
-    display: flex;
-    width: 34px;
-    height: 28px;
-    background-color: #444;
-    border-radius: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-}
-.image-2 {
-    display: flex;
-    width: 36px;
-    height: 30px;
-}

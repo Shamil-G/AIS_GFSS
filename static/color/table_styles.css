@@ -1,28 +1,31 @@
-.title, .title2 {
-    padding: 6px 16px 6px 10px;
+﻿table {
+    border-collapse: collapse;
+    text-shadow: none;
 }
-.title{
-    font-size: 20px;
-}
-.title2 {
-    font-size: 16px;
-}
-/* Форма ABOUT*/
-.table_s {
-    margin: 12px;
-}
-.th_s, .td_s, .td_s2 {
+thead {
     text-align: center;
     text-decoration: none;
     padding: 3px 12px;
-    font-weight: normal;
     border: 1px solid rgba(180, 180, 180, 0.3);
 }
 /* Подсвечиваем строки на котором стоит курсор*/
-.tr_s:hover {
-    border: 1px solid rgba(180, 180, 180, 0.3);
-    background: #555;
+tbody > tr:hover {
+    background: #c9edcd;
 }
+td, th {
+    text-align: center;
+    text-decoration: none;
+    font-weight: normal;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+td {
+    padding: 3px 12px;
+}
+th {
+    font-weight: bold;
+    padding: 5px 14px;
+}
+
 /* Если отчет выбирали то установим новый цвет */
 .a_s {
     color: green;
@@ -49,7 +52,24 @@
     color: blanchedalmond;
     text-decoration: none;
 }
-*/*, *:after, *:before {
+*/
+*, *:after, *:before {
     box-sizing: border-box;
 }
-
+reports > a {
+    text-decoration: none;
+    align-items: center;
+    padding: 5px 5px 5px 10px;
+    display: block;
+    border: inherit;
+    border-radius: inherit;
+    color: #41794e;
+    text-shadow: 1px 2px 3px grey;
+    text-shadow: none;
+}
+reports > a:hover {
+    background: #117910;
+    color: wheat;
+    text-decoration: none;
+    border-radius: 4px;
+}

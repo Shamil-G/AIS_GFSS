@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, flash, url_for, g, session
+﻿from flask import render_template, request, redirect, flash, url_for, g, session
 from flask_login import login_required, logout_user, login_user, current_user
 from sso.sso_login import SSO_User
 from main_app import app, log, login_manager
@@ -107,13 +107,13 @@ def login_page():
 
         resp_json=resp.json()
         log.debug(f'LOGIN POST. resp_json: {resp_json}/{type(resp_json)}')
+        log.info(f'LOGIN POST. resp_json: {resp_json}/{type(resp_json)}')
         if resp_json['status'] !=200:
             log.info(f'----------------\n\tUSER {session['username']}/{session['password']} not Registred\n----------------')
-            return render_template('login.html')
+            return render_template('login.html', info='Неверна Фамилия (или ИИН) или пароль в Windows')
 
         json_user = resp_json['user']
-        # session['username'] = json_user['login_name']
-        # session['password'] = json_user['password']
+        
         log.info(f'LOGIN POST. json_user: {json_user}')
 
     # Если такой username существует и объект user создался, надо проверить пароль и вытащить атрибуты

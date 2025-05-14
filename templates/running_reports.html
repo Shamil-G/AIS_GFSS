@@ -1,13 +1,13 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block title %}
     {{ res_value('RUNNING_REPORT') }}
 {% endblock %}
 
 {% block main_title %}
-<form method="POST">
-    <input class="input_s" type="date" id="request_date" name="request_date" value="{{ request_date }}">
-    <button class="bt_s" type="submit" name="submit">{{ res_value('SELECT_BY_DATE') }}</button>
+<form method="POST" style="display:flex; border: none">
+    <input class="input_s" style="margin: 2px 12px 2px 0px" type="date" id="request_date" name="request_date" value="{{ request_date }}">
+    <button type="submit" name="submit">{{ res_value('SELECT_BY_DATE') }}</button>
 </form>
 {% endblock %}
 
@@ -17,77 +17,80 @@
 {% endblock %}
 
 {% block body %}
-    <form class="form_r">
+    <form style="margin:0; border: none;">
         {% if list %}
         <table>
-            <thead class="th_s">
+            <thead>
                 <tr>
-                    <th class="th_s"><a>{{ res_value('REPORT_DATE') }}</a></th>
-                    <th class="th_s"><a>{{ res_value('REPORT_ID') }}</a></th>
-                    <th class="th_s"><a>{{ res_value('REPORT_NAME') }}</a></th>
-                    <th class="th_s"><a>{{ res_value('REPORT_STATUS') }}</a></th>
-                    <th class="th_s"><a>{{ res_value('RFPM_ID') }}</a></th>
-                    <th class="th_s"><a>{{ res_value('DATE_FIRST') }}</a></th>
-                    <th class="th_s"><a>{{ res_value('DATE_SECOND') }}</a></th>
-                    <th class="th_s"><a>{{ res_value('RFBN_ID') }}</a></th>
-                    <th class="th_s"></th>
+                    <th><a>{{ res_value('REPORT_DATE') }}</a></th>
+                    <th><a>{{ res_value('REPORT_ID') }}</a></th>
+                    <th><a>{{ res_value('REPORT_NAME') }}</a></th>
+                    <th><a>{{ res_value('REPORT_STATUS') }}</a></th>
+                    <th><a>{{ res_value('RFPM_ID') }}</a></th>
+                    <th><a>{{ res_value('DATE_FIRST') }}</a></th>
+                    <th><a>{{ res_value('DATE_SECOND') }}</a></th>
+                    <th><a>{{ res_value('RFBN_ID') }}</a></th>
+                    <th></th>
                 </tr>
+            </thead>
+            <tbody>
                 {% for el in list %}
                 <tr>
-                    <td class="td_s">
+                    <td>
                         <a class="a_s">{{ el['date_event'] }}</a>
                     </td>
-                    <td class="td_s">
+                    <td>
                         <a class="a_s">{{ el['num'] }}</a>
                     </td>
-                    <td class="td_s">
+                    <td>
                         <a class="a_s">{{ el['name'] }}</a>
                     </td>
 
                     {% if el['status'] == 2 or el['status'] == '2' %}
-                    <td class="td_s">
+                    <td>
                         <a class="a_s2" href="/uploads/{{el['path']}}">{{ res_value('REPORT_GET') }}</a>
                     </td>
                     {% elif el['status'] == 3 or el['status'] == '3' %}
-                    <td class="td_s">
+                    <td>
                         <a class="a_s2" href="/uploads/{{el['path']}}">{{ res_value('REPORT_MISTAKE') }}</a>
                     </td>
                     {% else %}
-                    <td class="td_s">
+                    <td>
                         <a class="a_s">{{ res_value('REPORT_PREPARING') }}</a>
                     </td>
                     {% endif %}
-                    <td class="td_s">
+                    <td>
                         {% if el['rfpm_id'] %}
                         <a class="a_s">{{ el['rfpm_id'] }}</a>
                         {% endif %}
                     </td>
-                    <td class="td_s">
+                    <td>
                         {% if el['date_first'] %}
                         <a class="a_s">{{ el['date_first'] }}</a>
                         {% endif %}
                     </td>
-                    <td class="td_s">
+                    <td>
                         {% if el['date_second'] %}
                         <a class="a_s">{{ el['date_second'] }}</a>
                         {% endif %}
                     </td>
-                    <td class="td_s">
+                    <td>
                         {% if el['rfbn_id'] %}
                         <a class="a_s">{{ el['rfbn_id'] }}</a>
                         {% endif %}
                     </td>
 
                     {% if el['status'] == 2 or el['status'] == 3 %}
-                    <td class="td_s">
+                    <td>
                         <a class="a_s2" href="/remove-reports/{{ el['date_event'] }}/{{ el['num'] }}">{{ res_value('REMOVE_REPORT') }}</a>
                     </td>
                     {% else %}
-                    <td class="td_s"></td>
+                    <td></td>
                     {% endif %}
                 </tr>
                 {% endfor %}
-</table>
+            </tbody>
+        </table>
         {% endif %}
     </form>
 {% endblock %}

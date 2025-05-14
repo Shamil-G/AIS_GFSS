@@ -14,11 +14,13 @@
 {% endblock %}
 
 {% block body %}
-    <form class="form_r" style="padding-bottom: 54px">
+<!--<form class="form_r">-->
+<!--<div class="table_list">-->
         {% for el in cursor %}
         <groups>
-            <a class="title2" href="/list-reports/{{el}}">{{ el }}</a>
+        <a class="title2" href="/list-reports/{{el}}">{{ el }}</a>
         </groups>
         {% endfor %}
-    </form>
+<!--</div>-->
+<!--</form>-->
 {% endblock %}

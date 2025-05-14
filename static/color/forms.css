@@ -1,24 +1,9 @@
-.form_s, .form_r {
+form {
     margin: 4px;
-    padding: 6px;
     border-radius: 5px;
-    border: 1px solid rgba(180, 180, 180, 0.3);
-}
-
-.form_r {
-    margin: 4px;
-    padding: 12px 10px 24px 10px;
-    border-radius: 5px;
-    border: 1px solid rgba(180, 180, 180, 0.3);
-}
-
-.form_aux {
-    margin: 4px;
     padding: 12px 10px 12px 10px;
-    border-radius: 5px;
     border: 1px solid rgba(180, 180, 180, 0.3);
 }
-
 .name_system {
     color: #ddd;
     margin: 4px;

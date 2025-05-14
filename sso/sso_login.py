@@ -1,4 +1,4 @@
-from ldap3 import Server, Connection, SUBTREE
+﻿from ldap3 import Server, Connection, SUBTREE
 from flask import session
 from util.ip_addr import ip_addr
 from util.logger import log
@@ -18,8 +18,12 @@ class SSO_User:
         if src_user and 'login_name' in src_user:
             log.info(f'SSO_USER. src_user: {src_user}')
 
+            login_name = src_user['login_name']
+            self.username = login_name
+            session['username'] = login_name
+
             if 'dep_name' not in src_user or src_user['dep_name'] not in permit_deps:
-                log.info(f'----------------\n\tUSER {self.full_name} not Registred\n----------------')
+                log.info(f'----------------\n\tUSER {self.username} from {ip} not Registred\n----------------')
                 return None
 
             principalName = src_user['principalName']
@@ -28,9 +32,6 @@ class SSO_User:
             full_name = src_user['fio']
             self.full_name = full_name
             
-            login_name = src_user['login_name']
-            self.username = login_name
-            session['username'] = login_name
 
             if 'post' in src_user:
                 self.post = src_user['post']
@@ -40,16 +41,17 @@ class SSO_User:
                 self.depname = src_user['dep_name']
                 session['depname']=self.depname
 
-            if src_user['fio'] in ldap_admins or src_user['post'] in ldap_boss:
-                log.info(f'----------------\n\tUSER {session['username']} are Admin\n----------------')
-                self.roles='admin'
-            else:
-                self.roles='operator'
-            session['roles'] = self.roles
-            
             if 'roles' in src_user:
                 self.roles = src_user['roles']
-                session['roles']=self.roles
+                log.info(f'----------------\n\tUSER {session['username']} have SSO Roles {self.roles}\n----------------')
+            elif src_user['fio'] in ldap_admins or src_user['post'] in ldap_boss:
+                self.roles='admin'
+                log.info(f'----------------\n\tUSER {session['username']} are System Admin\n----------------')
+            else:
+                self.roles='operator'
+                log.info(f'----------------\n\tUSER {session['username']} are Operator\n----------------')
+            session['roles'] = self.roles
+            
                 
             self.full_name = full_name
             session['full_name'] = full_name 
@@ -57,7 +59,7 @@ class SSO_User:
             self.ip_addr = ip
             log.info(f"LM SSO. SUCCESS. USERNAME: {self.username}, ip_addr: {self.ip_addr}\n\tFIO: {self.full_name}, roles: {self.roles} ")
             return self
-        log.info(f"LM SSO. F`AIL. USERNAME: {src_user}, ip_addr: {ip}, password: {session['password']}")
+        log.info(f"LM SSO. FAIL. USERNAME: {src_user}, ip_addr: {ip}, password: {session['password']}")
         return None
 
     def have_role(self, role_name):

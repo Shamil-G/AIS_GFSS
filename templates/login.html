@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block title %}
 {{ res_value('LOGIN_PAGE') }}
@@ -20,26 +20,26 @@
     {% endif %}
     {% endwith %}
 </div>
-<form class="form_s" method="POST">
-    <table style="width:20%">
-        <tr>
-            <td>
-                <input class="input_login" type="text" name="username" placeholder="Фамилия или ИИН">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input class="input_login" type="password" name="password" placeholder="Пароль в Windows">
-            </td>
-        </tr>
+<form style="border:none; padding: 12px 0px 0px 24px;"method="POST">
+    <table>
+        <tbody>
+            <tr>
+                <td style="border: none; text-align:left; padding: 3px 0px;">
+                    <input class="input_login" style="margin: 0px" type="text" name="username" placeholder="Фамилия или ИИН">
+                </td>
+            </tr>
+            <tr>
+                <td style="border: none; text-align: left; padding: 3px 0px;">
+                    <input class="input_login" style="margin: 4px 0px 0px 0px" type="password" name="password" placeholder="Пароль в Windows">
+                </td>
+            </tr>
+        <tbody>
     </table>
-    <br/>
-    <button class="bt_s" type="submit">{{ res_value('LOGIN_BUTTON') }}</button>
-    <div style="text-align: left; margin: 12px 7px 0px">
+    <button style="margin-top: 16px" type="submit">{{ res_value('LOGIN_BUTTON') }}</button>
+    <div style="text-align: left; margin-top: 20px; text-shadow:none; font-size: 20px">
         {% if info %}
         <a>{{ info }}</a>
         {% endif %}
     </div>
-    <br>
 </form>
 {% endblock %}

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ru">
 <head>
     <link rel="stylesheet" type="text/css" href="/static/{{session['style']}}/main.css">
@@ -11,8 +11,8 @@
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
-    <div class = "common-container">
-        <header class="header">
+    <common-container>
+        <header>
             <div class="header-l"><img class="img_logo" src="/static/img/logo-g.ico"><a style="font-size:20px">&emsp;{{ res_value('APP_NAME') }}</a> </div>
 
             <div><a></a></div>
@@ -41,36 +41,40 @@
             </div>
         </header>
 
-        <nav class="nav">
+        <nav>
             {% block navigate %}{% endblock %}
-                {% if g.user.is_active %}
-                    <a class="nav_button" href="/running-reports">{{ res_value('RUNNING_REPORTS') }}</a>
-                {% if 'admin' in g.user.roles %}
-                    <a class="nav_button" id="aux_task" href="/auxiliary-task-dia">{{ res_value('AUXILIARY_TASK') }}</a>
-                {% endif %}
-                <!--<a class="title2" href="/change-passwd">{{ res_value('CHANGE_PASSWORD') }}</a>-->
-                <a class="nav_button" href="/logout">{{ res_value('LOGOUT') }}</a>
+            {% if g.user.is_active %}
+            <a class="nav_button" href="/running-reports">{{ res_value('RUNNING_REPORTS') }}</a>
+            {% if 'admin' in g.user.roles %}
+            <a class="nav_button" id="aux_task" href="/auxiliary-task-dia">{{ res_value('AUXILIARY_TASK') }}</a>
+            {% endif %}
+            <!--<a class="title2" href="/change-passwd">{{ res_value('CHANGE_PASSWORD') }}</a>-->
+            <a class="nav_button" href="/logout">{{ res_value('LOGOUT') }}</a>
             {% endif %}
         </nav>
 
-        <div class="article_title">
+        <!--<div class="article_title">
+            {% block main_title_2 %}{% endblock %}
+        </div>-->
+        <article_title>
             {% block main_title %}{% endblock %}
-        </div>
-        <article class="article">
-                    {% block body %}{% endblock %}
+        </article_title>
+
+        <article>
+            {% block body %}{% endblock %}
         </article>
 
-        <footer class="footer">
-              <div class="footer-l">
-                 <small>© 2023</small>
-              </div>
-              <div class="footer-r">
-                  <small style="visibility: hidden">{{ res_value('CREATORS') }}</small>
-                  <small style="visibility: hidden">{{ res_value('FOR_DEVELOPERS') }}</small>
-                  <a style="font-size:14px">{% if g.user and g.user.full_name %} {{g.user.full_name}}/{{g.user.principal_name}}/{{g.user.depname}} {% endif %}</a>
-              </div>
+        <footer>
+            <div class="footer-l">
+                <small>© 2023</small>
+            </div>
+            <div class="footer-r">
+                <small style="visibility: hidden">{{ res_value('CREATORS') }}</small>
+                <small style="visibility: hidden">{{ res_value('FOR_DEVELOPERS') }}</small>
+                <a style="font-size:14px">{% if g.user and g.user.full_name %} {{g.user.full_name}}/{{g.user.principal_name}}/{{g.user.depname}} {% endif %}</a>
+            </div>
         </footer>
-    </div>
+    </common-container>
 </body>
 
 </html>

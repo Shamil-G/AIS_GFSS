@@ -1,0 +1,51 @@
+﻿a[href^='/language'], header a[href^='/log'] {
+    color: #fff;
+    margin-left: 10px;
+    padding: 5px;
+    text-decoration: none;
+    border-radius: 4px;
+}
+.nm_load_minso {
+    /*    color: brown;*/
+    font-size: 18px;
+    text-decoration: none;
+    padding: 2px 0px;
+}
+.cancel_background_hover:hover {
+    background: inherit;
+}
+label {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: left;
+}
+groups {
+    margin: 5px 12px;
+    /*padding: 6px 10px 6px 10px;*/
+    float: left; /*Задаем обтекание*/
+    text-align: center; /*Центрируем текст по горизонтали*/
+    position: relative;
+    background: #444;
+}
+groups {
+    text-decoration: none;
+    display: flex;
+    position: relative;
+    border-radius: 5px;
+    font-weight: 500;
+}
+groups:hover {
+    background: #555;
+    box-shadow: 4px 4px 16px rgba(70,205,79, 0.4);
+}
+
+groups > a {
+    margin: 5px 9px;
+    padding: 6px 10px 6px 10px;
+    text-decoration: none;
+    color: #fff;
+}
+/* Подкрашиваем буквы в желтенький цвет */
+groups > a:hover {
+    color: #dfdba7;
+}
