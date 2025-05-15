@@ -1,4 +1,4 @@
-from configparser import ConfigParser
+﻿from configparser import ConfigParser
 import xlsxwriter
 import datetime
 from   util.logger import log
@@ -16,8 +16,8 @@ SELECT	/*+parallel(8)*/
 		round(AVG(ph.sum_pay), 2) sz_avg
 FROM payment_history ph, pnpd_document pd
 WHERE pd.pnpd_id = ph.pnpd_id
-AND act_month >= to_date(:dt_from,'YYYY-MM-DD') 
-And act_month < to_date(:dt_to,'YYYY-MM-DD') + 1
+and pd.pncp_date >= to_date(:dt_from,'YYYY-MM-DD') 
+and pd.pncp_date < to_date(:dt_to,'YYYY-MM-DD') + 1
 And substr(pd.rfpm_id,1,4) in ('0701','0702','0703','0704','0705')
 And pd.ridt_id In (6, 7, 8)
 And pd.status In (0, 1, 2, 3, 5, 7)
