@@ -90,6 +90,13 @@ footer > .footer-r, header > .header-r {
     align-items: center;
     justify-content: flex-end;
 }
+footer > .footer-c, header > .header-c {
+    margin: 8px 24px;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 nav > a {
     text-decoration: none;
     align-items: center;
@@ -108,7 +115,7 @@ article_title > a {
     border-radius: 4px;
 }
 article_title > a:hover, reports > a:hover,
-.header-r > a:hover {
+.header-r > a:hover, .header-c > a:hover {
     background: #117910;
     color: wheat;
     text-decoration: none;

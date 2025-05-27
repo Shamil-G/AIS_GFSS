@@ -1,4 +1,4 @@
-ï»¿@import url('forms.css');
+@import url('forms.css');
 @import url('table_styles.css');
 @import url('button.css');
 @import url('images.css');
@@ -41,34 +41,34 @@ nav {
     grid-template-rows: repeat(12,minmax(28px, 20%));
     grid-template-columns: 100%;
     grid-row-gap: 3px;
-    grid-area: nav; /* Ð·Ð°Ð´Ð°ÐµÐ¼ Ð¸Ð¼Ñ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð° */
+    grid-area: nav; /* çàäàåì èìÿ ýëåìåíòà */
     align-content: stretch;
 }
 article {
     padding: 6px 0px;
     margin: 0;
-    grid-area: article; /* Ð·Ð°Ð´Ð°ÐµÐ¼ Ð¸Ð¼Ñ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð° */
+    grid-area: article; /* çàäàåì èìÿ ýëåìåíòà */
 }
 article_title {
     padding: 2px 16px;
     background: #333;
-    display: flex; /*Ð”Ð»Ñ Ð²Ñ‹Ñ€Ð°Ð²Ð½Ð¸Ð²Ð°Ð½Ð¸Ñ Ð·Ð°Ð³Ð¾Ð»Ð¾Ð²ÐºÐ° Ð¿Ð¾ Ñ†ÐµÐ½Ñ‚Ñ€Ñƒ*/
-    align-items: center; /*Ð”Ð»Ñ Ð²Ñ‹Ñ€Ð°Ð²Ð½Ð¸Ð²Ð°Ð½Ð¸Ñ Ð·Ð°Ð³Ð¾Ð»Ð¾Ð²ÐºÐ° Ð¿Ð¾ Ñ†ÐµÐ½Ñ‚Ñ€Ñƒ*/
-    grid-area: article_title; /* Ð·Ð°Ð´Ð°ÐµÐ¼ Ð¸Ð¼Ñ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð° */
+    display: flex; /*Äëÿ âûðàâíèâàíèÿ çàãîëîâêà ïî öåíòðó*/
+    align-items: center; /*Äëÿ âûðàâíèâàíèÿ çàãîëîâêà ïî öåíòðó*/
+    grid-area: article_title; /* çàäàåì èìÿ ýëåìåíòà */
 }
 header {
     display: grid;
     padding-left: 16px;
     grid-template-columns: 4fr 4fr 4fr;
-    align-items: center; /* Ð’Ñ‹Ñ€Ð°Ð²Ð½Ð¸Ð²Ð°ÐµÐ¼ Ð¿Ð¾ Ð²ÐµÑ€Ñ‚Ð¸ÐºÐ°Ð»Ð¸*/
-    grid-area: header;  /* Ð·Ð°Ð´Ð°ÐµÐ¼ Ð¸Ð¼Ñ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð° */
+    align-items: center; /* Âûðàâíèâàåì ïî âåðòèêàëè*/
+    grid-area: header;  /* çàäàåì èìÿ ýëåìåíòà */
 }
 footer {
     display: grid;
     padding: 8px 16px;
-    align-items: center; /* Ð’Ñ‹Ñ€Ð°Ð²Ð½Ð¸Ð²Ð°ÐµÐ¼ Ð¿Ð¾ Ð²ÐµÑ€Ñ‚Ð¸ÐºÐ°Ð»Ð¸*/
+    align-items: center; /* Âûðàâíèâàåì ïî âåðòèêàëè*/
     grid-template-columns: 1fr 6fr;
-    grid-area: footer;  /* Ð·Ð°Ð´Ð°ÐµÐ¼ Ð¸Ð¼Ñ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð° */
+    grid-area: footer;  /* çàäàåì èìÿ ýëåìåíòà */
 }
 header, footer, article_title, article_body, article_info {
     border-radius: 3px;
@@ -88,6 +88,17 @@ footer > .footer-r, header > .header-r {
     align-items: center;
     justify-content: flex-end;
 }
+footer > .footer-c, header > .header-c {
+    margin: 8px 24px;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.header-c > a {
+    color: white;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
 nav > a {
     text-decoration: none;
     align-items: center;
@@ -105,7 +116,8 @@ article_title > a {
     text-decoration: none;
     border-radius: 4px;
 }
-article_title > a:hover, nav > a:hover, .header-r > a:hover {
+article_title > a:hover, nav > a:hover,
+.header-r > a:hover, .header-c > a:hover {
     background: #777;
     color: wheat;
     text-decoration: none;

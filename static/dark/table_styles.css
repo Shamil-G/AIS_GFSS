@@ -8,7 +8,7 @@ thead {
     padding: 3px 12px;
     border: 1px solid rgba(180, 180, 180, 0.3);
 }
-/* ÐŸÐ¾Ð´ÑÐ²ÐµÑ‡Ð¸Ð²Ð°ÐµÐ¼ ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð½Ð° ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ð¼ ÑÑ‚Ð¾Ð¸Ñ‚ ÐºÑƒÑ€ÑÐ¾Ñ€*/
+/* Ïîäñâå÷èâàåì ñòðîêè íà êîòîðîì ñòîèò êóðñîð*/
 tbody > tr:hover {
     background: #555;
 }
@@ -36,7 +36,7 @@ th {
     font-size: 16px;
 }
 
-/* Ð•ÑÐ»Ð¸ Ð¾Ñ‚Ñ‡ÐµÑ‚ Ð²Ñ‹Ð±Ð¸Ñ€Ð°Ð»Ð¸ Ñ‚Ð¾ ÑƒÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ð¼ Ð½Ð¾Ð²Ñ‹Ð¹ Ñ†Ð²ÐµÑ‚ */
+/* Åñëè îò÷åò âûáèðàëè òî óñòàíîâèì íîâûé öâåò */
 .a_s {
     color: #ddd;
     text-decoration: none;
@@ -62,13 +62,10 @@ th {
     color: blanchedalmond;
     text-decoration: none;
 }
-*/*, *:after, *:before {
-    box-sizing: border-box;
-}
-
+*/
 reports {
     color: #ddd;
-    text-align: left; /*Ð¦ÐµÐ½Ñ‚Ñ€Ð¸Ñ€ÑƒÐµÐ¼ Ñ‚ÐµÐºÑÑ‚ Ð¿Ð¾ Ð³Ð¾Ñ€Ð¸Ð·Ð¾Ð½Ñ‚Ð°Ð»Ð¸*/
+    text-align: left; /*Öåíòðèðóåì òåêñò ïî ãîðèçîíòàëè*/
 }
 reports > a {
     text-decoration: none;
@@ -84,4 +81,7 @@ reports > a:hover {
     color: wheat;
     text-decoration: none;
     border-radius: 4px;
+}
+*, *:after, *:before {
+    box-sizing: border-box;
 }

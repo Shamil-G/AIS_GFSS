@@ -1,4 +1,4 @@
-﻿.input_s, .input_login {
+.input_s, .input_login {
     color: #ddd;
     margin: 4px;
     padding: 9px;
@@ -64,4 +64,3 @@
     border-radius: 5px;
     cursor: pointer;
 }
-

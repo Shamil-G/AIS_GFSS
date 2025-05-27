@@ -1,4 +1,4 @@
-ï»¿a[href^='/language'], header a[href^='/log'] {
+a[href^='/language'], header a[href^='/log'] {
     color: #fff;
     margin-left: 10px;
     padding: 5px;
@@ -22,8 +22,8 @@ label {
 groups {
     margin: 5px 12px;
     /*padding: 6px 10px 6px 10px;*/
-    float: left; /*Ð—Ð°Ð´Ð°ÐµÐ¼ Ð¾Ð±Ñ‚ÐµÐºÐ°Ð½Ð¸Ðµ*/
-    text-align: center; /*Ð¦ÐµÐ½Ñ‚Ñ€Ð¸Ñ€ÑƒÐµÐ¼ Ñ‚ÐµÐºÑÑ‚ Ð¿Ð¾ Ð³Ð¾Ñ€Ð¸Ð·Ð¾Ð½Ñ‚Ð°Ð»Ð¸*/
+    float: left; /*Çàäàåì îáòåêàíèå*/
+    text-align: center; /*Öåíòðèðóåì òåêñò ïî ãîðèçîíòàëè*/
     position: relative;
     background: #444;
 }
@@ -45,7 +45,7 @@ groups > a {
     text-decoration: none;
     color: #fff;
 }
-/* ÐŸÐ¾Ð´ÐºÑ€Ð°ÑˆÐ¸Ð²Ð°ÐµÐ¼ Ð±ÑƒÐºÐ²Ñ‹ Ð² Ð¶ÐµÐ»Ñ‚ÐµÐ½ÑŒÐºÐ¸Ð¹ Ñ†Ð²ÐµÑ‚ */
+/* Ïîäêðàøèâàåì áóêâû â æåëòåíüêèé öâåò */
 groups > a:hover {
     color: #dfdba7;
 }
