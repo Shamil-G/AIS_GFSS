@@ -38,6 +38,7 @@ REQ_4_CALC_PART = Требования к расчетной части:!
 REMOVE = Удалить!
 REPEATE_PASSWORD = Повторите пароль:!
 REPORT_ABSENT = Отчет отсутствует!
+REPORT_REQUEST=Запросить отчёт
 REPORT_GET = Получить отчет!
 REPORT_PREPARING = Отчет готовится!
 REPORT_MISTAKE = Ошибка формирования!

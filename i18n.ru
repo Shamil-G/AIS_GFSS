@@ -34,6 +34,7 @@ NEW_CALC = Новый расчет
 NEW_NICK = Новая учетка
 NEW_NICKNAME = Новое имя:
 NEW_MODEL = Новая модель
+REPORT_REQUEST=Запросить отчёт
 REPORT_NAME = Отчет
 PASSWORD = Пароль
 PARTICIPANTS = Участники

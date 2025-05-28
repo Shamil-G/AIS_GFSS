@@ -1,29 +1,32 @@
 ﻿table {
+    width: 100%;
     border-collapse: collapse;
     text-shadow: none;
 }
-thead {
-    text-align: center;
+thead th {
+    font-size: 18px;
+    font-weight: bold;
     text-decoration: none;
     padding: 3px 12px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+tr > th {
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: none;
+    box-sizing: border-box;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+tr > td {
+    margin-left: 4px;
+    padding: 3px 12px;
+    font-size: 16px;
     border: 1px solid rgba(180, 180, 180, 0.3);
 }
 /* Подсвечиваем строки на котором стоит курсор*/
 tbody > tr:hover {
     background: #c9edcd;
-}
-td, th {
-    text-align: center;
-    text-decoration: none;
-    font-weight: normal;
-    border: 1px solid rgba(180, 180, 180, 0.3);
-}
-td {
-    padding: 3px 12px;
-}
-th {
-    font-weight: bold;
-    padding: 5px 14px;
 }
 
 /* Если отчет выбирали то установим новый цвет */

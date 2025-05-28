@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}
 {{ res_value('SELECT_REPORT') }}
@@ -14,9 +14,8 @@
 {% endblock %}
 
 {% block body %}
-
 <form style="margin: 16px; border: none" method="POST">
-    <table>
+    <table style="width: auto">
         <tbody>
         {% for el in params %}
         <tr class="cancel_background_hover">
@@ -49,6 +48,6 @@
         </tbody>
     </table>
     <br/>
-    <button type="submit" name="edit_parms">Запросить отчёт</button>
+    <button type="submit" name="edit_parms">{{res_value('REPORT_REQUEST')}}</button>
 </form>
 {% endblock %}

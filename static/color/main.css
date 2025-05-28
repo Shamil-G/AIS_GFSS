@@ -16,13 +16,14 @@ html, body {
     width: 100%;
     text-decoration: none;
     font-family: Calibri;
-    background: #c9edcd;
+    background: #c9edcd52;
 }
 common-container {
+    margin: 1px;
     min-height: 100%;
     display: grid;
     grid-template-columns: 1fr 7fr;
-    grid-template-rows: 0.5fr 0.5fr 7fr 0.3fr;
+    grid-template-rows: 44px 44px auto 36px;
     grid-gap: 2px;
     grid-template-areas: "header header"
         "nav article_title"
@@ -52,11 +53,12 @@ article {
     grid-area: article; /* задаем имя элемента */
 }
 article_title {
-    padding: 2px 16px;
-    background: #b5fdbb;
+    padding: 2px 24px;
+    font-size: 20px;
     display: flex; /*Для выравнивания заголовка по центру*/
     align-items: center; /*Для выравнивания заголовка по центру*/
     grid-area: article_title; /* задаем имя элемента */
+    background-color: #cfefd5;
 }
 header {
     display: grid;
@@ -64,6 +66,7 @@ header {
     grid-template-columns: 4fr 4fr 4fr;
     align-items: center; /* Выравниваем по вертикали*/
     grid-area: header; /* задаем имя элемента */
+    /*    background-color: #cfefd5;*/
 }
 footer {
     display: grid;
@@ -91,7 +94,7 @@ footer > .footer-r, header > .header-r {
     justify-content: flex-end;
 }
 footer > .footer-c, header > .header-c {
-    margin: 8px 24px;
+    margin: 4px 24px;
     text-align: right;
     display: flex;
     align-items: center;
@@ -109,10 +112,11 @@ nav > a {
 }
 article_title > a {
     margin: 2px;
-    padding: 9px 12px 9px 12px;
+    padding: 8px 12px 8px 12px;
     color: green;
     text-decoration: none;
     border-radius: 4px;
+    font-size: 18px;
 }
 article_title > a:hover, reports > a:hover,
 .header-r > a:hover, .header-c > a:hover {

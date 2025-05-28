@@ -38,9 +38,10 @@
 .input_s {
     color: green;
     margin: 4px;
-    padding: 9px;
+    padding: 8px;
     align-items: center;
     background-color: wheat;
+    background-color: #efefd3e6;
     font-size: 18px;
     /*background-color: rgba(159, 191, 149, 0.3);*/ /*#fffcd3;*/
     border-radius: 5px;

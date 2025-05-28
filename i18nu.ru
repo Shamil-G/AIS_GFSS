@@ -44,6 +44,7 @@ RFPM_ID = Код выплаты
 RFBN_ID = Код региона
 DATE_FIRST = Первая дата
 DATE_SECOND = Вторая дата
+REPORT_REQUEST=Запросить отчёт
 REPORT_GET = Получить отчет
 REPORT_ID = Номер отчета
 REPORT_PREPARING = Отчет готовится
