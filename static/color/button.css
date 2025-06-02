@@ -43,13 +43,14 @@ button:not(:disabled):not(.disabled) {
     cursor: pointer;
 }
 .nav_button {
-    padding: 9px 12px 9px 12px;
+    padding: 3px 12px 3px 6px;
     text-decoration: none;
     align-items: center;
     color: green;
     display: flex;
     position: relative;
-    border-radius: 5px;
+    border-radius: inherit;
+    border-radius: inherit;
     font-weight: 500;
     box-shadow: 3px 3px 6px grey;
 }

@@ -41,7 +41,7 @@ nav {
     margin: 0;
     padding: 2px;
     display: grid;
-    grid-template-rows: repeat(12,minmax(28px, 20%));
+    grid-template-rows: repeat(12,minmax(48px, 58px));
     grid-template-columns: 100%;
     grid-row-gap: 3px;
     grid-area: nav; /* задаем имя элемента */
@@ -99,16 +99,6 @@ footer > .footer-c, header > .header-c {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-nav > a {
-    text-decoration: none;
-    align-items: center;
-    padding: 9px 12px 9px 12px;
-    display: flex;
-    border: inherit;
-    border-radius: inherit;
-    color: #ddd;
-    font-size: 18px;
 }
 article_title > a {
     margin: 2px;
