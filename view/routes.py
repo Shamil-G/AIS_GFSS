@@ -193,6 +193,7 @@ def uploaded_file(full_path):
     if platform == 'unix' and not full_path.startswith('/'):
         full_path = f'/{full_path}'
     file_path, file_name = path.split(full_path)
+    log.debug(f"UPLOADED_FILE. FULL_PATH: {full_path}\n\tFILE_PATH: {file_path}\n\tFLE_NAME: {file_name}")
     if full_path.startswith(REPORT_PATH):
         status = check_report(full_path)
         log.debug(f"UPLOADED_FILE. STATUS: {status} : {type(status)}, PATH: {file_path}, file_name: {file_name}, REPORT_PATH: {REPORT_PATH}")

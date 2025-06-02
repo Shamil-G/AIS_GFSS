@@ -222,6 +222,14 @@ dict_reports = {
                 "author": "Гусейнов Ш.А.",
                 "params": {"date_first": "C", "date_second": "по "},
                 },
+                {
+                "name": "СО по категориям МЗП и районам (3029-районы)",
+                "num_rep": "03",
+                "proc": "rep_dia_3029_1",
+                "data_approve": "14.03.2025",
+                "author": "Гусейнов Ш.А.",
+                "params": {"date_first": "C", "date_second": "по "},
+                },
             ]
         },
 
