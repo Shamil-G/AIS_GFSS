@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block body %}
-<form action="/load_minso_dia" style="padding-left: 2%" method="POST" id="form_input" enctype="multipart/form-data">
+<form action="/load_minso_dia" style="padding-left: 2%; border: none" method="POST" id="form_input" enctype="multipart/form-data">
     <a class="nm_load_minso">01. {{ res_value('LOAD_LIST_ORG_MINSO') }}</a>
     <br>
     <label class="upload-file__label" for="file" id="label_file_input">
@@ -28,7 +28,7 @@
                id="file">
 
     </label>
-    <button style="margin-top: 14px" type="submit">{{ res_value('LOAD_FILE') }}</button>
+    <button style="margin-top: 24px" type="submit">{{ res_value('LOAD_FILE') }}</button>
     <div>
         <span id="id_mess" style="color: #ff54dc; text-decoration: none; padding: 2px 0px; margin: 4px 0px 0px 3px ">{{ info }}</span>
     </div>

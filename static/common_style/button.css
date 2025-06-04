@@ -1,16 +1,33 @@
-button {
-    color: #ddd;
-    background-color: #198518;
+button, .bt {
+    margin: 2px 0px;
+    padding: 9px 34px 9px 34px;
+    text-decoration: none;
+    align-items: center;
+    display: flex;
+    border: inherit;
+    border-radius: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    line-height: 1.5;
+    position: relative;
+    text-decoration: none;
+/*    transition: color .2s ease-in-out,background-color .2s ease-in-out, border-color .2s ease-in-out, box-shadow .2s ease-in-out;*/
 }
 button:hover {
+    top: 1px;
+    transition: .3s linear;
     text-decoration: none;
-    color: lightgoldenrodyellow;
+    box-shadow: 4px 4px 16px grey;
 }
+
 button.danger {
     color: white;
+    margin-right: 30px;
+    margin-left: 30px;
     background-color: #971c2c;
     border-color: #de3a4b;
 }
+
 button.danger:hover {
     color: yellow;
     background-color: #de3a4b;
@@ -21,7 +38,15 @@ button:not(:disabled):not(.disabled) {
     cursor: pointer;
 }
 .nav_button {
+    padding: 3px 12px 3px 6px;
+    text-decoration: none;
+    align-items: center;
     color: green;
+    display: flex;
+    position: relative;
+    border-radius: 4px;
+    font-weight: 500;
+    box-shadow: 3px 3px 6px grey;
 }
 .upload-file__input {
     opacity: 0;
@@ -33,9 +58,10 @@ button:not(:disabled):not(.disabled) {
 }
 
 .nav_button:hover, .bt_r:hover, .bt_s:hover {
+    top: 1px;
+    transition: .3s linear;
     box-shadow: 4px 4px 16px grey;
 }
-
 .upload-file__label {
     margin: 9px 0px;
     padding: 9px;

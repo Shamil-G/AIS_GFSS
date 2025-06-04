@@ -149,7 +149,7 @@ def do_report(file_name: str, date_first: str):
 
 			row_cnt = 1
 			all_cnt=0
-			shift_row = 3
+			shift_row = 2
 			cnt_part = 0
 
 			log.info(f'{file_name}. Загружаем данные за месяц {first_d}')
@@ -201,10 +201,10 @@ def do_report(file_name: str, date_first: str):
 			for i in range(page_num):
 				# ADD HEADERS
 				format_worksheet(worksheet=worksheet[page_num-1], common_format=title_format)
-				worksheet[page_num-1].write(0, 0, report_name, title_report_code)
+				worksheet[page_num-1].write(0, 0, report_name, title_name_report)
 				worksheet[page_num-1].write(1, 0, f'Выгрузка за месяц: {first_d}', title_name_report)
 				# Шифр отчета
-				worksheet[i].write(0, 14, report_code, title_name_report)
+				worksheet[i].write(0, 14, report_code, title_report_code)
 
 				worksheet[i].write(1, 14, f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})', title_format_it)
 

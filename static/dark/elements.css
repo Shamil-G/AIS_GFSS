@@ -1,18 +1,11 @@
-a[href^='/language'], header a[href^='/log'] {
-    color: #fff;
-    margin-left: 10px;
-    padding: 5px;
-    text-decoration: none;
-    border-radius: 4px;
-}
 .nm_load_minso {
-    /*    color: brown;*/
-    font-size: 18px;
-    text-decoration: none;
-    padding: 2px 0px;
+    color: mediumvioletred;
 }
 .cancel_background_hover:hover {
     background: inherit;
+}
+a[href^='/language'], header a[href^='/log'] {
+    color: #fff;
 }
 label {
     font-size: 20px;

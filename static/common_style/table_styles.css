@@ -1,0 +1,73 @@
+﻿table {
+    width: 100%;
+    border-collapse: collapse;
+    text-shadow: none;
+}
+thead th {
+    font-size: 17px;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 3px 12px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+tr > th {
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: none;
+    box-sizing: border-box;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+tr > td {
+    margin-left: 4px;
+    padding: 3px 12px;
+    text-align: center;
+    font-size: 16px;
+    border: 1px solid rgba(180, 180, 180, 0.3);
+}
+
+/* Если отчет выбирали то установим новый цвет */
+.a_s {
+    color: green;
+    text-decoration: none;
+}
+.a_s:visited {
+    color: darkgreen;
+    text-decoration: none;
+}
+.a_s:link {
+    color: #ddd;
+    text-decoration: none;
+}
+.a_s2 {
+    color: brown;
+    text-decoration: none;
+}
+.a_s2:hover {
+    color:palevioletred;
+}
+
+/*
+.a_s2:visited {
+    color: blanchedalmond;
+    text-decoration: none;
+}
+*/
+
+reports > a {
+    text-decoration: none;
+    align-items: center;
+    padding: 5px 5px 5px 10px;
+    display: block;
+    border: inherit;
+    border-radius: inherit;
+    text-shadow: 1px 2px 3px grey;
+    text-shadow: none;
+}
+reports > a:hover {
+    text-decoration: none;
+    border-radius: 4px;
+}
+*, *:after, *:before {
+    box-sizing: border-box;
+}

@@ -1,0 +1,11 @@
+﻿@import url('../common_style/main.css');
+@import url('../common_style/forms.css');
+@import url('../common_style/table_styles.css');
+@import url('../common_style/button.css');
+@import url('../common_style/elements.css');
+@import url('../common_style/images.css');
+@import url('main.css');
+@import url('button.css');
+@import url('table_styles.css');
+@import url('input_field.css');
+@import url('elements.css');

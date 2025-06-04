@@ -1,29 +1,6 @@
-table {
-    border-collapse: collapse;
-    text-shadow: none;
-}
-thead {
-    text-align: center;
-    text-decoration: none;
-    padding: 3px 12px;
-    border: 1px solid rgba(180, 180, 180, 0.3);
-}
 /* ѕодсвечиваем строки на котором стоит курсор*/
 tbody > tr:hover {
     background: #555;
-}
-td, th {
-    text-align: center;
-    text-decoration: none;
-    font-weight: normal;
-    border: 1px solid rgba(180, 180, 180, 0.3);
-}
-td {
-    padding: 3px 12px;
-}
-th {
-    font-weight: bold;
-    padding: 5px 14px;
 }
 
 .title, .title2 {

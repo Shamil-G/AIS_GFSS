@@ -6,8 +6,8 @@
 
 {% block main_title %}
 <form method="POST" style="display:flex; border: none">
-    <input class="input_s" style="margin: 2px 12px 2px 0px" type="date" id="request_date" name="request_date" value="{{ request_date }}">
-    <button type="submit" name="submit">{{ res_value('SELECT_BY_DATE') }}</button>
+    <input class="input_s" style="margin: 2px 24px 2px 0px; padding: 0px 4px 0px 6px" type="date" id="request_date" name="request_date" value="{{ request_date }}">
+    <button type="submit" class="bt" name="submit">{{ res_value('SELECT_BY_DATE') }}</button>
 </form>
 {% endblock %}
 
@@ -42,7 +42,7 @@
                     <td>
                         <a class="a_s">{{ el['num'] }}</a>
                     </td>
-                    <td>
+                    <td style="text-align: left">
                         <a class="a_s">{{ el['name'] }}</a>
                     </td>
 

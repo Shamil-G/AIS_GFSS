@@ -1,27 +1,10 @@
-﻿table {
-    width: 100%;
-    border-collapse: collapse;
-    text-shadow: none;
-}
-thead th {
-    font-size: 18px;
-    font-weight: bold;
-    text-decoration: none;
-    padding: 3px 12px;
+﻿thead th {
     border: 1px solid rgba(180, 180, 180, 0.3);
 }
 tr > th {
-    padding: 10px;
-    text-align: center;
-    font-weight: bold;
-    text-decoration: none;
-    box-sizing: border-box;
-    border: 1px solid rgba(180, 180, 180, 0.3);
+    border: 1px solid rgba(255, 0, 0, 0.3);
 }
 tr > td {
-    margin-left: 4px;
-    padding: 3px 12px;
-    font-size: 16px;
     border: 1px solid rgba(180, 180, 180, 0.3);
 }
 /* Подсвечиваем строки на котором стоит курсор*/
@@ -50,29 +33,12 @@ tbody > tr:hover {
     color:palevioletred;
 }
 
-/*
-.a_s2:visited {
-    color: blanchedalmond;
-    text-decoration: none;
-}
-*/
-
 reports > a {
-    text-decoration: none;
-    align-items: center;
-    padding: 5px 5px 5px 10px;
-    display: block;
-    border: inherit;
-    border-radius: inherit;
     color: #41794e;
-    text-shadow: 1px 2px 3px grey;
-    text-shadow: none;
 }
 reports > a:hover {
     background: #117910;
     color: wheat;
-    text-decoration: none;
-    border-radius: 4px;
 }
 *, *:after, *:before {
     box-sizing: border-box;
