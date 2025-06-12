@@ -41,10 +41,9 @@ button:not(:disabled):not(.disabled) {
     padding: 3px 12px 3px 6px;
     text-decoration: none;
     align-items: center;
-    color: green;
     display: flex;
     position: relative;
-    border-radius: 4px;
+    border-radius: inherit;
     font-weight: 500;
     box-shadow: 3px 3px 6px grey;
 }
