@@ -217,8 +217,6 @@ def view_remove_report(date_report,num_report):
 @app.route('/auxiliary-task-dia')
 @login_required
 def view_auxiliary_task_dia():
-    if 'Администратор ДИА' in g.user.roles:
-        log.info(f"VIEW AUXILIARY TASK DIA. {session['username']}.")
     mess = '' 
     if 'aux_info' in session:
         mess = session['aux_info']
@@ -229,34 +227,18 @@ def view_auxiliary_task_dia():
 @app.route('/load_minso_dia', methods=['POST', 'GET'])
 @login_required
 def view_load_minso_dia():
-    if 'Администратор ДИА' in g.user.roles:
-        if request.method == "POST":
-            log.info(f'request: {request}')
-            uploaded_file = request.files['file']
-            if uploaded_file.filename!='':
-                secure_fname = secure_filename(uploaded_file.filename)
-                file_name = path.join(LOG_PATH,secure_fname)
-                uploaded_file.save(file_name)
-                count, all_cnt, table_name, mess = load_minso_dia(file_name)
-                session['aux_info'] = mess
-                log.info(f"VIEW_LOAD_MINSO. LOAD_FILE: {file_name}, loaded: {count}/{all_cnt} , mess: {mess}")
-                if count<all_cnt:
-                    log.info(f"VIEW_LOAD_MINSO. DOWNLOAD LOG with ERROR: {LOG_PATH}/load_{secure_fname}.log")
-                    return send_from_directory(LOG_PATH, f'load_{table_name}.log')                
-    log.info(f"VIEW_LOAD_MINSO. info: {session['aux_info']}")
+    if request.method == "POST":
+        log.info(f'request: {request}')
+        uploaded_file = request.files['file']
+        if uploaded_file.filename!='':
+            secure_fname = secure_filename(uploaded_file.filename)
+            file_name = path.join(LOG_PATH,secure_fname)
+            uploaded_file.save(file_name)
+            count, all_cnt, table_name, mess = load_minso_dia(file_name)
+            session['aux_info'] = mess
+            log.info(f"VIEW_LOAD_MINSO\n\tLOAD_FILE: {file_name}\n\tloaded: {count}/{all_cnt}\n\tMESS: {mess}")
+            if count<all_cnt:
+                log.info(f"VIEW_LOAD_MINSO. DOWNLOAD LOG with ERROR: {LOG_PATH}/load_{secure_fname}.log")
+                return send_from_directory(LOG_PATH, f'load_{table_name}.log')                
+    log.info(f"VIEW_LOAD_MINSO\n\tUSER: {g.user.full_name}\n\tROLE: {g.user.roles}")
     return redirect(url_for('view_auxiliary_task_dia'))
-
-# @app.route('/change-passwd', methods=['POST', 'GET'])
-# def view_change_password():
-#     log.info(f"CHANGE PASSWORD")
-#     if '_flashes' in session:
-#         session['_flashes'].clear()
-#     if request.method == "POST":
-#         passwd_1 = request.form['password_1']
-#         passwd_2 = request.form['password_2']
-#         if passwd_1 != passwd_2:
-#             flash('Пароли не совпадают')
-#         else:
-#             change_passwd(session['username'], session['password'], passwd_1)
-#             return redirect(url_for('view_root'))
-#     return render_template("change_passwd.html")
