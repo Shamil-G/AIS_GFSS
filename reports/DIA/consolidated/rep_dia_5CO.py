@@ -13,23 +13,26 @@ stmt_report = """
 Select /*+ parallel(4) */
       knp, 
       coalesce(reg,'ZZ'),
+	  sex,
       Count(Unique sicid) cnt, 
       Sum(sum_pay) sm
 From( Select /*+ parallel(4) */
             m.sicid, 
+			case when p.sex=0 then 'Ж' else 'М' end as sex,
             m.knp knp, 
             m.sum_pay sum_pay,
             FIRST_VALUE(substr(coalesce(cb.RFBN_ID,'ZZ'),1,2)) 
 				over(partition by m.sicid order by m.pay_date_gfss desc) reg
-      From  si_member_2 m, rfon_organization o, cato_branch cb
+      From  si_member_2 m, rfon_organization o, cato_branch cb, person p
       Where m.PAY_DATE_GFSS >= to_date(:dt_from,'YYYY-MM-DD')
+	  and	m.sicid = p.sicid
 	  and	m.PAY_DATE_GFSS < to_date(:dt_to,'YYYY-MM-DD') + 1
 	  AND   m.PAY_DATE >= add_months(to_date(:dt_from,'YYYY-MM-DD'),-1) 
 	  AND	m.PAY_DATE < to_date(:dt_to,'YYYY-MM-DD') + 1
       and   m.p_rnn=o.bin(+)
       and   o.cato=cb.code(+)
 ) 
-group by reg, knp
+group by reg, knp, sex
 order by reg, knp
 """
 
@@ -43,19 +46,22 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(0, 0, 6)
 	worksheet.set_column(1, 1, 8)
 	worksheet.set_column(2, 2, 12)
-	worksheet.set_column(3, 3, 16)
-	worksheet.set_column(4, 4, 18)
+	worksheet.set_column(3, 3, 8)
+	worksheet.set_column(4, 4, 16)
+	worksheet.set_column(5, 6, 18)
 
 	worksheet.write(2,0, '1', common_format)
 	worksheet.write(2,1, '2', common_format)
 	worksheet.write(2,2, '3', common_format)
 	worksheet.write(2,3, '4', common_format)
 	worksheet.write(2,4, '5', common_format)
+	worksheet.write(2,5, '5', common_format)
 	worksheet.write(3,0, '№', common_format)
 	worksheet.write(3,1, 'КНП', common_format)
 	worksheet.write(3,2, 'Код района', common_format)
-	worksheet.write(3,3, 'Общее количество сотрудников за которых поступили СО', common_format)
-	worksheet.write(3,4, 'Общая сумма СО', common_format)
+	worksheet.write(3,3, 'Пол', common_format)
+	worksheet.write(3,4, 'Общее количество сотрудников за которых поступили СО', common_format)
+	worksheet.write(3,5, 'Общая сумма СО', common_format)
 
 
 def do_report(file_name: str, date_first: str, date_second: str):
@@ -175,13 +181,13 @@ def do_report(file_name: str, date_first: str, date_second: str):
 				col = 1
 				worksheet[page_num-1].write(row_cnt+shift_row, 0, all_cnt, digital_format_center)
 				for list_val in record:
-					if col in (1,):
+					if col in (1,3):
 						worksheet[page_num-1].write(row_cnt+shift_row, col, list_val, common_format)
 					if col in (2,):
 						worksheet[page_num-1].write(row_cnt+shift_row, col, list_val, digital_format_center)
-					if col in (3,):
-						worksheet[page_num-1].write(row_cnt+shift_row, col, list_val, digital_format)
 					if col in (4,):
+						worksheet[page_num-1].write(row_cnt+shift_row, col, list_val, digital_format)
+					if col in (5,):
 						worksheet[page_num-1].write(row_cnt+shift_row, col, list_val, money_format)
 					col+= 1
 				row_cnt+= 1

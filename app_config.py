@@ -14,6 +14,8 @@ REPORT_MODULE_PATH = f"reports"
 REPORT_PATH = f"{BASE}/spool"
 UPLOAD_PATH = f"{BASE}/uploads"
 
+tolem_server='http://tolem.gfss.kz'
+
 sso_server = 'http://192.168.1.34:8825'
 
 ldap_admins = ['Гусейнов Шамиль Аладдинович', 'Алибаева Мадина Жасулановна', 'Маликов Айдар Амангельдыевич']
