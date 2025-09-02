@@ -27,9 +27,15 @@
     margin: 4px;
     padding: 9px;
     align-items: center;
-    background-color: #caffca;
+    background-color: #efefd3e6;
     border-radius: 5px;
     border: 1px solid rgba(180, 180, 180, 0.3);
+}
+input.input_login:-webkit-autofill {
+    background-color: #efefd3e6 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #efefd3e6 inset !important;
+    -webkit-text-fill-color: green !important;
+    transition: background-color 5000s ease-in-out 0s;
 }
 .input_login:hover {
     transition: .3s linear;
