@@ -43,13 +43,13 @@ class SSO_User:
 
             if 'roles' in src_user:
                 self.roles = src_user['roles']
-                log.info(f'----------------\n\tUSER {session['username']} have SSO Roles {self.roles}\n----------------')
+                log.debug(f'----------------\n\tUSER {session['username']} have SSO Roles {self.roles}\n----------------')
             elif src_user['fio'] in ldap_admins or src_user['post'] in ldap_boss:
                 self.roles='admin'
-                log.info(f'----------------\n\tUSER {session['username']} are System Admin\n----------------')
+                log.debug(f'----------------\n\tUSER {session['username']} are System Admin\n----------------')
             else:
                 self.roles='operator'
-                log.info(f'----------------\n\tUSER {session['username']} are Operator\n----------------')
+                log.debug(f'----------------\n\tUSER {session['username']} are Operator\n----------------')
             session['roles'] = self.roles
             
                 
@@ -57,7 +57,7 @@ class SSO_User:
             session['full_name'] = full_name 
 
             self.ip_addr = ip
-            log.info(f"LM SSO. SUCCESS. USERNAME: {self.username}, ip_addr: {self.ip_addr}\n\tFIO: {self.full_name}, roles: {self.roles} ")
+            log.debug(f"LM SSO. SUCCESS. USERNAME: {self.username}, ip_addr: {self.ip_addr}\n\tFIO: {self.full_name}, roles: {self.roles} ")
             return self
         log.info(f"LM SSO. FAIL. USERNAME: {src_user}, ip_addr: {ip}, password: {session['password']}")
         return None

@@ -27,23 +27,30 @@ def get_list_groups():
 
 
 def get_list_reports():
-    names_reps = []
+    rep_params = []
+    if 'dep_name' not in session or 'grp_name' not in session:
+        return redirect(url_for('view_root'))
     dep_name = session['dep_name']
     grp_name = session['grp_name']
-    log.debug(f"---> GET_LIST_REPORTS. dep_name: {dep_name}, grp_name: {grp_name}")
+    # log.info(f"---> GET_LIST_REPORTS. dep_name: {dep_name}, grp_name: {grp_name}")
     if dep_name and grp_name:
         dep_grps = dict_reports.get(dep_name)
         if dep_grps:
+            # log.info(f"---> GET_LIST_REPORTS. INTO FOR DEP_GRPS: {dep_grps}")
             for grp in dep_grps:
                 if grp_name == grp['grp_name']:
-                    log.debug(f"---> GET_LIST_REPORTS. grp: {grp}")
+                    # log.info(f"---> GET_LIST_REPORTS. INTO FOR : {grp}")
                     # Выберем все отчеты из списка группы отчетов
                     for rep in grp['list']:
-                        log.debug(f"\n---> GET_LIST_REPORTS. REP: {rep}")
+                        # log.info(f"---> GET_LIST_REPORTS. INTO REP: {rep}")
                         rep_name = rep.get('name')
                         num_rep = rep.get('num_rep')
                         params = rep.get('params')
-                        names_reps.append({"num": num_rep, "name": rep_name, "params": params})
+                        meta_params={}
+                        if 'meta_params' in rep:
+                            meta_params = rep.get('meta_params')
+                        rep_params.append({"num": num_rep, "name": rep_name, "params": params, "meta_params": meta_params})
+                        # log.info(f"\n------> GET_LIST_REPORTS. names_reps: {rep_params}")
         else:
             log.info(f"\nERROR GET_LIST_REPORTS. dep_grps: {dep_grps}")
-    return names_reps
+    return rep_params

@@ -91,7 +91,7 @@ def view_set_dep(dep_name):
 @login_required
 def view_set_grp_name(grp):
     session['grp_name'] = str(grp)
-    log.debug(f'+++ SET GRP NAME. GRP_NAME: {grp}')
+    log.debug(f'+++ LIST_REPORTS/<grp>. GRP_NAME: {grp}')
     grps = get_list_reports()
     log.debug(f'+++ GROUPS: {grps}')
     if request.method == 'GET':
@@ -103,13 +103,18 @@ def view_set_grp_name(grp):
 def view_extract_params(rep_number):
     rep_num = str(rep_number).zfill(2)
     session['rep_code'] = rep_num
-    log.debug(f'+++ VIEW EXTRACT PARAMS: {rep_number}')
+    log.debug(f'1. VIEW EXTRACT PARAMS: {rep_number}')
     for rep in get_list_reports():
+        log.debug(f'2. VIEW EXTRACT PARAMS.REP: {rep}')
         if rep_num == rep.get('num'):
-            params = rep.get('params')
+            if 'meta_params' in rep:
+                meta_params = rep.get('meta_params')
+            if 'params' in rep:
+                params = rep.get('params')
+            log.debug(f"3. VIEW EXTRACT PARAMS. PARAMS: {params}")
             session['rep_name'] = rep['name']
-            if params and len(params)>0:
-                session['params'] = params
+            if meta_params and len(meta_params)>0:
+                session['params'] = meta_params
                 return redirect(url_for('view_set_params'))
             if params and len(params)>0:
                 session['params'] = params
@@ -122,12 +127,12 @@ def view_extract_params(rep_number):
 def view_set_params():
     new_params = {}
     if 'params' not in session:
-        log.info(f"EDIT_PARAMS. PARAMS not FOUND")
+        log.info(f"-------\n\tERROR. EDIT_PARAMS. PARAMS not FOUND\n-------")
         return redirect(url_for('view_root'))
 
     list_params = session['params']
+    log.debug(f'\nSET_PARAMS\n\tLIST_PARAMS:\t{list_params}')
     if request.method == 'POST':
-        log.info(f'SET_PARAMS. LIST_PARAMS: {list_params}')
         #Вытащим значения параметров из формы в новый список
         for parm in list_params:
             p = request.form[parm]

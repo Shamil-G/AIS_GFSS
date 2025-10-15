@@ -534,6 +534,48 @@ dict_reports = {
 
 
         },
+        {
+            "grp_name": "Списки", 
+            "module_dir": f"{REPORT_MODULE_PATH}.DIA.lists",
+            "live_time": "0",
+            "list": 
+            [
+                {
+                    "name": "Список получателей со статусом '7' или '20'",
+                    "num_rep": "01",
+                    "proc": "rep_dia_list_01",
+                    "data_approve": "14.10.2025",
+                    "author": "Гусейнов Ш.А.",
+                    "params": {"date_first": "С", "date_second": "по", "rfpm_id": "Код выплаты"},
+                    "meta_params": {
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "rfpm_id":{
+                            "display_name": "Код выплаты",
+                            "type": "string",
+                            "length": 8,
+                            "required": False
+                        },
+                        "status":{
+                            "display_name": "Статус",
+                            "type": "enum",
+                            "values": [7,20],
+                            "required": True
+                        }
+                    }
+                }   
+            ]
+        },
     ]
     ,
     "ДСР":
@@ -549,7 +591,7 @@ dict_reports = {
                     "proc": "dsr_01",
                     "data_approve": "11.10.2023",
                     "author": "Гусейнов Ш.",
-                    "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                    "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
                 },
             ]
         }
@@ -588,7 +630,7 @@ dict_reports = {
                 "proc": "rep_dmn_01",
                 "data_approve": "11.10.2023",
                 "author": "Адильханова А.",
-                "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
                 },
                 {
                 "name": "Количество дел по дням и регионам без доработки с ИИН-ами",
@@ -596,7 +638,7 @@ dict_reports = {
                 "proc": "rep_dmn_01_iin",
                 "data_approve": "11.10.2023",
                 "author": "Адильханова А.",
-                "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
                 },
                 {
                 "name": "Количество дел по дням и регионам с доработкой",
@@ -604,7 +646,7 @@ dict_reports = {
                 "proc": "rep_dmn_02",
                 "data_approve": "01.11.2023",
                 "author": "Адильханова А.",
-                "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
                 },
                 {
                 "name": "Количество дел по дням и регионам с доработкой с ИИН-ами",
@@ -612,7 +654,7 @@ dict_reports = {
                 "proc": "rep_dmn_02_iin",
                 "data_approve": "01.11.2023",
                 "author": "Адильханова А.",
-                "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
                 },
                 {
                     "name": "Количество дел по дням и регионам с доработкой 145",
@@ -620,7 +662,7 @@ dict_reports = {
                     "proc": "rep_dmen_145_with8",
                     "data_approve": "07.12.2023",
                     "author": "Адильханова А.",
-                    "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                    "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
                 },
                 {
                     "name": "Количество дел по дням и регионам с доработкой 145 ИИН-ы",
@@ -628,7 +670,7 @@ dict_reports = {
                     "proc": "rep_dmen_145_with8_iin",
                     "data_approve": "07.12.2023",
                     "author": "Адильханова А.",
-                    "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                    "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
                 } 
                 ,
                 {
@@ -637,7 +679,7 @@ dict_reports = {
                 "proc": "rep_dmn_12",
                 "data_approve": "29.01.2024",
                 "author": "Адильханова А.",
-                "params": {"srfpm_id": "Код выплаты:4", "date_first": "С", "date_second": "по"},
+                "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
                 }                
             ]
         }

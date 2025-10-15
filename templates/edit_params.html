@@ -8,46 +8,106 @@
 <a href="/"><dev class="image-home"><img src="/static/img/Home-1.png"></dev></a>&nbsp;. . .&nbsp;<a href="/dep/{{ session['dep_name'] }}">{{ session['dep_name'] }}</a>&nbsp;. . .&nbsp;<a href="/list-reports/{{ session['grp_name'] }}">{{ session['grp_name'] }}</a>&nbsp;. . .&nbsp;<a>{{ session['rep_code'] }}.&nbsp;{{ session['rep_name'] }}</a>
 {% endblock %}
 
-
 {% block navigate %}
-    <a class="nav_button" href="/{% if 'dep_name' in session %}dep/{{ session['dep_name']}}{% endif %}">{{ res_value('RETURN') }}</a>
+<a class="nav_button" href="/{% if 'dep_name' in session %}dep/{{ session['dep_name']}}{% endif %}">{{ res_value('RETURN') }}</a>
 {% endblock %}
 
 {% block body %}
 <form style="margin: 16px; border: none" method="POST">
     <table style="width: auto">
         <tbody>
-        {% for el in params %}
-        <tr class="cancel_background_hover">
-            {% if el[:1].lower() == 'd' %}
-            <td style="border: none; margin: 0px; padding: 0px; text-align: left;">
-                <label for="{{ el }}">{{ params.get(el) }}&emsp;</label>
-            </td>
-            <td style="border: none; margin: 0px; padding-left: 6px">
-                <input class="input_s" type="date" id="{{ el }}" name="{{ el }}">
-            </td>
-            {% elif el[:1].lower() == 's' %}
-            {% set list_val = params.get(el).split(':') %}
-            <td style="border: none; margin: 0px; padding: 0px; text-align: left;"> 
-                <label style="font-weight: bold; font-size: 20px;" for="{{ el }}">{{ list_val[0] }}</label>
-            </td>
-            <td style="border: none">
-                <input class="input_s" type="text" id="{{ el }}" name="{{ el }}" pattern="{ {{list_val[1]}} }" maxlength="{{ list_val[1] }}" minlength="{{ list_val[1] }}">
-            </td>
-            {% elif el[:1].lower() == 'n' %}
-            {% set list_val = params.get(el).split(':') %}
-            <td style="border: none; margin: 0px; padding: 0px; text-align: left;">
-                <label style="font-weight: bold; font-size: 20px;" for="{{ el }}">{{ list_val[0] }}</label>
-            </td>
-            <td style="border: none">
-                <input class="input_s" type="number" id="{{ el }}" name="{{ el }}" pattern="\d*" maxlength="{{ list_val[1] }}" minlength="{{ list_val[1] }}">
-            </td>
-            {% endif %}
-        </tr>
-        {% endfor %}
+            {% for key, val in params.items() %}
+            <tr class="cancel_background_hover">
+                {% if val is string %}
+                    {# Old Style: val — это display_name #}
+                    {% set display_name = val %}
+                    {% set input_type = 'string' %}
+                    {% set maxlength = 4 %}
+                    {% set is_required = True %}
+
+                    {% if key[:1].lower() == 'd' %}
+                        {% set input_type='date' %}
+                    {% endif %}
+                    {% if key[:1].lower() == 'n' %}
+                        {% set input_type='number' %}
+                    {% endif %}
+
+                {% else %}
+                    {# New Style: val — this is a dict #}
+                    {% set display_name = val.display_name %}
+                    {% set input_type = val.type %}
+                    {% set maxlength = val.length %}
+                    {% if val is mapping and 'required' in val %}
+                        {% set is_required = val.required %}
+                    {% else %}
+                        {% set is_required = True %}
+                    {% endif %}
+                {% endif %}
+
+                {% if maxlength is number %}
+                    {% if input_type == 'string' %}
+                        {% set width = maxlength + 2 %}
+                    {% elif input_type == 'number' %}
+                        {% set width = maxlength + 4 %}
+                    {% else %}
+                        {% set width = maxlength + 1 %}
+                    {% endif %}
+                {% else %}
+                    {% set width = 20 %}
+                {% endif %}
+                
+                {% if val is mapping and 'values' in val %}
+                    {% set enum_values = val['values'] %}
+                {% else %}
+                    {% set enum_values = [] %}
+                {% endif %}
+
+                <td style="border: none; margin: 0px; padding: 0px; text-align: left;">
+                    <label for="{{ key }}">{{ display_name }}</label>
+                </td>
+                <td style="border: none; margin: 0px; padding-left: 6px; text-align:left">
+
+                    {% if input_type == 'date' %}
+                        <input class="input_s" type="date" id="{{ key }}" name="{{ key }}"  {% if is_required %} required {% endif %}>
+                    {% endif %}
+
+                    {% if input_type == 'string' %}
+                        {% if maxlength is not none %}
+                            <input class="input_s" type="text" id="{{ key }}" name="{{ key }}" 
+                                   style="width: {{ width }}ch;" maxlength="{{ maxlength }}" size="{{ maxlength }}"
+                                   {% if is_required %} required {% endif %}">
+                        {% else %}
+                            <input style="width: {{ width }}ch;" class="input_s" type="text" 
+                                   id="{{ key }}" name="{{ key }}" {% if is_required %} required {% endif %}>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if input_type == 'number' %}
+                        {% if maxlength is not none %}
+                            <input id="{{ key }}" name="{{ key }}" class="input_s" 
+                                   type="number"   
+                                   style="width:{{ width }}ch;" size="{{ maxlength }}" max="{{ maxlength }}" 
+                                   inputmode="numeric" pattern="\d*" {% if is_required %} required {% endif %} >
+                        {% else %}
+                            <input class="input_s" type="number" id="{{ key }}" name="{{ key }}" inputmode="numeric" pattern="\d*"
+                                   style="width: {{ width }}ch;" size="{{ maxlength }}" max="{{ maxlength }}" {% if is_required %} required {% endif %}>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if input_type == 'enum' and enum_values %}
+                        <select class="input_s" id="{{ key }}" name="{{ key }}" 
+                                {% if is_required %} required {% endif %}>
+                            {% for option in enum_values %}
+                                <option value="{{ option }}">{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
-    <br/>
-    <button type="submit" name="edit_parms">{{res_value('REPORT_REQUEST')}}</button>
+    <br />
+    <button type="submit" name="edit_parms">{{ res_value('REPORT_REQUEST') }}</button>
 </form>
 {% endblock %}
