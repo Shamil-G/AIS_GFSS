@@ -18,10 +18,10 @@ SELECT /*+parallel(8)*/
     p.iin,
     p.lastname||' '||p.firstname||' '||p.middlename as fio,
     sd.risk_date,
-    st.dat,
+    first_value(st.dat) over(partition by sol.id order by st.dat desc) date_approve,
     pay.d_naz,
-    pay.nsum,
-    sd.sum_all,
+    sd.sum_calc,
+    sol.nsum sum_all,
     sd.date_calc,
     sd.sum_dop
 FROM ss_m_sol_st st, ss_m_sol sol, 
@@ -81,10 +81,10 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2,3, 'ИИН', common_format)
 	worksheet.write(2,4, 'ФИО', common_format)
 	worksheet.write(2,5, 'Дата риска', common_format)
-	worksheet.write(2,6, 'Дата назначения', common_format)
-	worksheet.write(2,7, 'Дата постановки на выплату', common_format)
-	worksheet.write(2,8, 'Назначенный размер', common_format)
-	worksheet.write(2,9, 'Сумма выплаты', common_format)
+	worksheet.write(2,6, 'Дата утверждения', common_format)
+	worksheet.write(2,7, 'Дата назначения', common_format)
+	worksheet.write(2,8, 'Расчетный размер', common_format)
+	worksheet.write(2,9, 'Назначенный размер', common_format)
 	worksheet.write(2,10, 'Дата расчета', common_format)
 	worksheet.write(2,11, 'Доп.сумма', common_format)
 
