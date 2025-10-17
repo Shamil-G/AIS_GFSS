@@ -24,14 +24,18 @@ SELECT /*+parallel(8)*/
     sd.sum_all,
     sd.date_calc,
     sd.sum_dop
-FROM ss_m_sol_st st, ss_m_pay pay, ss_data sd,
-     ss_m_sol sol, branch b, person p
+FROM ss_m_sol_st st, ss_m_sol sol, 
+	 ss_m_pay pay, ss_data sd, ss_z_doc z,
+     branch b, person p
 WHERE st2 = :st_status
-and pay.sid = st.sid
 and sol.id = st.sid
+and sol.id = pay.sid
+and sol.id = z.id
+and sol.id = sd.sipr_id
 and sol.sicid = p.sicid
-and sd.sipr_id = sol.id
 and substr(st.brid,1,2)||'00'=b.rfbn_id
+and z.id_tip = 'NEW'
+and st.host != 'SS_TO_EM5'
 and st.dat >= to_date(:dt_from,'YYYY-MM-DD')
 and st.dat < to_date(:dt_to,'YYYY-MM-DD') + 1
 and st.p_pc like '%'||:rfpm_id||'%'

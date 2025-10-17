@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ res_value('SELECT_REPORT') }}
+{% endblock %}
+
+{% block main_title %}
+<a href="/"><dev class="image-home"><img src="/static/img/Home-1.png"></dev></a>&nbsp;. . .&nbsp;<a href="/dep/{{ session['dep_name'] }}">{{ session['dep_name'] }}</a>&nbsp;. . .&nbsp;<a href="/list-reports/{{ session['grp_name'] }}">{{ session['grp_name'] }}</a>&nbsp;. . .&nbsp;<a>{{ session['rep_code'] }}.&nbsp;{{ session['rep_name'] }}</a>
+{% endblock %}
+
+
+{% block navigate %}
+<a class="nav_button" href="/{% if 'dep_name' in session %}dep/{{ session['dep_name']}}{% endif %}">{{ res_value('RETURN') }}</a>
+{% endblock %}
+
+{% block body %}
+<form style="margin: 16px; border: none" method="POST">
+    <table style="width: auto">
+        <tbody>
+            {% for el in params %}
+            <tr class="cancel_background_hover">
+                {% if el[:1].lower() == 'd' %}
+                <td style="border: none; margin: 0px; padding: 0px; text-align: left;">
+                    <label for="{{ el }}">{{ params.get(el) }}&emsp;</label>
+                </td>
+                <td style="border: none; margin: 0px; padding-left: 6px">
+                    <input class="input_s" type="date" id="{{ el }}" name="{{ el }}">
+                </td>
+                {% elif el[:1].lower() == 's' %}
+                {% set list_val = params.get(el).split(':') %}
+                <td style="border: none; margin: 0px; padding: 0px; text-align: left;">
+                    <label style="font-weight: bold; font-size: 20px;" for="{{ el }}">{{ list_val[0] }}</label>
+                </td>
+                <td style="border: none">
+                    <input class="input_s" type="text" id="{{ el }}" name="{{ el }}" pattern="{ {{list_val[1]}} }" maxlength="{{ list_val[1] }}" minlength="{{ list_val[1] }}">
+                </td>
+                {% elif el[:1].lower() == 'n' %}
+                {% set list_val = params.get(el).split(':') %}
+                <td style="border: none; margin: 0px; padding: 0px; text-align: left;">
+                    <label style="font-weight: bold; font-size: 20px;" for="{{ el }}">{{ list_val[0] }}</label>
+                </td>
+                <td style="border: none">
+                    <input class="input_s" type="number" id="{{ el }}" name="{{ el }}" pattern="\d*" maxlength="{{ list_val[1] }}" minlength="{{ list_val[1] }}">
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br />
+    <button type="submit" name="edit_parms">{{res_value('REPORT_REQUEST')}}</button>
+</form>
+{% endblock %}
