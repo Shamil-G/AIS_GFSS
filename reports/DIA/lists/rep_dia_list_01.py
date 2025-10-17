@@ -7,38 +7,47 @@ from   util.logger import log
 from   model.manage_reports import set_status_report
 
 
-report_name = 'Список получателей со статусом '
+report_name = 'Список получателей со статусом 20'
 report_code = 'LST.01'
 
 stmt_1 = """
-SELECT /*+parallel(8)*/
-    substr(st.brid,1,2) AS region,
-    b.name,
-    pay.pc,
-    p.iin,
-    p.lastname||' '||p.firstname||' '||p.middlename as fio,
-    sd.risk_date,
-    first_value(st.dat) over(partition by sol.id order by st.dat desc) date_approve,
-    pay.d_naz,
-    sd.sum_calc,
-    sol.nsum sum_all,
-    sd.date_calc,
-    sd.sum_dop
-FROM ss_m_sol_st st, ss_m_sol sol, 
-	 ss_m_pay pay, ss_data sd, ss_z_doc z,
-     branch b, person p
-WHERE st2 = :st_status
-and sol.id = st.sid
-and sol.id = pay.sid
-and sol.id = z.id
-and sol.id = sd.sipr_id
-and sol.sicid = p.sicid
-and substr(st.brid,1,2)||'00'=b.rfbn_id
-and z.id_tip = 'NEW'
-and st.host != 'SS_TO_EM5'
-and st.dat >= to_date(:dt_from,'YYYY-MM-DD')
-and st.dat < to_date(:dt_to,'YYYY-MM-DD') + 1
-and st.p_pc like '%'||:rfpm_id||'%'
+select a.region, a.name, a.pc, a.iin, a.fio, a.risk_date,
+        first_value(st.dat) over(partition by a.id order by st.dat desc) dat_7,
+		a.dat_20, a.sum_all, a.sum_pay
+from (
+    SELECT /*+parallel(8)*/
+        unique
+        sol.id,
+        substr(st.brid,1,2) AS region,
+        b.name,
+        pay.pc,
+        p.iin,
+        p.lastname||' '||p.firstname||' '||p.middlename as fio,
+        sd.risk_date,
+        first_value(st.dat) over(partition by sol.id order by st.dat desc) dat_20,
+        sol.nsum sum_all,
+        ceil(pay.nsum * (extract( day from last_day(st.dat) )-extract(day from sd.risk_date)+1) / extract( day from last_day(sysdate) )) as sum_pay
+    FROM ss_m_sol_st st, 
+         ss_m_pay pay,  
+         ss_m_sol sol, 
+         ss_data sd, ss_z_doc z,
+         branch b, person p
+    WHERE st2 = 20
+    and pay.sid = st.sid
+    and sol.id = st.sid
+    and sol.id = z.id
+    and sol.sicid = p.sicid
+    and sd.sipr_id = sol.id
+    and z.id_tip = 'NEW'
+    and st.host != 'SS_TO_EM5'
+    and substr(st.brid,1,2)||'00'=b.rfbn_id
+	and st.dat >= to_date(:dt_from,'YYYY-MM-DD')
+	and st.dat < to_date(:dt_to,'YYYY-MM-DD') + 1
+	and st.p_pc like '%'||:rfpm_id||'%'
+) a, ss_m_sol_st st
+where a.id = st.sid
+and   st.st2=7
+and   st.dat<a.dat_20
 order by 1,3,5
 """
 
@@ -60,8 +69,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.set_column(7, 7, 12)
 	worksheet.set_column(8, 8, 16)
 	worksheet.set_column(9, 9, 16)
-	worksheet.set_column(10, 10, 12)
-	worksheet.set_column(11, 11, 16)
+
 
 	worksheet.write(3,0, '1', common_format)
 	worksheet.write(3,1, '2', common_format)
@@ -72,8 +80,6 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(3,6, '7', common_format)
 	worksheet.write(3,7, '8', common_format)
 	worksheet.write(3,8, '9', common_format)
-	worksheet.write(3,9, '10', common_format)
-	worksheet.write(3,10, '11', common_format)
 
 	worksheet.write(2,0, 'Код региона', common_format)
 	worksheet.write(2,1, 'Наименование региона', common_format)
@@ -81,12 +87,10 @@ def format_worksheet(worksheet, common_format):
 	worksheet.write(2,3, 'ИИН', common_format)
 	worksheet.write(2,4, 'ФИО', common_format)
 	worksheet.write(2,5, 'Дата риска', common_format)
-	worksheet.write(2,6, 'Дата утверждения', common_format)
-	worksheet.write(2,7, 'Дата назначения', common_format)
-	worksheet.write(2,8, 'Расчетный размер', common_format)
-	worksheet.write(2,9, 'Назначенный размер', common_format)
-	worksheet.write(2,10, 'Дата расчета', common_format)
-	worksheet.write(2,11, 'Доп.сумма', common_format)
+	worksheet.write(2,6, 'Дата 7', common_format)
+	worksheet.write(2,7, 'Дата 20', common_format)
+	worksheet.write(2,8, 'Назначенный размер', common_format)
+	worksheet.write(2,9, 'Сумма к выплате', common_format)
 
 
 def do_report(file_name: str, date_first: str, date_second: str, rfpm_id: str, status: str):
@@ -178,7 +182,7 @@ def do_report(file_name: str, date_first: str, date_second: str, rfpm_id: str, s
 			m_val = [0]
 
 			log.info(f'{file_name}. Загружаем данные с {date_first} по {date_second}')
-			cursor.execute(active_stmt, dt_from=date_first,dt_to=date_second, st_status=status, rfpm_id=rfpm_id)
+			cursor.execute(active_stmt, dt_from=date_first,dt_to=date_second, rfpm_id=rfpm_id)
 
 			records = cursor.fetchall()
 			
@@ -191,9 +195,9 @@ def do_report(file_name: str, date_first: str, date_second: str, rfpm_id: str, s
 						worksheet.write(row_cnt+shift_row, col, list_val, name_common_format)
 					if col in (0,2,3):
 						worksheet.write(row_cnt+shift_row, col, list_val, common_format)
-					if col in (5,6,7,10):
+					if col in (5,6,7):
 						worksheet.write(row_cnt+shift_row, col, list_val, date_format)
-					if col in (8,9,11):
+					if col in (8,9):
 						worksheet.write(row_cnt+shift_row, col, list_val, money_format)
 					col += 1
 				cnt_part += 1
