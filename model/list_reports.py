@@ -311,6 +311,26 @@ dict_reports = {
                 "data_approve": "10.06.2023",
                 "author": "Адильханова А.К.",
                 "params": {"date_first": "C", "date_second": "по", "srfbn_id": "Код региона:2"},
+                "meta_params": {
+                        "rfbn_id":{
+                            "display_name": "Код региона",
+                            "type": "string",
+                            "length": 2,
+                            "required": False
+                        },
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        }
+                    }
                 },
                 {
                 "name": "Участники ЕП, в разрезе регионов",
@@ -359,6 +379,26 @@ dict_reports = {
                 "data_approve": "26.11.2024",
                 "author": "Гусейнов Ш.А.",
                 "params": {"date_first": "C", "date_second": "по", "srfbn_id": "Код региона:2"},
+                "meta_params": {
+                        "rfbn_id":{
+                            "display_name": "Код региона",
+                            "type": "string",
+                            "length": 2,
+                            "required": False
+                        },
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        }
+                }
                 },
                 {
                 "name": "Участники ПЗ, в разрезе регионов",
@@ -592,6 +632,26 @@ dict_reports = {
                     "data_approve": "11.10.2023",
                     "author": "Гусейнов Ш.",
                     "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
+                    "meta_params": {
+                        "rfpm_id":{
+                            "display_name": "Код выплаты",
+                            "type": "string",
+                            "length": 8,
+                            "required": False
+                        },
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        }
+                    }
                 },
             ]
         }
@@ -631,6 +691,26 @@ dict_reports = {
                 "data_approve": "11.10.2023",
                 "author": "Адильханова А.",
                 "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
+                    "meta_params": {
+                        "rfpm_id":{
+                            "display_name": "Код выплаты",
+                            "type": "string",
+                            "length": 8,
+                            "required": False
+                        },
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        }
+                    }
                 },
                 {
                 "name": "Количество дел по дням и регионам без доработки с ИИН-ами",
@@ -639,6 +719,26 @@ dict_reports = {
                 "data_approve": "11.10.2023",
                 "author": "Адильханова А.",
                 "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
+                    "meta_params": {
+                        "rfpm_id":{
+                            "display_name": "Код выплаты",
+                            "type": "string",
+                            "length": 8,
+                            "required": False
+                        },
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        }
+                    }
                 },
                 {
                 "name": "Количество дел по дням и регионам с доработкой",
@@ -647,6 +747,26 @@ dict_reports = {
                 "data_approve": "01.11.2023",
                 "author": "Адильханова А.",
                 "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
+                    "meta_params": {
+                        "rfpm_id":{
+                            "display_name": "Код выплаты",
+                            "type": "string",
+                            "length": 8,
+                            "required": False
+                        },
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        }
+                    }
                 },
                 {
                 "name": "Количество дел по дням и регионам с доработкой с ИИН-ами",
@@ -655,6 +775,26 @@ dict_reports = {
                 "data_approve": "01.11.2023",
                 "author": "Адильханова А.",
                 "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
+                    "meta_params": {
+                        "rfpm_id":{
+                            "display_name": "Код выплаты",
+                            "type": "string",
+                            "length": 8,
+                            "required": False
+                        },
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        }
+                    }
                 },
                 {
                     "name": "Количество дел по дням и регионам с доработкой 145",
@@ -663,6 +803,26 @@ dict_reports = {
                     "data_approve": "07.12.2023",
                     "author": "Адильханова А.",
                     "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
+                    "meta_params": {
+                        "rfpm_id":{
+                            "display_name": "Код выплаты",
+                            "type": "string",
+                            "length": 8,
+                            "required": False
+                        },
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        }
+                    }
                 },
                 {
                     "name": "Количество дел по дням и регионам с доработкой 145 ИИН-ы",
@@ -671,6 +831,26 @@ dict_reports = {
                     "data_approve": "07.12.2023",
                     "author": "Адильханова А.",
                     "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
+                    "meta_params": {
+                        "rfpm_id":{
+                            "display_name": "Код выплаты",
+                            "type": "string",
+                            "length": 8,
+                            "required": False
+                        },
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        }
+                    }
                 } 
                 ,
                 {
@@ -680,6 +860,26 @@ dict_reports = {
                 "data_approve": "29.01.2024",
                 "author": "Адильханова А.",
                 "params": {"rfpm_id": "Код выплаты", "date_first": "С", "date_second": "по"},
+                    "meta_params": {
+                        "rfpm_id":{
+                            "display_name": "Код выплаты",
+                            "type": "string",
+                            "length": 8,
+                            "required": False
+                        },
+                        "date_first": {
+                            "display_name": "C",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                        "date_second": {
+                            "display_name": "по",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        }
+                    }
                 }                
             ]
         }
