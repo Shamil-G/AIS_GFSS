@@ -568,7 +568,21 @@ dict_reports = {
                     "author": "Гусейнов Ш.А.",
                     "params": {"date_first": "С", "date_second": "по"},
                 },
-
+                {
+                    "name": "Динамика числености получателей и сумм СО",
+                    "num_rep": "09",
+                    "proc": "rep_dia_dynamic",
+                    "data_approve": "22.10.2025",
+                    "author": "Гусейнов Ш.А.",
+                    "meta_params": {
+                        "date_first": {
+                            "display_name": "За",
+                            "type": "date",
+                            "length": None,
+                            "required": True
+                        },
+                    }
+                },
             ]
 
 

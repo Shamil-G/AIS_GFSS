@@ -43,6 +43,23 @@ def get_quarter_number(input_date: str):
 	return Q_number
 
 
+def get_month_name(input_date: str):
+	match input_date[5:7]:
+		case '01': return 'январь'
+		case '02': return 'февраль'
+		case '03': return 'март'
+		case '04': return 'апрель'
+		case '05': return 'мая'
+		case '06': return 'июнь'
+		case '07': return 'июль'
+		case '08': return 'август'
+		case '09': return 'сентябрь'
+		case '10': return 'октябрь'
+		case '11': return 'ноябрь'
+		case '12': return 'декабрь'
+		case _: return input_date[4:7]
+
+
 if __name__ == "__main__":
 	test_date_1 = '11.01.2024'
 	# test_date_2 = '11.02.2024'
