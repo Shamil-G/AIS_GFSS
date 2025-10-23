@@ -12,12 +12,29 @@ report_code = 'DYN.9'
 
 stmt_report = """
 with dt as (select trunc(to_date(:dt_from,'YYYY-MM-DD'),'MM') dt_from from dual)
+, r as (
+select substr(d.rfpm_id, 1, 4) rfpm, 
+       ap.riac_id,
+       r.name,
+       count(unique d.pncd_id) cnt
+From pnpd_document d, pnap_act_prt_2 ap, riac_action r, dt
+Where d.pncp_date = add_months(dt.dt_from, -1)
+And   ap.act_month >= dt.dt_from 
+And   ap.act_month < add_months(dt.dt_from, 1)
+and   d.pncd_id=ap.pncd_id
+And substr(d.rfpm_id,1,4) in ('0701','0702','0703','0705')
+And d.ridt_id In (4,6, 7, 8)
+And d.status In (0, 1, 2, 3, 5, 7) 
+And d.pnsp_id > 0
+and r.riac_id=ap.riac_id
+Group By substr(d.rfpm_id, 1, 4), ap.riac_id, r.name
+)
 select * 
 from 
 (
-select '1. Численность получателей на начало месяца, человек' line, 
-       sum( case when rfpm='0701' then cnt else 0 end) cnt_0701,
+select ' 1. численность получателей на начало месяца, человек' line, 
        sum( case when rfpm='0702' then cnt else 0 end) cnt_0702,
+       sum( case when rfpm='0701' then cnt else 0 end) cnt_0701,
        sum( case when rfpm='0703' then cnt else 0 end) cnt_0703,
        sum( case when rfpm='0705' then cnt else 0 end) cnt_0705
 from (       
@@ -33,9 +50,9 @@ from (
 
 union
 
-select '2. Сумма выплат, тенге' line, 
-       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
+select ' 2. Сумма выплат, тенге' line, 
        sum( case when rfpm='0702' then cnt else 0 end) sum_0702,
+       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
        sum( case when rfpm='0703' then cnt else 0 end) sum_0703,
        sum( case when rfpm='0705' then cnt else 0 end) sum_0705
 from (       
@@ -51,9 +68,9 @@ from (
 
 union
 
-select '3. Назначено, человек*' line, 
-       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
+select ' 3. назначение, человек*' line, 
        sum( case when rfpm='0702' then cnt else 0 end) sum_0702,
+       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
        sum( case when rfpm='0703' then cnt else 0 end) sum_0703,
        sum( case when rfpm='0705' then cnt else 0 end) sum_0705
 from ( 
@@ -68,14 +85,13 @@ from (
 
 union
 
-select '4. Сумма социальных выплат для назначенных' line, 
-       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
+select ' 4. сумма социальных выплат для назначенных, тенге' line, 
        sum( case when rfpm='0702' then cnt else 0 end) sum_0702,
+       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
        sum( case when rfpm='0703' then cnt else 0 end) sum_0703,
        sum( case when rfpm='0705' then cnt else 0 end) sum_0705
 from ( 
   SELECT 
-      '4' line,
       substr(sfa.rfpm_id,1,4) rfpm, --"Код выплаты",
       sum(sfa.sum_all) cnt --"Назначенный размер, тенге"
   FROM sswh.sipr_maket_first_approve_2 sfa, dt
@@ -83,8 +99,78 @@ from (
   and sfa.date_approve >= dt.dt_from
   and sfa.date_approve < add_months(dt.dt_from, 1)
   group by substr(sfa.rfpm_id,1,4)
-  ) order by 1,2
+) 
+
+union
+
+select ' 5. смертность, человек' line, 
+       sum( case when rfpm='0702' then cnt else 0 end) sum_0702,
+       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
+       sum( case when rfpm='0703' then cnt else 0 end) sum_0703,
+       sum( case when rfpm='0705' then cnt else 0 end) sum_0705
+from r
+where r.riac_id in (122)
+
+union
+
+select ' 6. прибывшие из-за пределов Республики Казахстан, человек' line, 
+       sum( case when rfpm='0702' then cnt else 0 end) sum_0702,
+       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
+       sum( case when rfpm='0703' then cnt else 0 end) sum_0703,
+       sum( case when rfpm='0705' then cnt else 0 end) sum_0705
+from r
+where r.riac_id in (110)
+
+union 
+
+select ' 7. Убывшие за пределы Республики Казахстан, человек' line, 
+       sum( case when rfpm='0702' then cnt else 0 end) sum_0702,
+       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
+       sum( case when rfpm='0703' then cnt else 0 end) sum_0703,
+       sum( case when rfpm='0705' then cnt else 0 end) sum_0705
+from r
+where r.riac_id in (150)
+
+union 
+
+select ' 8. восстановленные, человек' line, 
+       sum( case when rfpm='0702' then cnt else 0 end) sum_0702,
+       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
+       sum( case when rfpm='0703' then cnt else 0 end) sum_0703,
+       sum( case when rfpm='0705' then cnt else 0 end) sum_0705
+from r
+where r.riac_id in (120, 121)
+
+union 
+
+select ' 9. снятые, человек' line, 
+       sum( case when rfpm='0702' then cnt else 0 end) sum_0702,
+       sum( case when rfpm='0701' then cnt else 0 end) sum_0701,
+       sum( case when rfpm='0703' then cnt else 0 end) sum_0703,
+       sum( case when rfpm='0705' then cnt else 0 end) sum_0705
+from r
+where r.riac_id in (151, 52)
+
+union 
+
+select '10. численность выплат на конец месяца, человек' line, 
+       sum( case when rfpm='0702' then cnt else 0 end) cnt_0702,
+       sum( case when rfpm='0701' then cnt else 0 end) cnt_0701,
+       sum( case when rfpm='0703' then cnt else 0 end) cnt_0703,
+       sum( case when rfpm='0705' then cnt else 0 end) cnt_0705
+from (       
+  select substr(d.rfpm_id, 1, 4) rfpm, count(unique d.pncd_id) cnt
+  From pnpd_document d, dt
+  Where d.pncp_date = dt.dt_from
+  And substr(d.rfpm_id,1,4) in ('0701','0702','0703','0705')
+  And d.ridt_id In (4,6, 7, 8)
+  And d.status In (0, 1, 2, 3, 5, 7) 
+  And d.pnsp_id > 0
+  Group By substr(d.rfpm_id, 1, 4)
+)
+
 ) order by line
+
 """
 
 
@@ -106,8 +192,8 @@ def format_worksheet(worksheet, common_format, title_format, title_format_it, da
 
 	worksheet.merge_range('A5:A6', 'Наименование', title_format)
 	worksheet.merge_range('B5:E5', 'По видам социальных рисков', title_format)
-	worksheet.write(5,1, '0701 - по случаю потери кормильца', title_format)
-	worksheet.write(5,2, '0702 - по случаю утраты трудоспособности', title_format)
+	worksheet.write(5,1, '0702 - по случаю утраты трудоспособности', title_format)
+	worksheet.write(5,2, '0701 - по случаю потери кормильца', title_format)
 	worksheet.write(5,3, '0703 - по случаю потери работы', title_format)
 	worksheet.write(5,4, '0705 - по случаю потери дохода в связи с уходом за ребенком по достижении им возраста 1,5 лет', title_format)
 
@@ -155,9 +241,9 @@ def do_report(file_name: str, date_first: str):
 			title_format_it.set_align('vcenter')
 			title_format_it.set_italic()
 
-			title_report_code = workbook.add_format({'align': 'right', 'font_size': '10'})
-			title_report_code.set_align('vcenter')
-			title_report_code.set_bold()
+			date_create_format = workbook.add_format({'align': 'right', 'font_size': '10'})
+			date_create_format.set_align('vcenter')
+			date_create_format.set_italic()
 
 			common_format = workbook.add_format({'align': 'center', 'font_color': 'black', 'text_wrap': True, 'font_size': '18' })
 			common_format.set_align('vcenter')
@@ -251,7 +337,7 @@ def do_report(file_name: str, date_first: str):
 			stop_time = now.strftime("%H:%M:%S")
 			worksheet[page_num-1].write(row_cnt+shift_row+1, 0, '* потребность на месяц', title_format_it)
 			info = f'Дата формирования: {now.strftime("%d.%m.%Y ")}({s_date} - {stop_time})'
-			worksheet[page_num-1].write(row_cnt+shift_row+1, 4, info, title_report_code)
+			worksheet[page_num-1].write(row_cnt+shift_row+1, 4, info, date_create_format)
 
 			workbook.close()
 
@@ -269,4 +355,4 @@ def thread_report(file_name: str, date_first: str):
 
 if __name__ == "__main__":
     log.info(f'Отчет {report_code} запускается.')
-    do_report('minSO_01.xlsx', '01.10.2022','31.10.2022')
+    do_report('test_dyn9.xlsx', '01.10.2022','31.10.2022')
