@@ -63,7 +63,7 @@ def format_worksheet(worksheet, common_format):
 	worksheet.merge_range('E3:E4', 'кол-во мужчин', common_format)
 	worksheet.merge_range('F3:F4', 'Сумма', common_format)
 
-def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
+def do_report(file_name: str, date_first: str, date_second: str, rfbn_id: str):
 	if os.path.isfile(file_name):
 		log.info(f'Отчет уже существует {file_name}')
 		return file_name
@@ -148,7 +148,7 @@ def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 			m_val = [0]
 
 			log.info(f'{file_name}. Загружаем данные с {date_first} по {date_second}')
-			cursor.execute(active_stmt, dt_from=date_first,dt_to=date_second, id_region=srfbn_id)
+			cursor.execute(active_stmt, dt_from=date_first,dt_to=date_second, id_region=rfbn_id)
 
 			records = cursor.fetchall()
 			
@@ -184,10 +184,10 @@ def do_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
 			log.info(f'REPORT: {report_code}. Формирование отчета {file_name} завершено ({s_date} - {stop_time}). Загружено {row_cnt-1} записей')
 
 
-def thread_report(file_name: str, date_first: str, date_second: str, srfbn_id: str):
+def thread_report(file_name: str, date_first: str, date_second: str, rfbn_id: str):
 	import threading
 	log.info(f'THREAD REPORT. DATE BETWEEN REPORT: {date_first} - {date_second}, FILE_NAME: {file_name}, srfbn_id: {srfbn_id}')
-	threading.Thread(target=do_report, args=(file_name, date_first, date_second, srfbn_id), daemon=True).start()
+	threading.Thread(target=do_report, args=(file_name, date_first, date_second, rfbn_id), daemon=True).start()
 	return {"status": 1, "file_path": file_name}
 
 
