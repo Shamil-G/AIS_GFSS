@@ -19,12 +19,12 @@ with all_data as (
                and    sfa.date_approve >= to_date(:d1,'YYYY-MM-DD') 
                and    sfa.date_approve <  to_date(:d2,'YYYY-MM-DD') + 1
                and    si.pay_month > case when substr(sfa.rfpm_id,1,4)='0704' 
-                                              then add_months(sfa.risk_date,-13)
-                                         else add_months(sfa.risk_date,-25)
+                                          then add_months(sfa.risk_date,-13)
+                                          else add_months(sfa.risk_date,-25)
                                      end
                and    si.pay_month < trunc(sfa.risk_date,'MM')
                and    si.pay_date > case when substr(sfa.rfpm_id,1,4)='0704' 
-                                              then add_months(sfa.risk_date,-13)
+                                         then add_months(sfa.risk_date,-13)
                                          else add_months(sfa.risk_date,-25)
                                     end
                and    si.pay_date < sfa.risk_date + 60

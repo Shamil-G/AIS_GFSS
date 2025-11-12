@@ -45,8 +45,8 @@ from (
       select sicid, rfpm_id from ep
       minus
       select sicid, rfpm_id from non_ep
-     )b, all_data a
-where b.sicid=a.sicid and b.rfpm_id=a.rfpm_id
+     )b, ep
+where b.sicid=ep.sicid and b.rfpm_id=ep.rfpm_id
 group by ep.sicid, ep.rfbn_id, ep.iin, ep.rfpm_id, ep.risk_date, ep.sum_avg, ep.kzd, ep.mrzp, ep.count_donation, ep.sum_all, ep.date_approve
 """
 
