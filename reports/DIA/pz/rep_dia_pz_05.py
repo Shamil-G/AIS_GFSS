@@ -17,28 +17,36 @@ with all_data as (
                from   si_member_2 si, sipr_maket_first_approve_2 sfa
                where  si.sicid=sfa.sicid
                and    sfa.date_approve >= to_date(:d1,'YYYY-MM-DD') 
-			   and    sfa.date_approve <  to_date(:d2,'YYYY-MM-DD') + 1
-               and    si.pay_month between add_months(sfa.risk_date,-24) and sfa.risk_date
-               and    si.pay_date > add_months(sfa.risk_date,-24)
+               and    sfa.date_approve <  to_date(:d2,'YYYY-MM-DD') + 1
+               and    si.pay_month > case when substr(sfa.rfpm_id,1,4)='0704' 
+                                              then add_months(sfa.risk_date,-13)
+                                         else add_months(sfa.risk_date,-25)
+                                     end
+               and    si.pay_month <= sfa.risk_date
+               and    si.pay_date > case when substr(sfa.rfpm_id,1,4)='0704' 
+                                              then add_months(sfa.risk_date,-13)
+                                         else add_months(sfa.risk_date,-25)
+                                    end
+               and    si.pay_date < sfa.risk_date + 60
          ),
 ep as (
-               select unique sicid
+               select unique sicid, rfpm_id
                from   all_data a
                where  nvl(a.type_payment,'X')='P'
          )
         ,
 non_ep as (
-               select unique sicid
+               select unique sicid, rfpm_id
                from   all_data a
                where  nvl(a.type_payment,'X')!='P' --or type_payer is null
          )
 select a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd, a.mrzp, a.count_donation, a.sum_all, a.date_approve
 from (
-      select sicid from ep
+      select sicid, rfpm_id from ep
       intersect
-      select sicid from non_ep
+      select sicid, rfpm_id from non_ep
      )b, all_data a
-where b.sicid=a.sicid
+where b.sicid=a.sicid and b.rfpm_id=a.rfpm_id
 group by a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd, a.mrzp, a.count_donation, a.sum_all, a.date_approve
 """
 
