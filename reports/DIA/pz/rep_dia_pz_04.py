@@ -22,7 +22,7 @@ with all_data as (
                                               then add_months(sfa.risk_date,-13)
                                          else add_months(sfa.risk_date,-25)
                                      end
-               and    si.pay_month <= sfa.risk_date
+               and    si.pay_month < trunc(sfa.risk_date,'MM')
                and    si.pay_date > case when substr(sfa.rfpm_id,1,4)='0704' 
                                               then add_months(sfa.risk_date,-13)
                                          else add_months(sfa.risk_date,-25)
