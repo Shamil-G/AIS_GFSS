@@ -30,23 +30,23 @@ with all_data as (
                and    si.pay_date < sfa.risk_date + 60
          ),
 ep as (
-               select unique sicid, rfpm_id
+               select unique sicid, rfpm_id, risk_date
                from   all_data a
                where  nvl(a.type_payment,'X')='P'
          )
         ,
 non_ep as (
-               select unique sicid, rfpm_id
+               select unique sicid, rfpm_id, risk_date
                from   all_data a
                where  nvl(a.type_payment,'X')!='P' --or type_payer is null
          )
 select a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd, a.mrzp, a.count_donation, a.sum_all, a.date_approve
 from (
-      select sicid, rfpm_id from ep
+      select sicid, rfpm_id, risk_date from ep
       intersect
-      select sicid, rfpm_id from non_ep
+      select sicid, rfpm_id, risk_date from non_ep
      )b, all_data a
-where b.sicid=a.sicid and b.rfpm_id=a.rfpm_id
+where b.sicid=a.sicid and b.rfpm_id=a.rfpm_id and b.risk_date=a.risk_date
 group by a.sicid, a.rfbn_id, a.iin, a.rfpm_id, a.risk_date, a.sum_avg, a.kzd, a.mrzp, a.count_donation, a.sum_all, a.date_approve
 """
 

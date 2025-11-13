@@ -36,17 +36,17 @@ ep as (
          )
         ,
 non_ep as (
-               select unique sicid, rfpm_id
+               select unique sicid, rfpm_id, risk_date
                from   all_data a
                where  nvl(a.type_payment,'X')!='P' --or type_payer is null
          )
 select ep.sicid, ep.rfbn_id, ep.iin, ep.rfpm_id, ep.risk_date, ep.sum_avg, ep.kzd, ep.mrzp, ep.count_donation, ep.sum_all, ep.date_approve
 from (
-      select sicid, rfpm_id from ep
+      select sicid, rfpm_id, risk_date from ep
       minus
-      select sicid, rfpm_id from non_ep
+      select sicid, rfpm_id, risk_date from non_ep
      )b, ep
-where b.sicid=ep.sicid and b.rfpm_id=ep.rfpm_id
+where b.sicid=ep.sicid and b.rfpm_id=ep.rfpm_id and b.risk_date=ep.risk_date
 group by ep.sicid, ep.rfbn_id, ep.iin, ep.rfpm_id, ep.risk_date, ep.sum_avg, ep.kzd, ep.mrzp, ep.count_donation, ep.sum_all, ep.date_approve
 """
 
